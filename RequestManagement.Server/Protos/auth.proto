@@ -1,0 +1,38 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+package auth;
+
+// Сервис аутентификации
+service AuthService {
+    rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse);
+    rpc Authorize (AuthorizeRequest) returns (AuthorizeResponse);
+}
+
+// Сообщения для запросов и ответов
+
+// Запрос на аутентификацию
+message AuthenticateRequest {
+    string login = 1;         // Логин пользователя
+    string password = 2;      // Пароль пользователя
+}
+
+// Ответ на аутентификацию
+message AuthenticateResponse {
+    int32 user_id = 1;        // ID пользователя (0, если аутентификация не удалась)
+    string login = 2;         // Логин пользователя
+    int32 role = 3;           // Роль пользователя (enum UserRole)
+    string token = 4;         // JWT-токен для дальнейших запросов
+}
+
+// Запрос на проверку прав доступа
+message AuthorizeRequest {
+    int32 user_id = 1;        // ID пользователя
+    int32 required_role = 2;  // Требуемая роль (enum UserRole)
+}
+
+// Ответ на проверку прав доступа
+message AuthorizeResponse {
+    bool is_authorized = 1;   // Признак наличия прав
+}

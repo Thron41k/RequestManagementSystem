@@ -1,0 +1,99 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+package request;
+
+import "google/protobuf/timestamp.proto";
+
+// Сервис для работы с заявками
+service RequestService {
+    rpc CreateRequest (CreateRequestRequest) returns (CreateRequestResponse);
+    rpc DeleteRequest (DeleteRequestRequest) returns (DeleteRequestResponse);
+    rpc UpdateRequest (UpdateRequestRequest) returns (UpdateRequestResponse);
+    rpc GetRequest (GetRequestRequest) returns (GetRequestResponse);
+    rpc GetAllRequests (GetAllRequestsRequest) returns (GetAllRequestsResponse);
+}
+
+// Сообщения для запросов и ответов
+
+// Запрос на создание заявки
+message CreateRequestRequest {
+    string number = 1;                       // Номер заявки
+    google.protobuf.Timestamp creation_date = 2;  // Дата создания
+    google.protobuf.Timestamp due_date = 3;       // Срок исполнения
+    string comment = 4;                      // Комментарий к заявке
+    string execution_comment = 5;            // Комментарий по исполнению
+    int32 status = 6;                        // Статус заявки (enum RequestStatus)
+    int32 equipment_id = 7;                  // ID назначения (техники)
+    repeated Item items = 8;                 // Список наименований
+}
+
+// Ответ на создание заявки
+message CreateRequestResponse {
+    int32 request_id = 1;                    // ID созданной заявки
+}
+
+// Запрос на удаление заявки
+message DeleteRequestRequest {
+    int32 request_id = 1;                    // ID заявки для удаления
+}
+
+// Ответ на удаление заявки
+message DeleteRequestResponse {
+    bool success = 1;                        // Признак успешного удаления
+}
+
+// Запрос на обновление заявки
+message UpdateRequestRequest {
+    int32 request_id = 1;                    // ID заявки для обновления
+    string number = 2;                       // Номер заявки
+    google.protobuf.Timestamp creation_date = 3;  // Дата создания
+    google.protobuf.Timestamp due_date = 4;       // Срок исполнения
+    string comment = 5;                      // Комментарий к заявке
+    string execution_comment = 6;            // Комментарий по исполнению
+    int32 status = 7;                        // Статус заявки (enum RequestStatus)
+    int32 equipment_id = 8;                  // ID назначения (техники)
+    repeated Item items = 9;                 // Список наименований
+}
+
+// Ответ на обновление заявки
+message UpdateRequestResponse {
+    bool success = 1;                        // Признак успешного обновления
+}
+
+// Запрос на получение заявки по ID
+message GetRequestRequest {
+    int32 request_id = 1;                    // ID заявки
+}
+
+// Ответ с данными заявки
+message GetRequestResponse {
+    int32 request_id = 1;                    // ID заявки
+    string number = 2;                       // Номер заявки
+    google.protobuf.Timestamp creation_date = 3;  // Дата создания
+    google.protobuf.Timestamp due_date = 4;       // Срок исполнения
+    string comment = 5;                      // Комментарий к заявке
+    string execution_comment = 6;            // Комментарий по исполнению
+    int32 status = 7;                        // Статус заявки (enum RequestStatus)
+    int32 equipment_id = 8;                  // ID назначения (техники)
+    repeated Item items = 9;                 // Список наименований
+}
+
+// Запрос на получение всех заявок
+message GetAllRequestsRequest {}
+
+// Ответ со списком всех заявок
+message GetAllRequestsResponse {
+    repeated GetRequestResponse requests = 1;  // Список заявок
+}
+
+// Сообщение для наименования
+message Item {
+    int32 id = 1;                            // ID наименования
+    string name = 2;                         // Название наименования
+    string article = 3;                      // Артикул
+    int32 quantity = 4;                      // Количество
+    string note = 5;                         // Примечание
+    int32 status = 6;                        // Статус наименования (enum ItemStatus)
+}
