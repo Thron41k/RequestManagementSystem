@@ -1,8 +1,5 @@
 ﻿using Grpc.Core;
-using Microsoft.Extensions.Logging;
 using RequestManagement.Common.Interfaces;
-using RequestManagement.Common.Models;
-using System.Threading.Tasks;
 using RequestManagement.Common.Models.Enums;
 
 namespace RequestManagement.Server.Controllers
@@ -20,7 +17,7 @@ namespace RequestManagement.Server.Controllers
         {
             logger.LogInformation("Creating new request with number: {Number}", request.Number);
 
-            var newRequest = new Request
+            var newRequest = new Common.Models.Request
             {
                 Number = request.Number,
                 CreationDate = DateTime.SpecifyKind(request.CreationDate.ToDateTime(), DateTimeKind.Utc),
@@ -53,7 +50,7 @@ namespace RequestManagement.Server.Controllers
         {
             logger.LogInformation("Updating request with ID: {RequestId}", request.RequestId);
 
-            var updatedRequest = new Request
+            var updatedRequest = new Common.Models.Request
             {
                 Id = request.RequestId,
                 Number = request.Number,

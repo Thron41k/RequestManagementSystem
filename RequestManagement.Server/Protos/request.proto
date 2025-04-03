@@ -90,10 +90,9 @@ message GetAllRequestsResponse {
 
 // Сообщение для наименования
 message Item {
-    int32 id = 1;                            // ID наименования
-    string name = 2;                         // Название наименования
-    string article = 3;                      // Артикул
-    int32 quantity = 4;                      // Количество
-    string note = 5;                         // Примечание
-    int32 status = 6;                        // Статус наименования (enum ItemStatus)
+    int32 id = 1;
+    int32 nomenclature_id = 2; // Заменяем name и article
+    int32 quantity = 3;
+    string note = 4;
+    int32 status = 5;
 }

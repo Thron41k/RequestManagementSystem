@@ -1,0 +1,33 @@
+﻿<Window x:Class="WpfClient.Views.MainMenu"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:WpfClient.Views"
+        Title="Request Management" Height="400" Width="600">
+    <Window.Resources>
+        <ResourceDictionary Source="MainDictionary.xaml" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Меню -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="Заявки">
+                <MenuItem Header="Просмотреть все заявки" Command="{Binding ViewRequestsCommand}"/>
+                <MenuItem Header="Создать заявку" Command="{Binding CreateRequestCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Справочники" Visibility="{Binding IsAdminVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <MenuItem Header="Машины" Command="{Binding EditEquipmentCommand}"/>
+                <MenuItem Header="Водители" Command="{Binding EditDriversCommand}"/>
+                <MenuItem Header="Группы дефектов" Command="{Binding EditDefectGroupsCommand}"/>
+                <MenuItem Header="Деффекты" Command="{Binding EditDefectsCommand}"/>
+                <MenuItem Header="Номенклатура" Command="{Binding EditNomenclatureCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Контент -->
+        <ContentControl Grid.Row="1" Content="{Binding CurrentView}"/>
+    </Grid>
+</Window>

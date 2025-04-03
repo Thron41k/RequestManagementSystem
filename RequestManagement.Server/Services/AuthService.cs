@@ -28,7 +28,8 @@ namespace RequestManagement.Server.Services
                 throw new ArgumentException("Login cannot be null or empty", nameof(login));
             if (string.IsNullOrWhiteSpace(password))
                 throw new ArgumentException("Password cannot be null or empty", nameof(password));
-
+            var tmp_pass = BCrypt.Net.BCrypt.HashPassword(password);
+            Console.WriteLine(tmp_pass);
             var user = await _userService.GetUserByLoginAsync(login);
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
                 return null;

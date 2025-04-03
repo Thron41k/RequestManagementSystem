@@ -1,0 +1,171 @@
+﻿@model RequestManagement.Client.Models.RequestViewModel
+
+@{
+    ViewData["Title"] = "Редактирование заявки";
+}
+
+<h2>Редактирование заявки #@Model.Number</h2>
+
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    @if (User.IsInRole("Administrator"))
+    {
+        <div class="form-group">
+            <label asp-for="Number">Номер заявки</label>
+            <input asp-for="Number" class="form-control" />
+            <span asp-validation-for="Number" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CreationDate">Дата создания</label>
+            <input asp-for="CreationDate" class="form-control" type="date" value="@Model.CreationDate.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="CreationDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DueDate">Срок исполнения</label>
+            <input asp-for="DueDate" class="form-control" type="date" value="@Model.DueDate.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="DueDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Comment">Комментарий</label>
+            <textarea asp-for="Comment" class="form-control" rows="3">@Model.Comment</textarea>
+            <span asp-validation-for="Comment" class="text-danger"></span>
+        </div>
+    }
+    else
+    {
+        <input type="hidden" asp-for="Number" />
+        <input type="hidden" asp-for="CreationDate" />
+        <input type="hidden" asp-for="DueDate" />
+        <input type="hidden" asp-for="Comment" />
+    }
+
+    <div class="form-group">
+        <label asp-for="ExecutionComment">Комментарий по исполнению</label>
+        <textarea asp-for="ExecutionComment" class="form-control" rows="3">@Model.ExecutionComment</textarea>
+        <span asp-validation-for="ExecutionComment" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Status">Статус</label>
+        <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<RequestManagement.Common.Models.Enums.RequestStatus>()"></select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    @if (User.IsInRole("Administrator"))
+    {
+        <div class="form-group">
+            <label asp-for="EquipmentId">ID техники</label>
+            <input asp-for="EquipmentId" class="form-control" type="number" />
+            <span asp-validation-for="EquipmentId" class="text-danger"></span>
+        </div>
+
+        <h4>Наименования</h4>
+        <div id="items-container">
+            @for (int i = 0; i < Model.Items.Count; i++)
+            {
+                <div class="item-row mb-3" data-index="@i">
+                    <input type="hidden" asp-for="Items[i].Id" />
+                    <div class="form-group">
+                        <label asp-for="Items[i].Name">Название</label>
+                        <input asp-for="Items[i].Name" class="form-control" />
+                        <span asp-validation-for="Items[i].Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Items[i].Article">Артикул</label>
+                        <input asp-for="Items[i].Article" class="form-control" />
+                        <span asp-validation-for="Items[i].Article" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Items[i].Quantity">Количество</label>
+                        <input asp-for="Items[i].Quantity" class="form-control" type="number" />
+                        <span asp-validation-for="Items[i].Quantity" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Items[i].Note">Примечание</label>
+                        <textarea asp-for="Items[i].Note" class="form-control" rows="2">@Model.Items[i].Note</textarea>
+                        <span asp-validation-for="Items[i].Note" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Items[i].Status">Статус</label>
+                        <select asp-for="Items[i].Status" class="form-control" asp-items="Html.GetEnumSelectList<RequestManagement.Common.Models.Enums.ItemStatus>()"></select>
+                        <span asp-validation-for="Items[i].Status" class="text-danger"></span>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-item">Удалить</button>
+                </div>
+            }
+        </div>
+        <button type="button" id="add-item" class="btn btn-secondary mb-3">Добавить наименование</button>
+    }
+    else
+    {
+        <input type="hidden" asp-for="EquipmentId" />
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            <input type="hidden" asp-for="Items[i].Id" />
+            <input type="hidden" asp-for="Items[i].Name" />
+            <input type="hidden" asp-for="Items[i].Article" />
+            <input type="hidden" asp-for="Items[i].Quantity" />
+            <input type="hidden" asp-for="Items[i].Note" />
+            <input type="hidden" asp-for="Items[i].Status" />
+        }
+    }
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let itemIndex = @Model.Items.Count;
+
+        document.getElementById('add-item')?.addEventListener('click', function () {
+            const container = document.getElementById('items-container');
+            const itemHtml = `
+                <div class="item-row mb-3" data-index="${itemIndex}">
+                    <div class="form-group">
+                        <label>Название</label>
+                        <input name="Items[${itemIndex}].Name" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Артикул</label>
+                        <input name="Items[${itemIndex}].Article" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Количество</label>
+                        <input name="Items[${itemIndex}].Quantity" class="form-control" type="number" value="1" />
+                    </div>
+                    <div class="form-group">
+                        <label>Примечание</label>
+                        <textarea name="Items[${itemIndex}].Note" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Статус</label>
+                        <select name="Items[${itemIndex}].Status" class="form-control">
+        @foreach (var status in Enum.GetValues(typeof(RequestManagement.Common.Models.Enums.ItemStatus)))
+        {
+                                    <option value="@((int)status)">@status</option>
+        }
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-item">Удалить</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', itemHtml);
+            itemIndex++;
+        });
+
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-item')) {
+                e.target.closest('.item-row').remove();
+            }
+        });
+    </script>
+}

@@ -7,43 +7,12 @@ namespace RequestManagement.Common.Models;
 /// </summary>
 public class Item
 {
-    /// <summary>
-    /// Уникальный идентификатор наименования
-    /// </summary>
     public int Id { get; set; }
-
-    /// <summary>
-    /// Название наименования
-    /// </summary>
-    public string Name { get; set; }
-
-    /// <summary>
-    /// Артикул наименования
-    /// </summary>
-    public string Article { get; set; }
-
-    /// <summary>
-    /// Количество наименования
-    /// </summary>
+    public int NomenclatureId { get; set; }    // Ссылка на номенклатуру
+    public Nomenclature Nomenclature { get; set; } // Навигационное свойство
     public int Quantity { get; set; }
-
-    /// <summary>
-    /// Примечание к наименованию
-    /// </summary>
-    public string? Note { get; set; }
-
-    /// <summary>
-    /// Статус наименования
-    /// </summary>
+    public string Note { get; set; }
     public ItemStatus Status { get; set; }
-
-    /// <summary>
-    /// Идентификатор заявки, к которой относится наименование
-    /// </summary>
     public int RequestId { get; set; }
-
-    /// <summary>
-    /// Ссылка на заявку (навигационное свойство)
-    /// </summary>
     public Request Request { get; set; }
 }
