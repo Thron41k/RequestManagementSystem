@@ -142,8 +142,8 @@ namespace RequestManagement.Server.Services
                 ExecutionComment = "",
                 Status = RequestStatus.Created,
                 EquipmentId = equipment.Id,
-                Items = new List<Item>
-                {
+                Items =
+                [
                     new Item
                     {
                         NomenclatureId = 1, // Турбокомпрессор
@@ -151,6 +151,7 @@ namespace RequestManagement.Server.Services
                         Note = "",
                         Status = ItemStatus.Pending
                     },
+
                     new Item
                     {
                         NomenclatureId = 2, // Аккумулятор 6СТ-190
@@ -158,7 +159,7 @@ namespace RequestManagement.Server.Services
                         Note = "",
                         Status = ItemStatus.Pending
                     }
-                }
+                ]
             };
 
             _dbContext.Requests.Add(request);

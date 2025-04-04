@@ -1,0 +1,308 @@
+﻿using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
+using RequestManagement.Common.Models;
+using RequestManagement.Common.Models.Enums;
+using RequestManagement.Server.Controllers;
+using RequestManagement.Server.Data;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace RequestManagement.Server.Services
+{
+    /// <summary>
+    /// Сервис для работы с заявками и оборудованием через gRPC
+    /// </summary>
+    public class RequestService22 : Controllers.RequestService.RequestServiceBase
+    {
+        private readonly ApplicationDbContext _dbContext;
+
+        public RequestService22(ApplicationDbContext dbContext)
+        {
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        }
+
+        /// <summary>
+        /// Получает список всех заявок
+        /// </summary>
+        public override async Task<GetAllRequestsResponse> GetAllRequests(GetAllRequestsRequest request, ServerCallContext context)
+        {
+            var requests = await _dbContext.Requests
+                .Include(r => r.Items)
+                    .ThenInclude(i => i.Nomenclature)
+                .Include(r => r.Equipment)
+                .ToListAsync();
+
+            var response = new GetAllRequestsResponse();
+            response.Requests.AddRange(requests.Select(r => new RequestManagement.Server.Controllers.Request
+            {
+                RequestId = r.Id,
+                Number = r.Number,
+                CreationDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(r.CreationDate.ToUniversalTime()),
+                DueDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(r.DueDate.ToUniversalTime()),
+                Comment = r.Comment ?? "",
+                ExecutionComment = r.ExecutionComment ?? "",
+                Status = (int)r.Status,
+                EquipmentId = r.EquipmentId,
+                Items = { r.Items.Select(i => new RequestManagement.Server.Controllers.Item
+                {
+                    Id = i.Id,
+                    NomenclatureId = i.NomenclatureId,
+                    Quantity = i.Quantity,
+                    Note = i.Note ?? "",
+                    Status = (int)i.Status
+                }) }
+            }));
+
+            return response;
+        }
+
+        /// <summary>
+        /// Получает заявку по идентификатору
+        /// </summary>
+        public override async Task<RequestManagement.Server.Controllers.Request> GetRequest(GetRequestRequest request, ServerCallContext context)
+        {
+            var req = await _dbContext.Requests
+                .Include(r => r.Items)
+                    .ThenInclude(i => i.Nomenclature)
+                .Include(r => r.Equipment)
+                .FirstOrDefaultAsync(r => r.Id == request.RequestId);
+
+            if (req == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, $"Request with ID {request.RequestId} not found."));
+            }
+
+            return new RequestManagement.Server.Controllers.Request
+            {
+                RequestId = req.Id,
+                Number = req.Number,
+                CreationDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(req.CreationDate.ToUniversalTime()),
+                DueDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(req.DueDate.ToUniversalTime()),
+                Comment = req.Comment ?? "",
+                ExecutionComment = req.ExecutionComment ?? "",
+                Status = (int)req.Status,
+                EquipmentId = req.EquipmentId,
+                Items = { req.Items.Select(i => new RequestManagement.Server.Controllers.Item
+                {
+                    Id = i.Id,
+                    NomenclatureId = i.NomenclatureId,
+                    Quantity = i.Quantity,
+                    Note = i.Note ?? "",
+                    Status = (int)i.Status
+                }) }
+            };
+        }
+
+        /// <summary>
+        /// Создает новую заявку
+        /// </summary>
+        public override async Task<CreateRequestResponse> CreateRequest(CreateRequestRequest request, ServerCallContext context)
+        {
+            var newRequest = new RequestManagement.Common.Models.Request
+            {
+                Number = request.Number,
+                CreationDate = request.CreationDate.ToDateTime(),
+                DueDate = request.DueDate.ToDateTime(),
+                Comment = request.Comment,
+                ExecutionComment = request.ExecutionComment,
+                Status = (RequestStatus)request.Status,
+                EquipmentId = request.EquipmentId,
+                Items = request.Items.Select(i => new RequestManagement.Common.Models.Item
+                {
+                    NomenclatureId = i.NomenclatureId,
+                    Quantity = i.Quantity,
+                    Note = i.Note,
+                    Status = (ItemStatus)i.Status
+                }).ToList()
+            };
+
+            foreach (var item in newRequest.Items)
+            {
+                if (!await _dbContext.Nomenclature.AnyAsync(n => n.Id == item.NomenclatureId))
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, $"Nomenclature with ID {item.NomenclatureId} not found."));
+            }
+
+            _dbContext.Requests.Add(newRequest);
+            await _dbContext.SaveChangesAsync();
+
+            return new CreateRequestResponse { RequestId = newRequest.Id };
+        }
+
+        /// <summary>
+        /// Обновляет существующую заявку
+        /// </summary>
+        public override async Task<UpdateRequestResponse> UpdateRequest(UpdateRequestRequest request, ServerCallContext context)
+        {
+            var existingRequest = await _dbContext.Requests
+                .Include(r => r.Items)
+                .FirstOrDefaultAsync(r => r.Id == request.RequestId);
+
+            if (existingRequest == null)
+            {
+                return new UpdateRequestResponse { Success = false };
+            }
+
+            existingRequest.Number = request.Number;
+            existingRequest.CreationDate = request.CreationDate.ToDateTime();
+            existingRequest.DueDate = request.DueDate.ToDateTime();
+            existingRequest.Comment = request.Comment;
+            existingRequest.ExecutionComment = request.ExecutionComment;
+            existingRequest.Status = (RequestStatus)request.Status;
+            existingRequest.EquipmentId = request.EquipmentId;
+
+            _dbContext.Items.RemoveRange(existingRequest.Items);
+            existingRequest.Items = request.Items.Select(i => new RequestManagement.Common.Models.Item
+            {
+                Id = i.Id,
+                NomenclatureId = i.NomenclatureId,
+                Quantity = i.Quantity,
+                Note = i.Note,
+                Status = (ItemStatus)i.Status
+            }).ToList();
+
+            foreach (var item in existingRequest.Items)
+            {
+                if (!await _dbContext.Nomenclature.AnyAsync(n => n.Id == item.NomenclatureId))
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, $"Nomenclature with ID {item.NomenclatureId} not found."));
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return new UpdateRequestResponse { Success = true };
+        }
+
+        /// <summary>
+        /// Удаляет заявку по идентификатору
+        /// </summary>
+        public override async Task<DeleteRequestResponse> DeleteRequest(DeleteRequestRequest request, ServerCallContext context)
+        {
+            var req = await _dbContext.Requests
+                .Include(r => r.Items)
+                .FirstOrDefaultAsync(r => r.Id == request.RequestId);
+
+            if (req == null)
+            {
+                return new DeleteRequestResponse { Success = false };
+            }
+
+            _dbContext.Requests.Remove(req);
+            await _dbContext.SaveChangesAsync();
+
+            return new DeleteRequestResponse { Success = true };
+        }
+
+        /// <summary>
+        /// Получает список всех машин
+        /// </summary>
+        public override async Task<GetAllEquipmentResponse> GetAllEquipment(GetAllEquipmentRequest request, ServerCallContext context)
+        {
+            var equipmentList = await _dbContext.Equipments.ToListAsync();
+            var response = new GetAllEquipmentResponse();
+            response.Equipment.AddRange(equipmentList.Select(e => new RequestManagement.Server.Controllers.Equipment
+            {
+                Id = e.Id,
+                Name = e.Name,
+                LicensePlate = e.StateNumber // Используем StateNumber вместо LicensePlate
+            }));
+            return response;
+        }
+
+        /// <summary>
+        /// Создает новую машину
+        /// </summary>
+        public override async Task<CreateEquipmentResponse> CreateEquipment(CreateEquipmentRequest request, ServerCallContext context)
+        {
+            var equipment = new RequestManagement.Common.Models.Equipment
+            {
+                Name = request.Name,
+                StateNumber = request.LicensePlate // Используем StateNumber вместо LicensePlate
+            };
+
+            _dbContext.Equipments.Add(equipment);
+            await _dbContext.SaveChangesAsync();
+
+            return new CreateEquipmentResponse { Id = equipment.Id };
+        }
+
+        /// <summary>
+        /// Обновляет существующую машину
+        /// </summary>
+        public override async Task<UpdateEquipmentResponse> UpdateEquipment(UpdateEquipmentRequest request, ServerCallContext context)
+        {
+            var equipment = await _dbContext.Equipments.FirstOrDefaultAsync(e => e.Id == request.Id);
+            if (equipment == null)
+            {
+                return new UpdateEquipmentResponse { Success = false };
+            }
+
+            equipment.Name = request.Name;
+            equipment.StateNumber = request.LicensePlate; // Используем StateNumber вместо LicensePlate
+
+            await _dbContext.SaveChangesAsync();
+            return new UpdateEquipmentResponse { Success = true };
+        }
+
+        /// <summary>
+        /// Удаляет машину по идентификатору
+        /// </summary>
+        public override async Task<DeleteEquipmentResponse> DeleteEquipment(DeleteEquipmentRequest request, ServerCallContext context)
+        {
+            var equipment = await _dbContext.Equipments.FirstOrDefaultAsync(e => e.Id == request.Id);
+            if (equipment == null)
+            {
+                return new DeleteEquipmentResponse { Success = false };
+            }
+
+            _dbContext.Equipments.Remove(equipment);
+            await _dbContext.SaveChangesAsync();
+            return new DeleteEquipmentResponse { Success = true };
+        }
+
+        // Дополнительный метод для примера из Excel (опционально)
+        public async Task<int> AddRequestFromExcel()
+        {
+            var equipment = await _dbContext.Equipments
+                .FirstOrDefaultAsync(e => e.StateNumber == "Н 507 СН");
+            if (equipment == null)
+            {
+                equipment = new Equipment { Name = "КАМАЗ 53215-15", StateNumber = "Н 507 СН" };
+                _dbContext.Equipments.Add(equipment);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            var newRequest = new RequestManagement.Common.Models.Request
+            {
+                Number = "БПТР0001043",
+                CreationDate = new DateTime(2025, 4, 2, 0, 0, 0, DateTimeKind.Utc),
+                DueDate = new DateTime(2025, 4, 14, 0, 0, 0, DateTimeKind.Utc),
+                Comment = "АКБ И турбина КАМАЗ 53215-15 г.н. Н 507 СН",
+                ExecutionComment = "",
+                Status = RequestStatus.Created,
+                EquipmentId = equipment.Id,
+                Items =
+                [
+                    new RequestManagement.Common.Models.Item
+                    {
+                        NomenclatureId = 1, // Турбокомпрессор
+                        Quantity = 1,
+                        Note = "",
+                        Status = ItemStatus.Pending
+                    },
+                    new RequestManagement.Common.Models.Item
+                    {
+                        NomenclatureId = 2, // Аккумулятор 6СТ-190
+                        Quantity = 2,
+                        Note = "",
+                        Status = ItemStatus.Pending
+                    }
+                ]
+            };
+
+            _dbContext.Requests.Add(newRequest);
+            await _dbContext.SaveChangesAsync();
+
+            return newRequest.Id;
+        }
+    }
+}

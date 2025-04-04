@@ -13,6 +13,11 @@ service RequestService {
     rpc UpdateRequest (UpdateRequestRequest) returns (UpdateRequestResponse);
     rpc GetRequest (GetRequestRequest) returns (GetRequestResponse);
     rpc GetAllRequests (GetAllRequestsRequest) returns (GetAllRequestsResponse);
+
+    rpc GetAllEquipment (GetAllEquipmentRequest) returns (GetAllEquipmentResponse);
+    rpc CreateEquipment (CreateEquipmentRequest) returns (CreateEquipmentResponse);
+    rpc UpdateEquipment (UpdateEquipmentRequest) returns (UpdateEquipmentResponse);
+    rpc DeleteEquipment (DeleteEquipmentRequest) returns (DeleteEquipmentResponse);
 }
 
 // Сообщения для запросов и ответов
@@ -95,4 +100,36 @@ message Item {
     int32 quantity = 3;
     string note = 4;
     int32 status = 5;
+}
+
+// Сообщения для Equipment
+message GetAllEquipmentRequest {}
+message GetAllEquipmentResponse {
+    repeated Equipment equipment = 1;
+}
+message CreateEquipmentRequest {
+    string name = 1;
+    string license_plate = 2;
+}
+message UpdateEquipmentRequest {
+    int32 id = 1;
+    string name = 2;
+    string license_plate = 3;
+}
+message DeleteEquipmentRequest {
+    int32 id = 1;
+}
+message CreateEquipmentResponse {
+    int32 id = 1;
+}
+message UpdateEquipmentResponse {
+    bool success = 1;
+}
+message DeleteEquipmentResponse {
+    bool success = 1;
+}
+message Equipment {
+    int32 id = 1;
+    string name = 2;
+    string license_plate = 3;
 }
