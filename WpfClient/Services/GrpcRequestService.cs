@@ -1,6 +1,4 @@
 ﻿using Grpc.Core;
-using RequestManagement.Common.Models;
-using RequestManagement.Common.Models.Enums;
 using RequestManagement.Server.Controllers;
 
 namespace WpfClient.Services
@@ -8,123 +6,96 @@ namespace WpfClient.Services
     public class GrpcRequestService
     {
         private readonly RequestService.RequestServiceClient _client;
-
-        public GrpcRequestService(RequestService.RequestServiceClient client)
+        private readonly AuthTokenStore _tokenStore;
+        public GrpcRequestService(RequestService.RequestServiceClient client, AuthTokenStore tokenStore)
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _client = client;
+            _tokenStore = tokenStore;
         }
 
-        private Metadata GetAuthHeaders()
+        public async Task<List<Equipment>> GetAllEquipmentAsync(string filter = "")
         {
-            var token = AuthTokenStore.JwtToken;
-            if (string.IsNullOrEmpty(token))
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
             {
-                throw new InvalidOperationException("JWT token not found.");
+                headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
             }
-            return new Metadata { { "Authorization", $"Bearer {token}" } };
+
+            var response = await _client.GetAllEquipmentAsync(new GetAllEquipmentRequest{ Filter = filter }, headers);
+            return response.Equipment.ToList();
         }
 
-        public async Task<List<Request>> GetAllRequestsAsync()
+        public async Task CreateEquipmentAsync(CreateEquipmentRequest request)
         {
-            var response = await _client.GetAllRequestsAsync(new GetAllRequestsRequest(), GetAuthHeaders());
-            return response.Requests.Select(r => new Request
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
             {
-                Id = r.RequestId,
-                Number = r.Number,
-                CreationDate = r.CreationDate.ToDateTime(),
-                DueDate = r.DueDate.ToDateTime(),
-                Comment = r.Comment,
-                ExecutionComment = r.ExecutionComment,
-                Status = (RequestStatus)r.Status,
-                EquipmentId = r.EquipmentId,
-                Items = r.Items.Select(i => new RequestManagement.Common.Models.Item
-                {
-                    Id = i.Id,
-                    NomenclatureId = i.NomenclatureId,
-                    Quantity = i.Quantity,
-                    Note = i.Note,
-                    Status = (ItemStatus)i.Status
-                }).ToList()
-            }).ToList();
+                headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+            }
+
+            await _client.CreateEquipmentAsync(request, headers);
         }
 
-        public async Task<Request> GetRequestByIdAsync(int id)
+        public async Task UpdateEquipmentAsync(UpdateEquipmentRequest request)
         {
-            var request = new GetRequestRequest { RequestId = id };
-            var response = await _client.GetRequestAsync(request, GetAuthHeaders());
-            return new Request
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
             {
-                Id = response.RequestId,
-                Number = response.Number,
-                CreationDate = response.CreationDate.ToDateTime(),
-                DueDate = response.DueDate.ToDateTime(),
-                Comment = response.Comment,
-                ExecutionComment = response.ExecutionComment,
-                Status = (RequestStatus)response.Status,
-                EquipmentId = response.EquipmentId,
-                Items = response.Items.Select(i => new RequestManagement.Common.Models.Item
-                {
-                    Id = i.Id,
-                    NomenclatureId = i.NomenclatureId,
-                    Quantity = i.Quantity,
-                    Note = i.Note,
-                    Status = (ItemStatus)i.Status
-                }).ToList()
-            };
+                headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+            }
+
+            await _client.UpdateEquipmentAsync(request, headers);
         }
 
-        public async Task CreateRequestAsync(Request request)
+        public async Task DeleteEquipmentAsync(DeleteEquipmentRequest request)
         {
-            var grpcRequest = new CreateRequestRequest
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
             {
-                Number = request.Number,
-                CreationDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(request.CreationDate.ToUniversalTime()),
-                DueDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(request.DueDate.ToUniversalTime()),
-                Comment = request.Comment ?? "",
-                ExecutionComment = request.ExecutionComment ?? "",
-                Status = (int)request.Status,
-                EquipmentId = request.EquipmentId
-            };
-            grpcRequest.Items.AddRange(request.Items.Select(i => new RequestManagement.Server.Controllers.Item
-            {
-                NomenclatureId = i.NomenclatureId,
-                Quantity = i.Quantity,
-                Note = i.Note ?? "",
-                Status = (int)i.Status
-            }));
+                headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+            }
 
-            await _client.CreateRequestAsync(grpcRequest, GetAuthHeaders());
+            await _client.DeleteEquipmentAsync(request, headers);
         }
 
-        public async Task UpdateRequestAsync(Request request)
+        public async Task<List<Driver>> GetAllDriversAsync(string filter = "")
         {
-            var grpcRequest = new UpdateRequestRequest
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
             {
-                RequestId = request.Id,
-                Number = request.Number,
-                CreationDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(request.CreationDate.ToUniversalTime()),
-                DueDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(request.DueDate.ToUniversalTime()),
-                Comment = request.Comment ?? "",
-                ExecutionComment = request.ExecutionComment ?? "",
-                Status = (int)request.Status,
-                EquipmentId = request.EquipmentId
-            };
-            grpcRequest.Items.AddRange(request.Items.Select(i => new RequestManagement.Server.Controllers.Item
+                headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+            }
+            var response = await _client.GetAllDriversAsync(new GetAllDriversRequest { Filter = filter }, headers);
+            return response.Drivers.ToList();
+        }
+        public async Task CreateDriverAsync(CreateDriverRequest request)
+        {
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
             {
-                Id = i.Id,
-                NomenclatureId = i.NomenclatureId,
-                Quantity = i.Quantity,
-                Note = i.Note ?? "",
-                Status = (int)i.Status
-            }));
-
-            await _client.UpdateRequestAsync(grpcRequest, GetAuthHeaders());
+                headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+            }
+            await _client.CreateDriverAsync(request, headers);
         }
 
-        public async Task DeleteRequestAsync(int id)
+        public async Task UpdateDriverAsync(UpdateDriverRequest request)
         {
-            var request = new DeleteRequestRequest { RequestId = id };
-            await _client.DeleteRequestAsync(request, GetAuthHeaders());
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
+            {
+                headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+            }
+            await _client.UpdateDriverAsync(request, headers);
+        }
+
+        public async Task DeleteDriverAsync(DeleteDriverRequest request)
+        {
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
+            {
+                headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+            }
+            await _client.DeleteDriverAsync(request, headers);
         }
     }
 }

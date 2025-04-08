@@ -32,15 +32,15 @@ namespace WpfClient
             {
                 o.Address = new Uri("http://localhost:5001");
             });
-
+            services.AddSingleton<AuthTokenStore>();
             services.AddScoped<GrpcAuthService>();
             services.AddScoped<GrpcRequestService>();
             services.AddScoped<LoginViewModel>();
-            services.AddScoped<RequestsViewModel>();
+            services.AddScoped<EquipmentViewModel>(); // Добавляем ViewModel для оборудования
             services.AddScoped<MainMenuViewModel>();
             services.AddTransient<MainWindow>();
-            services.AddTransient<RequestsWindow>();
             services.AddTransient<MainMenu>();
+            services.AddTransient<EquipmentView>(); // Добавляем представление для оборудования
         }
     }
 }

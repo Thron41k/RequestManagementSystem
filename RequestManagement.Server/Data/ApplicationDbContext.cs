@@ -13,8 +13,6 @@ namespace RequestManagement.Server.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Request> Requests { get; set; }
-        public DbSet<Item> Items { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<Nomenclature> Nomenclature { get; set; }
@@ -27,25 +25,6 @@ namespace RequestManagement.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Отношения для Request и Item
-            modelBuilder.Entity<Request>()
-                .HasMany(r => r.Items)
-                .WithOne(i => i.Request)
-                .HasForeignKey(i => i.RequestId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Request>()
-                .HasOne(r => r.Equipment)
-                .WithMany()
-                .HasForeignKey(r => r.EquipmentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Item>()
-                .HasOne(i => i.Nomenclature)
-                .WithMany()
-                .HasForeignKey(i => i.NomenclatureId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // Отношение Nomenclature -> Warehouse
             modelBuilder.Entity<Nomenclature>()
                 .HasOne(n => n.Warehouse)
@@ -202,7 +181,7 @@ namespace RequestManagement.Server.Data
                 }
             );
 
-            // Начальные данные для Equipment (уже есть, но добавим для примера)
+            // Начальные данные для Equipment
             modelBuilder.Entity<Equipment>().HasData(
                 new Equipment
                 {
@@ -252,10 +231,6 @@ namespace RequestManagement.Server.Data
             // Индексы
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Login)
-                .IsUnique();
-
-            modelBuilder.Entity<Request>()
-                .HasIndex(r => r.Number)
                 .IsUnique();
 
             modelBuilder.Entity<Consumption>()

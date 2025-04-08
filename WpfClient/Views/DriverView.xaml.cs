@@ -4,12 +4,12 @@ using WpfClient.ViewModels;
 namespace WpfClient.Views
 {
     /// <summary>
-    /// Логика взаимодействия для EquipmentView.xaml
+    /// Логика взаимодействия для DriverView.xaml
     /// </summary>
-    public partial class EquipmentView
+    public partial class DriverView
     {
         private readonly bool _editMode;
-        public EquipmentView(EquipmentViewModel viewModel,bool editMode)
+        public DriverView(DriverViewModel viewModel,bool editMode)
         {
             InitializeComponent();
             DataContext = viewModel;

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WpfClient.Views.EquipmentView"
+﻿<UserControl x:Class="WpfClient.Views.DriverView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,16 +11,30 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBox Grid.Row="0"  Text="{Binding NewEquipmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="400" Margin="5" />
+                <TextBox Grid.Row="1"  Text="{Binding NewEquipmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="400" Margin="5" />
+                <TextBox Grid.Row="2"  Text="{Binding NewEquipmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="400" Margin="5" />
+            </Grid>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5" Height="30">
+                <Button Content="Добавить" Command="{Binding AddDriverCommand}" Margin="5"/>
+                <Button Content="Сохранить" Command="{Binding UpdateDriverCommand}" Margin="5"/>
+                <Button Content="Удалить" Command="{Binding DeleteDriverCommand}" Margin="5"/>
+            </StackPanel>
+        </Grid>
+     
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
-            <TextBox Text="{Binding NewEquipmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="400" Margin="5" />
-            <TextBox Text="{Binding NewEquipmentLicensePlate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150" Margin="5" />
-            <Button Content="Добавить" Command="{Binding AddEquipmentCommand}" Margin="5"/>
-            <Button Content="Сохранить" Command="{Binding UpdateEquipmentCommand}" Margin="5"/>
-            <Button Content="Удалить" Command="{Binding DeleteEquipmentCommand}" Margin="5"/>
-        </StackPanel>
-
-        <DataGrid Grid.Row="1" ItemsSource="{Binding EquipmentList}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="5" CanUserResizeRows="False" CanUserAddRows="False">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding DriverList}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="5" CanUserResizeRows="False" CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="50"/>
                 <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>

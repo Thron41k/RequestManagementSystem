@@ -33,4 +33,10 @@
     <ProjectReference Include="..\RequestManagement.Server\RequestManagement.Server.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Views\DriverView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

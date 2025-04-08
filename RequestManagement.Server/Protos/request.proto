@@ -2,134 +2,98 @@
 
 option csharp_namespace = "RequestManagement.Server.Controllers";
 
-package request;
-
 import "google/protobuf/timestamp.proto";
 
-// Сервис для работы с заявками
 service RequestService {
-    rpc CreateRequest (CreateRequestRequest) returns (CreateRequestResponse);
-    rpc DeleteRequest (DeleteRequestRequest) returns (DeleteRequestResponse);
-    rpc UpdateRequest (UpdateRequestRequest) returns (UpdateRequestResponse);
-    rpc GetRequest (GetRequestRequest) returns (GetRequestResponse);
-    rpc GetAllRequests (GetAllRequestsRequest) returns (GetAllRequestsResponse);
-
+    // Методы для работы с оборудованием
     rpc GetAllEquipment (GetAllEquipmentRequest) returns (GetAllEquipmentResponse);
     rpc CreateEquipment (CreateEquipmentRequest) returns (CreateEquipmentResponse);
     rpc UpdateEquipment (UpdateEquipmentRequest) returns (UpdateEquipmentResponse);
     rpc DeleteEquipment (DeleteEquipmentRequest) returns (DeleteEquipmentResponse);
+
+    rpc GetAllDrivers (GetAllDriversRequest) returns (GetAllDriversResponse);
+    rpc CreateDriver (CreateDriverRequest) returns (CreateDriverResponse);
+    rpc UpdateDriver (UpdateDriverRequest) returns (UpdateDriverResponse);
+    rpc DeleteDriver (DeleteDriverRequest) returns (DeleteDriverResponse);
 }
 
-// Сообщения для запросов и ответов
-
-// Запрос на создание заявки
-message CreateRequestRequest {
-    string number = 1;                       // Номер заявки
-    google.protobuf.Timestamp creation_date = 2;  // Дата создания
-    google.protobuf.Timestamp due_date = 3;       // Срок исполнения
-    string comment = 4;                      // Комментарий к заявке
-    string execution_comment = 5;            // Комментарий по исполнению
-    int32 status = 6;                        // Статус заявки (enum RequestStatus)
-    int32 equipment_id = 7;                  // ID назначения (техники)
-    repeated Item items = 8;                 // Список наименований
+// Сообщения для оборудования
+message GetAllEquipmentRequest {
+    string filter = 1;
 }
 
-// Ответ на создание заявки
-message CreateRequestResponse {
-    int32 request_id = 1;                    // ID созданной заявки
-}
-
-// Запрос на удаление заявки
-message DeleteRequestRequest {
-    int32 request_id = 1;                    // ID заявки для удаления
-}
-
-// Ответ на удаление заявки
-message DeleteRequestResponse {
-    bool success = 1;                        // Признак успешного удаления
-}
-
-// Запрос на обновление заявки
-message UpdateRequestRequest {
-    int32 request_id = 1;                    // ID заявки для обновления
-    string number = 2;                       // Номер заявки
-    google.protobuf.Timestamp creation_date = 3;  // Дата создания
-    google.protobuf.Timestamp due_date = 4;       // Срок исполнения
-    string comment = 5;                      // Комментарий к заявке
-    string execution_comment = 6;            // Комментарий по исполнению
-    int32 status = 7;                        // Статус заявки (enum RequestStatus)
-    int32 equipment_id = 8;                  // ID назначения (техники)
-    repeated Item items = 9;                 // Список наименований
-}
-
-// Ответ на обновление заявки
-message UpdateRequestResponse {
-    bool success = 1;                        // Признак успешного обновления
-}
-
-// Запрос на получение заявки по ID
-message GetRequestRequest {
-    int32 request_id = 1;                    // ID заявки
-}
-
-// Ответ с данными заявки
-message GetRequestResponse {
-    int32 request_id = 1;                    // ID заявки
-    string number = 2;                       // Номер заявки
-    google.protobuf.Timestamp creation_date = 3;  // Дата создания
-    google.protobuf.Timestamp due_date = 4;       // Срок исполнения
-    string comment = 5;                      // Комментарий к заявке
-    string execution_comment = 6;            // Комментарий по исполнению
-    int32 status = 7;                        // Статус заявки (enum RequestStatus)
-    int32 equipment_id = 8;                  // ID назначения (техники)
-    repeated Item items = 9;                 // Список наименований
-}
-
-// Запрос на получение всех заявок
-message GetAllRequestsRequest {}
-
-// Ответ со списком всех заявок
-message GetAllRequestsResponse {
-    repeated GetRequestResponse requests = 1;  // Список заявок
-}
-
-// Сообщение для наименования
-message Item {
-    int32 id = 1;
-    int32 nomenclature_id = 2; // Заменяем name и article
-    int32 quantity = 3;
-    string note = 4;
-    int32 status = 5;
-}
-
-// Сообщения для Equipment
-message GetAllEquipmentRequest {}
 message GetAllEquipmentResponse {
     repeated Equipment equipment = 1;
 }
+
 message CreateEquipmentRequest {
     string name = 1;
     string license_plate = 2;
 }
+
+message CreateEquipmentResponse {
+    int32 id = 1;
+}
+
 message UpdateEquipmentRequest {
     int32 id = 1;
     string name = 2;
     string license_plate = 3;
 }
-message DeleteEquipmentRequest {
-    int32 id = 1;
-}
-message CreateEquipmentResponse {
-    int32 id = 1;
-}
+
 message UpdateEquipmentResponse {
     bool success = 1;
 }
+
+message DeleteEquipmentRequest {
+    int32 id = 1;
+}
+
 message DeleteEquipmentResponse {
     bool success = 1;
 }
+
 message Equipment {
     int32 id = 1;
     string name = 2;
     string license_plate = 3;
+}
+
+message GetAllDriversRequest {
+    string filter = 1; // Фильтр для поиска по имени или должности
+}
+
+message GetAllDriversResponse {
+    repeated Driver drivers = 1;
+}
+
+message CreateDriverRequest {
+    Driver driver = 1;
+}
+
+message CreateDriverResponse {
+    int32 id = 1; // ID созданного водителя
+}
+
+message UpdateDriverRequest {
+    Driver driver = 1;
+}
+
+message UpdateDriverResponse {
+    bool success = 1;
+}
+
+message DeleteDriverRequest {
+    int32 id = 1;
+}
+
+message DeleteDriverResponse {
+    bool success = 1;
+}
+
+message Driver {
+    int32 id = 1;
+    string full_name = 2;   // Полное ФИО
+    string short_name = 3;  // Фамилия с инициалами
+    string position = 4;    // Должность
 }

@@ -4,34 +4,16 @@ using System.Threading.Tasks;
 
 namespace RequestManagement.Common.Interfaces
 {
-    /// <summary>
-    /// Интерфейс для работы с заявками
-    /// </summary>
     public interface IRequestService
     {
-        /// <summary>
-        /// Создает новую заявку
-        /// </summary>
-        Task<int> CreateRequestAsync(Request request);
+        Task<int> CreateEquipmentAsync(Equipment equipment);
+        Task<bool> UpdateEquipmentAsync(Equipment equipment);
+        Task<bool> DeleteEquipmentAsync(int id);
+        Task<List<Equipment>> GetAllEquipmentAsync(string filter = "");
 
-        /// <summary>
-        /// Удаляет заявку по идентификатору
-        /// </summary>
-        Task<bool> DeleteRequestAsync(int requestId);
-
-        /// <summary>
-        /// Обновляет существующую заявку
-        /// </summary>
-        Task<bool> UpdateRequestAsync(Request request);
-
-        /// <summary>
-        /// Получает заявку по идентификатору
-        /// </summary>
-        Task<Request> GetRequestByIdAsync(int requestId);
-
-        /// <summary>
-        /// Получает список всех заявок
-        /// </summary>
-        Task<List<Request>> GetAllRequestsAsync();
+        Task<List<Driver>> GetAllDriversAsync(string filter = "");
+        Task<int> CreateDriverAsync(Driver driver);
+        Task<bool> UpdateDriverAsync(Driver driver);
+        Task<bool> DeleteDriverAsync(int id);
     }
 }

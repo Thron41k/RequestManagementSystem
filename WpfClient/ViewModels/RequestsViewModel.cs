@@ -23,8 +23,7 @@ namespace WpfClient.ViewModels
 
         public async Task LoadRequestsAsync()
         {
-            var requestList = await _requestService.GetAllRequestsAsync();
-            requests = new ObservableCollection<Request>(requestList);
+            
         }
     }
 }

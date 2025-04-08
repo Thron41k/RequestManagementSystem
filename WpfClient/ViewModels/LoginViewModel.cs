@@ -1,84 +1,52 @@
-﻿using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.Windows;
+using System.Windows.Input;
+using RequestManagement.Common.Models.Enums;
+using WpfClient.Helpers;
 using WpfClient.Services;
 using WpfClient.Views;
 
 namespace WpfClient.ViewModels
 {
-    public partial class LoginViewModel : ObservableObject
+    public class LoginViewModel
     {
         private readonly GrpcAuthService _authService;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly RelayCommand _loginCommand; // Сохраняем ссылку для вызова NotifyCanExecuteChanged
+        private readonly MainMenuViewModel _mainMenuViewModel;
+        private readonly AuthTokenStore _authTokenStore;
 
-        [ObservableProperty]
-        private string login;
-
-        [ObservableProperty]
-        private string password;
-
-        [ObservableProperty]
-        private string errorMessage;
-
-        [ObservableProperty]
-        private bool isAuthenticated;
-
+        public string Login { get; set; }
+        public string Password { get; set; }
         public ICommand LoginCommand { get; }
 
-        public LoginViewModel(GrpcAuthService authService, IServiceProvider serviceProvider)
+        public LoginViewModel(GrpcAuthService authService, MainMenuViewModel mainMenuViewModel,AuthTokenStore authTokenStore)
         {
             _authService = authService;
-            _serviceProvider = serviceProvider;
-
-            _loginCommand = new RelayCommand(async () => await LoginAsync(), () => CanLogin());
-            LoginCommand = _loginCommand;
-
-            // Подписка на изменения свойств
-            PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName is nameof(Login) or nameof(Password))
-                {
-                    _loginCommand.NotifyCanExecuteChanged();
-                }
-            };
-
-            System.Diagnostics.Debug.WriteLine("LoginCommand инициализирован: " + (LoginCommand != null));
+            _mainMenuViewModel = mainMenuViewModel;
+            _authTokenStore = authTokenStore;
+            LoginCommand = new RelayCommand(async () => await LoginAsync());
         }
 
-        public async Task LoginAsync()
+        private async Task LoginAsync()
         {
-            try
+            var passwordBox = (Application.Current.MainWindow as MainWindow)?.passwordBox;
+            if (passwordBox == null || string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(passwordBox.Password))
             {
-                var response = await _authService.AuthenticateAsync(Login, Password);
-                if (response == null)
-                {
-                    ErrorMessage = "Неверный логин или пароль.";
-                    return;
-                }
-
-                AuthTokenStore.JwtToken = response.Token;
-                AuthTokenStore.UserRole = response.Role;
-                IsAuthenticated = true;
-                ErrorMessage = null;
-
-                var requestsWindow = _serviceProvider.GetRequiredService<MainMenu>();
-                requestsWindow.Show();
-                if (App.Current.MainWindow is MainWindow mainWindow)
-                {
-                    mainWindow.Close();
-                }
+                MessageBox.Show("Введите логин и пароль.");
+                return;
             }
-            catch (Exception ex)
+
+            var token = await _authService.AuthenticateAsync(Login, passwordBox.Password);
+            if (!string.IsNullOrEmpty(token.Token))
             {
-                ErrorMessage = $"Ошибка: {ex.Message}";
+                _authTokenStore.SetToken(token.Token);
+                _authTokenStore.SetRole((UserRole)token.Role);
+                var mainMenu = new MainMenu(_mainMenuViewModel);
+                mainMenu.Show();
+                Application.Current.MainWindow.Close();
             }
-        }
-
-        private bool CanLogin()
-        {
-            return !string.IsNullOrEmpty(Login) && !string.IsNullOrEmpty(Password);
+            else
+            {
+                MessageBox.Show("Ошибка входа. Проверьте логин и пароль.");
+            }
         }
     }
 }

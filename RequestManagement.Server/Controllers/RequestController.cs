@@ -1,103 +1,29 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
-using RequestManagement.Common.Models.Enums;
+using RequestManagement.Common.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace RequestManagement.Server.Controllers
 {
     /// <summary>
-    /// gRPC-контроллер для работы с заявками
+    /// gRPC-контроллер для работы с оборудованием
     /// </summary>
-    public class RequestController(IRequestService requestService, ILogger<RequestController> logger)
-        : RequestService.RequestServiceBase
+    public class RequestController : RequestService.RequestServiceBase
     {
-        /// <summary>
-        /// Создает новую заявку
-        /// </summary>
-        public override async Task<CreateRequestResponse> CreateRequest(CreateRequestRequest request, ServerCallContext context)
+        private readonly IRequestService _requestService;
+        private readonly ILogger<RequestController> _logger;
+
+        public RequestController(IRequestService requestService, ILogger<RequestController> logger)
         {
-            logger.LogInformation("Creating new request with number: {Number}", request.Number);
-
-            var newRequest = new Common.Models.Request
-            {
-                Number = request.Number,
-                CreationDate = DateTime.SpecifyKind(request.CreationDate.ToDateTime(), DateTimeKind.Utc),
-                DueDate = DateTime.SpecifyKind(request.DueDate.ToDateTime(), DateTimeKind.Utc),
-                Comment = request.Comment,
-                ExecutionComment = request.ExecutionComment,
-                Status = (RequestStatus)request.Status,
-                EquipmentId = request.EquipmentId
-            };
-
-            var requestId = await requestService.CreateRequestAsync(newRequest);
-            return new CreateRequestResponse { RequestId = requestId };
+            _requestService = requestService ?? throw new ArgumentNullException(nameof(requestService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
-        /// Удаляет заявку
+        /// Получает список всех единиц оборудования
         /// </summary>
-        public override async Task<DeleteRequestResponse> DeleteRequest(DeleteRequestRequest request, ServerCallContext context)
-        {
-            logger.LogInformation("Deleting request with ID: {RequestId}", request.RequestId);
-
-            var success = await requestService.DeleteRequestAsync(request.RequestId);
-            return new DeleteRequestResponse { Success = success };
-        }
-
-        /// <summary>
-        /// Обновляет заявку
-        /// </summary>
-        public override async Task<UpdateRequestResponse> UpdateRequest(UpdateRequestRequest request, ServerCallContext context)
-        {
-            logger.LogInformation("Updating request with ID: {RequestId}", request.RequestId);
-
-            var updatedRequest = new Common.Models.Request
-            {
-                Id = request.RequestId,
-                Number = request.Number,
-                CreationDate = DateTime.SpecifyKind(request.CreationDate.ToDateTime(), DateTimeKind.Utc),
-                DueDate = DateTime.SpecifyKind(request.DueDate.ToDateTime(), DateTimeKind.Utc),
-                Comment = request.Comment,
-                ExecutionComment = request.ExecutionComment,
-                Status = (RequestStatus)request.Status,
-                EquipmentId = request.EquipmentId
-            };
-
-            var success = await requestService.UpdateRequestAsync(updatedRequest);
-            return new UpdateRequestResponse { Success = success };
-        }
-
-        /// <summary>
-        /// Получает заявку по ID
-        /// </summary>
-        public override async Task<GetRequestResponse> GetRequest(GetRequestRequest request, ServerCallContext context)
-        {
-            logger.LogInformation("Getting request with ID: {RequestId}", request.RequestId);
-
-            var req = await requestService.GetRequestByIdAsync(request.RequestId);
-            if (req == null)
-            {
-                throw new RpcException(new Status(StatusCode.NotFound, $"Request with ID {request.RequestId} not found"));
-            }
-
-            var response = new GetRequestResponse
-            {
-                RequestId = req.Id,
-                Number = req.Number,
-                CreationDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(req.CreationDate),
-                DueDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(req.DueDate),
-                Comment = req.Comment ?? "",
-                ExecutionComment = req.ExecutionComment ?? "",
-                Status = (int)req.Status,
-                EquipmentId = req.EquipmentId
-            };
-
-            return response;
-        }
-
-        /// <summary>
-        /// Получает все заявки
-        /// </summary>
-        public override async Task<GetAllRequestsResponse> GetAllRequests(GetAllRequestsRequest request, ServerCallContext context)
+        public override async Task<GetAllEquipmentResponse> GetAllEquipment(GetAllEquipmentRequest request, ServerCallContext context)
         {
             var user = context.GetHttpContext().User;
             if (!user.Identity.IsAuthenticated)
@@ -105,27 +31,126 @@ namespace RequestManagement.Server.Controllers
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
             }
 
-            logger.LogInformation("Getting all requests");
+            _logger.LogInformation("Getting all equipment");
 
-            var requests = await requestService.GetAllRequestsAsync();
-            var response = new GetAllRequestsResponse();
-
-            foreach (var req in requests)
+            var equipmentList = await _requestService.GetAllEquipmentAsync(request.Filter);
+            var response = new GetAllEquipmentResponse();
+            response.Equipment.AddRange(equipmentList.Select(e => new Equipment
             {
-                response.Requests.Add(new GetRequestResponse
-                {
-                    RequestId = req.Id,
-                    Number = req.Number,
-                    CreationDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(req.CreationDate),
-                    DueDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(req.DueDate),
-                    Comment = req.Comment ?? "",
-                    ExecutionComment = req.ExecutionComment ?? "",
-                    Status = (int)req.Status,
-                    EquipmentId = req.EquipmentId
-                });
-            }
+                Id = e.Id,
+                Name = e.Name,
+                LicensePlate = e.StateNumber ?? ""
+            }));
 
             return response;
+        }
+
+        /// <summary>
+        /// Создает новую единицу оборудования
+        /// </summary>
+        public override async Task<CreateEquipmentResponse> CreateEquipment(CreateEquipmentRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Creating new equipment with name: {Name}", request.Name);
+
+            var equipment = new RequestManagement.Common.Models.Equipment
+            {
+                Name = request.Name,
+                StateNumber = request.LicensePlate
+            };
+
+            var id = await _requestService.CreateEquipmentAsync(equipment);
+            return new CreateEquipmentResponse { Id = id };
+        }
+
+        /// <summary>
+        /// Обновляет существующую единицу оборудования
+        /// </summary>
+        public override async Task<UpdateEquipmentResponse> UpdateEquipment(UpdateEquipmentRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Updating equipment with ID: {Id}", request.Id);
+
+            var equipment = new RequestManagement.Common.Models.Equipment
+            {
+                Id = request.Id,
+                Name = request.Name,
+                StateNumber = request.LicensePlate
+            };
+
+            var success = await _requestService.UpdateEquipmentAsync(equipment);
+            return new UpdateEquipmentResponse { Success = success };
+        }
+
+        /// <summary>
+        /// Удаляет единицу оборудования
+        /// </summary>
+        public override async Task<DeleteEquipmentResponse> DeleteEquipment(DeleteEquipmentRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Deleting equipment with ID: {Id}", request.Id);
+
+            var success = await _requestService.DeleteEquipmentAsync(request.Id);
+            return new DeleteEquipmentResponse { Success = success };
+        }
+
+        public override async Task<GetAllDriversResponse> GetAllDrivers(GetAllDriversRequest request, ServerCallContext context)
+        {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
+
+            _logger.LogInformation("Getting all drivers by filter");
+
+            var equipmentList = await _requestService.GetAllDriversAsync(request.Filter);
+            var response = new GetAllDriversResponse();
+            response.Drivers.AddRange(equipmentList.Select(e => new Driver
+            {
+                Id = e.Id,
+                FullName = e.FullName,
+                ShortName = e.ShortName,
+                Position = e.Position
+            }));
+
+            return response;
+        }
+
+        public override async Task<CreateDriverResponse> CreateDriver(CreateDriverRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Creating new driver with full name and position: {Name} - {Position}", request.Driver.FullName,request.Driver.Position);
+
+            var driver = new RequestManagement.Common.Models.Driver
+            {
+                FullName = request.Driver.FullName,
+                ShortName = request.Driver.ShortName,
+                Position = request.Driver.Position
+            };
+
+            var id = await _requestService.CreateDriverAsync(driver);
+            return new CreateDriverResponse { Id = id };
+        }
+
+        public override async Task<UpdateDriverResponse> UpdateDriver(UpdateDriverRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Updating driver with ID: {Id}", request.Driver.Id);
+
+            var driver = new RequestManagement.Common.Models.Driver
+            {
+                Id = request.Driver.Id,
+                FullName = request.Driver.FullName,
+                ShortName = request.Driver.ShortName,
+                Position = request.Driver.Position
+            };
+
+            var success = await _requestService.UpdateDriverAsync(driver);
+            return new UpdateDriverResponse { Success = success };
+        }
+
+        public override async Task<DeleteDriverResponse> DeleteDriver(DeleteDriverRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Deleting driver with ID: {Id}", request.Id);
+
+            var success = await _requestService.DeleteDriverAsync(request.Id);
+            return new DeleteDriverResponse { Success = success };
         }
     }
 }
