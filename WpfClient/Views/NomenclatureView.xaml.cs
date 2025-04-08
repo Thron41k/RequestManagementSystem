@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace WpfClient.Views
+namespace WpfClient.Views;
+
+/// <summary>
+/// Логика взаимодействия для NomenclatureView.xaml
+/// </summary>
+public partial class NomenclatureView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для NomenclatureView.xaml
-    /// </summary>
-    public partial class NomenclatureView : UserControl
+    public NomenclatureView()
     {
-        public NomenclatureView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

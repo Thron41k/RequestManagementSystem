@@ -32,13 +32,14 @@
                 <Button Content="Удалить" Command="{Binding DeleteDriverCommand}" Margin="5"/>
             </StackPanel>
         </Grid>
-     
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding DriverList}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="5" CanUserResizeRows="False" CanUserAddRows="False">
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding DriverList}"  SelectedItem="{Binding SelectedDriver}" AutoGenerateColumns="False" Margin="5" CanUserResizeRows="False" CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="50"/>
-                <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Номер" Binding="{Binding LicensePlate}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="ФИО" Binding="{Binding FullName}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="ФИО" Binding="{Binding ShortName}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Должность" Binding="{Binding Position}" IsReadOnly="True"/>
             </DataGrid.Columns>
             <DataGrid.InputBindings>
                 <MouseBinding Gesture="LeftDoubleClick" Command="{Binding SelectRowCommand}" />
@@ -48,7 +49,7 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
             <TextBox  TextWrapping="Wrap" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="674" Margin="5"/>
             <Border BorderBrush="Black" BorderThickness="1" Margin="5"/>
-            <Button Content="Обновить" Command="{Binding LoadEquipmentCommand}" Margin="5"/>
+            <Button Content="Обновить" Command="{Binding LoadDriverCommand}" Margin="5"/>
         </StackPanel>
 
     </Grid>

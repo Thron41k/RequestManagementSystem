@@ -1,23 +1,22 @@
 ﻿using System.Windows;
 using WpfClient.ViewModels;
 
-namespace WpfClient.Views
+namespace WpfClient.Views;
+
+public partial class MainWindow : Window
 {
-    public partial class MainWindow : Window
+    public MainWindow(LoginViewModel viewModel)
     {
-        public MainWindow(LoginViewModel viewModel)
+        InitializeComponent();
+        DataContext = viewModel;
+
+        // Проверка DataContext
+        if (DataContext == null)
         {
-            InitializeComponent();
-            DataContext = viewModel;
-
-            // Проверка DataContext
-            if (DataContext == null)
-            {
-                MessageBox.Show("DataContext не установлен!");
-            }
-
-            // Привязка пароля из PasswordBox
-            passwordBox.PasswordChanged += (s, e) => viewModel.Password = passwordBox.Password;
+            MessageBox.Show("DataContext не установлен!");
         }
+
+        // Привязка пароля из PasswordBox
+        passwordBox.PasswordChanged += (s, e) => viewModel.Password = passwordBox.Password;
     }
 }

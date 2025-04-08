@@ -4,26 +4,25 @@ using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Models;
 using WpfClient.Services;
 
-namespace WpfClient.ViewModels
+namespace WpfClient.ViewModels;
+
+public partial class RequestsViewModel : ObservableObject
 {
-    public partial class RequestsViewModel : ObservableObject
+    private readonly GrpcRequestService _requestService;
+
+    [ObservableProperty]
+    private ObservableCollection<Request> requests = new();
+
+    public IRelayCommand CreateRequestCommand { get; }
+
+    public RequestsViewModel(GrpcRequestService requestService)
     {
-        private readonly GrpcRequestService _requestService;
+        _requestService = requestService;
+        CreateRequestCommand = new RelayCommand(() => { /* Логика создания */ });
+    }
 
-        [ObservableProperty]
-        private ObservableCollection<Request> requests = new();
-
-        public IRelayCommand CreateRequestCommand { get; }
-
-        public RequestsViewModel(GrpcRequestService requestService)
-        {
-            _requestService = requestService;
-            CreateRequestCommand = new RelayCommand(() => { /* Логика создания */ });
-        }
-
-        public async Task LoadRequestsAsync()
-        {
+    public async Task LoadRequestsAsync()
+    {
             
-        }
     }
 }

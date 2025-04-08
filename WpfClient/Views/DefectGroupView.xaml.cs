@@ -1,15 +1,16 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using WpfClient.ViewModels;
 
 namespace WpfClient.Views;
 
 /// <summary>
-/// Логика взаимодействия для EquipmentView.xaml
+/// Логика взаимодействия для DefectGroupsView.xaml
 /// </summary>
-public partial class EquipmentView
+public partial class DefectGroupView
 {
     private readonly bool _editMode;
-    public EquipmentView(EquipmentViewModel viewModel,bool editMode)
+    public DefectGroupView(DefectGroupViewModel viewModel, bool editMode)
     {
         InitializeComponent();
         DataContext = viewModel;
@@ -18,6 +19,6 @@ public partial class EquipmentView
     }
     private void ViewModel_CloseWindowRequested(object? sender, EventArgs e)
     {
-        if(!_editMode) Window.GetWindow(this)?.Close(); // Закрываем окно, содержащее UserControl
+        if (!_editMode) Window.GetWindow(this)?.Close(); // Закрываем окно, содержащее UserControl
     }
 }

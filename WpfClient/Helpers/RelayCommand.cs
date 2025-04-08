@@ -1,13 +1,12 @@
 ﻿using System.Windows.Input;
 
-namespace WpfClient.Helpers
+namespace WpfClient.Helpers;
+
+public class RelayCommand : ICommand
 {
-    public class RelayCommand : ICommand
-    {
-        private readonly Action _execute;
-        public RelayCommand(Action execute) => _execute = execute;
-        public event EventHandler CanExecuteChanged;
-        public bool CanExecute(object parameter) => true;
-        public void Execute(object parameter) => _execute();
-    }
+    private readonly Action _execute;
+    public RelayCommand(Action execute) => _execute = execute;
+    public event EventHandler CanExecuteChanged;
+    public bool CanExecute(object parameter) => true;
+    public void Execute(object parameter) => _execute();
 }

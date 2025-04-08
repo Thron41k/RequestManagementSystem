@@ -5,48 +5,47 @@ using WpfClient.Helpers;
 using WpfClient.Services;
 using WpfClient.Views;
 
-namespace WpfClient.ViewModels
+namespace WpfClient.ViewModels;
+
+public class LoginViewModel
 {
-    public class LoginViewModel
+    private readonly GrpcAuthService _authService;
+    private readonly MainMenuViewModel _mainMenuViewModel;
+    private readonly AuthTokenStore _authTokenStore;
+
+    public string Login { get; set; }
+    public string Password { get; set; }
+    public ICommand LoginCommand { get; }
+
+    public LoginViewModel(GrpcAuthService authService, MainMenuViewModel mainMenuViewModel,AuthTokenStore authTokenStore)
     {
-        private readonly GrpcAuthService _authService;
-        private readonly MainMenuViewModel _mainMenuViewModel;
-        private readonly AuthTokenStore _authTokenStore;
+        _authService = authService;
+        _mainMenuViewModel = mainMenuViewModel;
+        _authTokenStore = authTokenStore;
+        LoginCommand = new RelayCommand(async () => await LoginAsync());
+    }
 
-        public string Login { get; set; }
-        public string Password { get; set; }
-        public ICommand LoginCommand { get; }
-
-        public LoginViewModel(GrpcAuthService authService, MainMenuViewModel mainMenuViewModel,AuthTokenStore authTokenStore)
+    private async Task LoginAsync()
+    {
+        var passwordBox = (Application.Current.MainWindow as MainWindow)?.passwordBox;
+        if (passwordBox == null || string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(passwordBox.Password))
         {
-            _authService = authService;
-            _mainMenuViewModel = mainMenuViewModel;
-            _authTokenStore = authTokenStore;
-            LoginCommand = new RelayCommand(async () => await LoginAsync());
+            MessageBox.Show("Введите логин и пароль.");
+            return;
         }
 
-        private async Task LoginAsync()
+        var token = await _authService.AuthenticateAsync(Login, passwordBox.Password);
+        if (token != null && !string.IsNullOrEmpty(token.Token))
         {
-            var passwordBox = (Application.Current.MainWindow as MainWindow)?.passwordBox;
-            if (passwordBox == null || string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(passwordBox.Password))
-            {
-                MessageBox.Show("Введите логин и пароль.");
-                return;
-            }
-
-            var token = await _authService.AuthenticateAsync(Login, passwordBox.Password);
-            if (!string.IsNullOrEmpty(token.Token))
-            {
-                _authTokenStore.SetToken(token.Token);
-                _authTokenStore.SetRole((UserRole)token.Role);
-                var mainMenu = new MainMenu(_mainMenuViewModel);
-                mainMenu.Show();
-                Application.Current.MainWindow.Close();
-            }
-            else
-            {
-                MessageBox.Show("Ошибка входа. Проверьте логин и пароль.");
-            }
+            _authTokenStore.SetToken(token.Token);
+            _authTokenStore.SetRole((UserRole)token.Role);
+            var mainMenu = new MainMenu(_mainMenuViewModel);
+            mainMenu.Show();
+            Application.Current.MainWindow.Close();
+        }
+        else
+        {
+            MessageBox.Show("Ошибка входа. Проверьте логин и пароль.");
         }
     }
 }

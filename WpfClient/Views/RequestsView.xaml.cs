@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace WpfClient.Views
+namespace WpfClient.Views;
+
+/// <summary>
+/// Логика взаимодействия для RequestsView.xaml
+/// </summary>
+public partial class RequestsView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для RequestsView.xaml
-    /// </summary>
-    public partial class RequestsView : UserControl
+    public RequestsView()
     {
-        public RequestsView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

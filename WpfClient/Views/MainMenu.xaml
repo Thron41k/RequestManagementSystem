@@ -20,8 +20,8 @@
             </MenuItem>
             <MenuItem Header="Справочники" Visibility="{Binding IsAdminVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <MenuItem Header="Машины" Command="{Binding ShowEquipmentCommand}"/>
-                <MenuItem Header="Водители" Command="{Binding EditDriversCommand}"/>
-                <MenuItem Header="Группы дефектов" Command="{Binding EditDefectGroupsCommand}"/>
+                <MenuItem Header="Водители" Command="{Binding ShowDriverCommand}"/>
+                <MenuItem Header="Группы дефектов" Command="{Binding ShowDefectGroupCommand}"/>
                 <MenuItem Header="Деффекты" Command="{Binding EditDefectsCommand}"/>
                 <MenuItem Header="Номенклатура" Command="{Binding EditNomenclatureCommand}"/>
             </MenuItem>

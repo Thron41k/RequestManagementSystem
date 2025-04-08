@@ -15,6 +15,11 @@ service RequestService {
     rpc CreateDriver (CreateDriverRequest) returns (CreateDriverResponse);
     rpc UpdateDriver (UpdateDriverRequest) returns (UpdateDriverResponse);
     rpc DeleteDriver (DeleteDriverRequest) returns (DeleteDriverResponse);
+
+    rpc GetAllDefectGroups (GetAllDefectGroupsRequest) returns (GetAllDefectGroupsResponse);
+    rpc CreateDefectGroup (CreateDefectGroupRequest) returns (CreateDefectGroupResponse);
+    rpc UpdateDefectGroup (UpdateDefectGroupRequest) returns (UpdateDefectGroupResponse);
+    rpc DeleteDefectGroup (DeleteDefectGroupRequest) returns (DeleteDefectGroupResponse);
 }
 
 // Сообщения для оборудования
@@ -96,4 +101,41 @@ message Driver {
     string full_name = 2;   // Полное ФИО
     string short_name = 3;  // Фамилия с инициалами
     string position = 4;    // Должность
+}
+
+message GetAllDefectGroupsRequest {
+    string filter = 1;
+}
+
+message GetAllDefectGroupsResponse {
+    repeated DefectGroup defectGroup = 1;
+}
+
+message CreateDefectGroupRequest {
+    DefectGroup defectGroup = 1;
+}
+
+message CreateDefectGroupResponse {
+    int32 id = 1;
+}
+
+message UpdateDefectGroupRequest {
+    DefectGroup defectGroup = 1;
+}
+
+message UpdateDefectGroupResponse {
+    bool success = 1;
+}
+
+message DeleteDefectGroupRequest {
+    int32 id = 1;
+}
+
+message DeleteDefectGroupResponse {
+    bool success = 1;
+}
+
+message DefectGroup {
+    int32 id = 1;
+    string name = 2;   
 }

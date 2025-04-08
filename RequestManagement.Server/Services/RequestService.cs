@@ -42,15 +42,22 @@ namespace RequestManagement.Server.Services
 
         public async Task<bool> DeleteEquipmentAsync(int id)
         {
-            var equipment = await _dbContext.Equipments
+            try
+            {
+                var equipment = await _dbContext.Equipments
                 .FirstOrDefaultAsync(e => e.Id == id);
 
-            if (equipment == null)
-                return false;
+                if (equipment == null)
+                    return false;
 
-            _dbContext.Equipments.Remove(equipment);
-            await _dbContext.SaveChangesAsync();
-            return true;
+                _dbContext.Equipments.Remove(equipment);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<List<Equipment>> GetAllEquipmentAsync(string filter = "")
@@ -115,15 +122,76 @@ namespace RequestManagement.Server.Services
 
         public async Task<bool> DeleteDriverAsync(int id)
         {
-            var driver = await _dbContext.Drivers
-                .FirstOrDefaultAsync(e => e.Id == id);
+            try
+            {
+                var driver = await _dbContext.Drivers
+                    .FirstOrDefaultAsync(e => e.Id == id);
 
-            if (driver == null)
+                if (driver == null)
+                    return false;
+
+                _dbContext.Drivers.Remove(driver);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<DefectGroup>> GetAllDefectGroupsAsync(string filter = "")
+        {
+            var query = _dbContext.DefectGroups.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.Contains(phrase)));
+            }
+            return await query
+                .Select(e => new DefectGroup
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                })
+                .ToListAsync();
+        }
+        public async Task<int> CreateDefectGroupAsync(DefectGroup defectGroup)
+        {
+            _dbContext.DefectGroups.Add(defectGroup);
+            await _dbContext.SaveChangesAsync();
+            return defectGroup.Id;
+        }
+        public async Task<bool> UpdateDefectGroupAsync(DefectGroup defectGroup)
+        {
+            var existDefectGroup = await _dbContext.DefectGroups
+                .FirstOrDefaultAsync(e => e.Id == defectGroup.Id);
+
+            if (existDefectGroup == null)
                 return false;
 
-            _dbContext.Drivers.Remove(driver);
+            existDefectGroup.Name = defectGroup.Name;
             await _dbContext.SaveChangesAsync();
             return true;
+        }
+        public async Task<bool> DeleteDefectGroupAsync(int id)
+        {
+            try
+            {
+                var defectGroup = await _dbContext.DefectGroups
+                    .FirstOrDefaultAsync(e => e.Id == id);
+
+                if (defectGroup == null)
+                    return false;
+
+                _dbContext.DefectGroups.Remove(defectGroup);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

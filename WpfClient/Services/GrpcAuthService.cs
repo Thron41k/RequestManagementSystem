@@ -1,38 +1,37 @@
 ﻿using Grpc.Core;
 using RequestManagement.Server.Controllers;
 
-namespace WpfClient.Services
+namespace WpfClient.Services;
+
+public class GrpcAuthService
 {
-    public class GrpcAuthService
+    private readonly AuthService.AuthServiceClient _authClient;
+    private readonly AuthTokenStore _tokenStore;
+
+    public GrpcAuthService(AuthService.AuthServiceClient authClient, AuthTokenStore tokenStore)
     {
-        private readonly AuthService.AuthServiceClient _authClient;
-        private readonly AuthTokenStore _tokenStore;
+        _authClient = authClient ?? throw new ArgumentNullException(nameof(authClient));
+        _tokenStore = tokenStore ?? throw new ArgumentNullException(nameof(tokenStore));
+    }
 
-        public GrpcAuthService(AuthService.AuthServiceClient authClient, AuthTokenStore tokenStore)
+    public async Task<AuthenticateResponse> AuthenticateAsync(string login, string password)
+    {
+        try
         {
-            _authClient = authClient ?? throw new ArgumentNullException(nameof(authClient));
-            _tokenStore = tokenStore ?? throw new ArgumentNullException(nameof(tokenStore));
+            var request = new AuthenticateRequest { Login = login, Password = password };
+            var response = await _authClient.AuthenticateAsync(request);
+            var token = response.Token;
+
+            // Сохраняем токен в AuthTokenStore
+            if (!string.IsNullOrEmpty(token))
+            {
+                _tokenStore.SetToken(token);
+            }
+            return response.UserId == 0 ? null : response;
         }
-
-        public async Task<AuthenticateResponse> AuthenticateAsync(string login, string password)
+        catch (RpcException ex)
         {
-            try
-            {
-                var request = new AuthenticateRequest { Login = login, Password = password };
-                var response = await _authClient.AuthenticateAsync(request);
-                var token = response.Token;
-
-                // Сохраняем токен в AuthTokenStore
-                if (!string.IsNullOrEmpty(token))
-                {
-                    _tokenStore.SetToken(token);
-                }
-                return response.UserId == 0 ? null : response;
-            }
-            catch (RpcException ex)
-            {
-                throw new Exception($"Ошибка аутентификации: {ex.Status.Detail}", ex);
-            }
+            throw new Exception($"Ошибка аутентификации: {ex.Status.Detail}", ex);
         }
     }
 }
