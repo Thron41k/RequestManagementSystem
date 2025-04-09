@@ -134,4 +134,41 @@ public class GrpcRequestService
         }
         await _client.DeleteDefectGroupAsync(request, headers);
     }
+    public async Task<List<Defect>> GetAllDefectsAsync(string filter = "")
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+        }
+        var response = await _client.GetAllDefectsAsync(new GetAllDefectsRequest { Filter = filter }, headers);
+        return response.Defect.ToList();
+    }
+    public async Task CreateDefectAsync(CreateDefectRequest request)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+        }
+        await _client.CreateDefectAsync(request, headers);
+    }
+    public async Task UpdateDefectAsync(UpdateDefectRequest request)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+        }
+        await _client.UpdateDefectAsync(request, headers);
+    }
+    public async Task DeleteDefectAsync(DeleteDefectRequest request)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(_tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {_tokenStore.GetToken()}");
+        }
+        await _client.DeleteDefectAsync(request, headers);
+    }
 }

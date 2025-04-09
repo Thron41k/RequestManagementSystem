@@ -205,5 +205,63 @@ namespace RequestManagement.Server.Controllers
             var success = await _requestService.DeleteDefectGroupAsync(request.Id);
             return new DeleteDefectGroupResponse { Success = success };
         }
+
+        public override async Task<GetAllDefectsResponse> GetAllDefects(GetAllDefectsRequest request, ServerCallContext context)
+        {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
+
+            _logger.LogInformation("Getting all defects by filter");
+
+            var defectList = await _requestService.GetAllDefectsAsync(request.Filter);
+            var response = new GetAllDefectsResponse();
+            response.Defect.AddRange(defectList.Select(e => new Defect
+            {
+                Id = e.Id,
+                Name = e.Name,
+                DefectGroupId = e.DefectGroupId
+            }));
+
+            return response;
+        }
+
+        public override async Task<CreateDefectResponse> CreateDefect(CreateDefectRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Creating new defect with name: {Name}", request.Defect.Name);
+
+            var defect = new Common.Models.Defect
+            {
+                Name = request.Defect.Name,
+                DefectGroupId = request.Defect.DefectGroupId
+            };
+
+            var id = await _requestService.CreateDefectAsync(defect);
+            return new CreateDefectResponse { Id = id };
+        }
+        public override async Task<UpdateDefectResponse> UpdateDefect(UpdateDefectRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Updating defect with ID: {Id}", request.Defect.Id);
+
+            var defect = new Common.Models.Defect
+            {
+                Id = request.Defect.Id,
+                Name = request.Defect.Name,
+                DefectGroupId = request.Defect.DefectGroupId
+            };
+
+            var success = await _requestService.UpdateDefectAsync(defect);
+            return new UpdateDefectResponse { Success = success };
+        }
+
+        public override async Task<DeleteDefectResponse> DeleteDefect(DeleteDefectRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Deleting defect with ID: {Id}", request.Id);
+
+            var success = await _requestService.DeleteDefectAsync(request.Id);
+            return new DeleteDefectResponse { Success = success };
+        }
     }
 }

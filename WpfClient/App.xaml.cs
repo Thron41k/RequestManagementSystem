@@ -40,10 +40,12 @@ public partial class App : Application
         services.AddScoped<MainMenuViewModel>();
         services.AddScoped<DriverViewModel>();
         services.AddScoped<DefectGroupViewModel>();
+        services.AddScoped<DefectViewModel>();
         services.AddTransient<MainWindow>();
         services.AddTransient<DriverView>();
         services.AddTransient<MainMenu>();
         services.AddTransient<EquipmentView>(); // Добавляем представление для оборудования
         services.AddTransient<DefectGroupView>();
+        services.AddTransient<DefectView>();
     }
 }

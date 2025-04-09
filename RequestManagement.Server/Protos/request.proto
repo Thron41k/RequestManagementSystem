@@ -20,6 +20,11 @@ service RequestService {
     rpc CreateDefectGroup (CreateDefectGroupRequest) returns (CreateDefectGroupResponse);
     rpc UpdateDefectGroup (UpdateDefectGroupRequest) returns (UpdateDefectGroupResponse);
     rpc DeleteDefectGroup (DeleteDefectGroupRequest) returns (DeleteDefectGroupResponse);
+
+    rpc GetAllDefects (GetAllDefectsRequest) returns (GetAllDefectsResponse);
+    rpc CreateDefect(CreateDefectRequest) returns (CreateDefectResponse);
+    rpc UpdateDefect (UpdateDefectRequest) returns (UpdateDefectResponse);
+    rpc DeleteDefect (DeleteDefectRequest) returns (DeleteDefectResponse);
 }
 
 // Сообщения для оборудования
@@ -138,4 +143,42 @@ message DeleteDefectGroupResponse {
 message DefectGroup {
     int32 id = 1;
     string name = 2;   
+}
+
+message GetAllDefectsRequest {
+    string filter = 1;
+}
+
+message GetAllDefectsResponse {
+    repeated Defect Defect = 1;
+}
+
+message CreateDefectRequest {
+    Defect Defect = 1;
+}
+
+message CreateDefectResponse {
+    int32 id = 1;
+}
+
+message UpdateDefectRequest {
+    Defect Defect = 1;
+}
+
+message UpdateDefectResponse {
+    bool success = 1;
+}
+
+message DeleteDefectRequest {
+    int32 id = 1;
+}
+
+message DeleteDefectResponse {
+    bool success = 1;
+}
+
+message Defect {
+    int32 id = 1;
+    string name = 2;
+    int32 defectGroupId = 3;
 }

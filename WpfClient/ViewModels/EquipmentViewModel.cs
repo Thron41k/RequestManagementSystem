@@ -110,7 +110,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
     private async Task LoadEquipmentAsync()
     {
         var filter = string.IsNullOrWhiteSpace(_filterText) ? "" : _filterText.Trim();
-        var equipmentList = await _requestService.GetAllEquipmentAsync(filter);
+        var equipmentList = await _requestService.GetAllEquipmentAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
             EquipmentList.Clear();

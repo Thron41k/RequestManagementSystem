@@ -10,19 +10,23 @@ public class MainMenuViewModel
     private readonly EquipmentViewModel _equipmentViewModel;
     private readonly DriverViewModel _driverViewModel;
     private readonly DefectGroupViewModel _defectGroupViewModel;
+    private readonly DefectViewModel _defectViewModel;
 
     public ICommand ShowEquipmentCommand { get; }
     public ICommand ShowDriverCommand { get; }
     public ICommand ShowDefectGroupCommand { get; }
+    public ICommand ShowDefectCommand { get; }
 
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel,DriverViewModel driverViewModel,DefectGroupViewModel defectGroupViewModel)
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel,DriverViewModel driverViewModel,DefectGroupViewModel defectGroupViewModel,DefectViewModel defectViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
         _defectGroupViewModel = defectGroupViewModel;
+        _defectViewModel = defectViewModel;
         ShowEquipmentCommand = new RelayCommand(ShowEquipment);
         ShowDriverCommand = new RelayCommand(ShowDriver);
         ShowDefectGroupCommand = new RelayCommand(ShowDefectGroup);
+        ShowDefectCommand = new RelayCommand(ShowDefect);
     }
 
     private void ShowEquipment()
@@ -63,5 +67,19 @@ public class MainMenuViewModel
         };
         window.Show();
         _ = _defectGroupViewModel.Load();
+    }
+
+    private void ShowDefect()
+    {
+        var defectView = new DefectView(_defectViewModel, true);
+        var window = new Window
+        {
+            Content = defectView,
+            Title = "Дефекты",
+            Width = 800,
+            Height = 600
+        };
+        window.Show();
+        _ = _defectViewModel.Load();
     }
 }

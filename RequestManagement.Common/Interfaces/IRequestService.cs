@@ -20,5 +20,10 @@ namespace RequestManagement.Common.Interfaces
         Task<int> CreateDefectGroupAsync(DefectGroup driver);
         Task<bool> UpdateDefectGroupAsync(DefectGroup driver);
         Task<bool> DeleteDefectGroupAsync(int id);
+
+        Task<List<Defect>> GetAllDefectsAsync(string filter = "");
+        Task<int> CreateDefectAsync(Defect driver);
+        Task<bool> UpdateDefectAsync(Defect driver);
+        Task<bool> DeleteDefectAsync(int id);
     }
 }

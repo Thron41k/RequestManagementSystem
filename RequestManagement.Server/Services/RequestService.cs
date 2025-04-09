@@ -66,7 +66,7 @@ namespace RequestManagement.Server.Services
             if (!string.IsNullOrWhiteSpace(filter))
             {
                 var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.Contains(phrase) || e.StateNumber!.Contains(phrase)));
+                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase) || e.StateNumber!.ToLower().Contains(phrase)));
             }
             return await query
                 .Select(e => new Equipment
@@ -84,7 +84,7 @@ namespace RequestManagement.Server.Services
             if (!string.IsNullOrWhiteSpace(filter))
             {
                 var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.FullName.Contains(phrase) || e.Position!.Contains(phrase)));
+                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.FullName.ToLower().Contains(phrase) || e.Position.ToLower().Contains(phrase)));
             }
             return await query
                 .Select(e => new Driver
@@ -146,7 +146,7 @@ namespace RequestManagement.Server.Services
             if (!string.IsNullOrWhiteSpace(filter))
             {
                 var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.Contains(phrase)));
+                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase)));
             }
             return await query
                 .Select(e => new DefectGroup
@@ -185,6 +185,64 @@ namespace RequestManagement.Server.Services
                     return false;
 
                 _dbContext.DefectGroups.Remove(defectGroup);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<Defect>> GetAllDefectsAsync(string filter = "")
+        {
+            var query = _dbContext.Defects.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase) || e.DefectGroup.Name.ToLower().Contains(phrase)));
+            }
+            return await query
+                .Select(e => new Defect
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    DefectGroupId = e.DefectGroupId
+                })
+                .ToListAsync();
+        }
+
+        public async Task<int> CreateDefectAsync(Defect defect)
+        {
+            _dbContext.Defects.Add(defect);
+            await _dbContext.SaveChangesAsync();
+            return defect.Id;
+        }
+        public async Task<bool> UpdateDefectAsync(Defect defect)
+        {
+            var existDefect = await _dbContext.Defects
+                .FirstOrDefaultAsync(e => e.Id == defect.Id);
+
+            if (existDefect == null)
+                return false;
+
+            existDefect.Name = defect.Name;
+            existDefect.DefectGroupId = defect.DefectGroupId;
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteDefectAsync(int id)
+        {
+            try
+            {
+                var defect = await _dbContext.Defects
+                    .FirstOrDefaultAsync(e => e.Id == id);
+
+                if (defect == null)
+                    return false;
+
+                _dbContext.Defects.Remove(defect);
                 await _dbContext.SaveChangesAsync();
                 return true;
             }

@@ -75,7 +75,7 @@ public class DefectGroupViewModel : INotifyPropertyChanged
     private async Task LoadDefectGroupAsync()
     {
         var filter = string.IsNullOrWhiteSpace(_filterText) ? "" : _filterText.Trim();
-        var defectGroupList = await _requestService.GetAllDefectGroupsAsync(filter);
+        var defectGroupList = await _requestService.GetAllDefectGroupsAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
             DefectGroupList.Clear();

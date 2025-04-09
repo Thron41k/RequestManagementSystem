@@ -82,7 +82,7 @@ public class DriverViewModel : INotifyPropertyChanged
     private async Task LoadDriverAsync()
     {
         var filter = string.IsNullOrWhiteSpace(_filterText) ? "" : _filterText.Trim();
-        var driverList = await _requestService.GetAllDriversAsync(filter);
+        var driverList = await _requestService.GetAllDriversAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
             DriverList.Clear();
