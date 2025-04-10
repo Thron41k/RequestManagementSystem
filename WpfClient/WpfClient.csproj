@@ -37,6 +37,12 @@
     <Compile Update="Views\DriverView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\NomenclatureView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\WarehouseView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,6 @@ option csharp_namespace = "RequestManagement.Server.Controllers";
 import "google/protobuf/timestamp.proto";
 
 service RequestService {
-    // Методы для работы с оборудованием
     rpc GetAllEquipment (GetAllEquipmentRequest) returns (GetAllEquipmentResponse);
     rpc CreateEquipment (CreateEquipmentRequest) returns (CreateEquipmentResponse);
     rpc UpdateEquipment (UpdateEquipmentRequest) returns (UpdateEquipmentResponse);
@@ -25,6 +24,16 @@ service RequestService {
     rpc CreateDefect(CreateDefectRequest) returns (CreateDefectResponse);
     rpc UpdateDefect (UpdateDefectRequest) returns (UpdateDefectResponse);
     rpc DeleteDefect (DeleteDefectRequest) returns (DeleteDefectResponse);
+
+    rpc GetAllWarehouses (GetAllWarehousesRequest) returns (GetAllWarehousesResponse);
+    rpc CreateWarehouse(CreateWarehouseRequest) returns (CreateWarehouseResponse);
+    rpc UpdateWarehouse (UpdateWarehouseRequest) returns (UpdateWarehouseResponse);
+    rpc DeleteWarehouse (DeleteWarehouseRequest) returns (DeleteWarehouseResponse);
+
+    rpc GetAllNomenclatures (GetAllNomenclaturesRequest) returns (GetAllNomenclaturesResponse);
+    rpc CreateNomenclature(CreateNomenclatureRequest) returns (CreateNomenclatureResponse);
+    rpc UpdateNomenclature (UpdateNomenclatureRequest) returns (UpdateNomenclatureResponse);
+    rpc DeleteNomenclature (DeleteNomenclatureRequest) returns (DeleteNomenclatureResponse);
 }
 
 // Сообщения для оборудования
@@ -150,11 +159,11 @@ message GetAllDefectsRequest {
 }
 
 message GetAllDefectsResponse {
-    repeated Defect Defect = 1;
+    repeated Defect defect = 1;
 }
 
 message CreateDefectRequest {
-    Defect Defect = 1;
+    Defect defect = 1;
 }
 
 message CreateDefectResponse {
@@ -162,7 +171,7 @@ message CreateDefectResponse {
 }
 
 message UpdateDefectRequest {
-    Defect Defect = 1;
+    Defect defect = 1;
 }
 
 message UpdateDefectResponse {
@@ -181,4 +190,81 @@ message Defect {
     int32 id = 1;
     string name = 2;
     int32 defectGroupId = 3;
+}
+
+message GetAllWarehousesRequest {
+    string filter = 1;
+}
+
+message GetAllWarehousesResponse {
+    repeated Warehouse warehouse = 1;
+}
+
+message CreateWarehouseRequest {
+    Warehouse warehouse = 1;
+}
+
+message CreateWarehouseResponse {
+    int32 id = 1;
+}
+
+message UpdateWarehouseRequest {
+    Warehouse warehouse = 1;
+}
+
+message UpdateWarehouseResponse {
+    bool success = 1;
+}
+
+message DeleteWarehouseRequest {
+    int32 id = 1;
+}
+
+message DeleteWarehouseResponse {
+    bool success = 1;
+}
+
+message Warehouse {
+    int32 id = 1;
+    string name = 2;
+}
+
+message GetAllNomenclaturesRequest {
+    string filter = 1;
+}
+
+message GetAllNomenclaturesResponse {
+    repeated Nomenclature nomenclature = 1;
+}
+
+message CreateNomenclatureRequest {
+    Nomenclature nomenclature = 1;
+}
+
+message CreateNomenclatureResponse {
+    int32 id = 1;
+}
+
+message UpdateNomenclatureRequest {
+    Nomenclature nomenclature = 1;
+}
+
+message UpdateNomenclatureResponse {
+    bool success = 1;
+}
+
+message DeleteNomenclatureRequest {
+    int32 id = 1;
+}
+
+message DeleteNomenclatureResponse {
+    bool success = 1;
+}
+
+message Nomenclature {
+    int32 id = 1;
+    string code = 2;
+    string name = 3;
+    string article = 4;
+    string unitOfMeasure = 5;
 }

@@ -4,12 +4,12 @@ using WpfClient.ViewModels;
 namespace WpfClient.Views;
 
 /// <summary>
-/// Логика взаимодействия для NomenclatureView.xaml
+/// Логика взаимодействия для WarehouseView.xaml
 /// </summary>
-public partial class NomenclatureView
+public partial class WarehouseView
 {
     private readonly bool _editMode;
-    public NomenclatureView(NomenclatureViewModel viewModel,bool editMode)
+    public WarehouseView(WarehouseViewModel viewModel,bool editMode)
     {
         InitializeComponent();
         DataContext = viewModel;

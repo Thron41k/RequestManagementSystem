@@ -1,5 +1,8 @@
 ﻿using RequestManagement.Common.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace RequestManagement.Common.Interfaces
@@ -25,5 +28,15 @@ namespace RequestManagement.Common.Interfaces
         Task<int> CreateDefectAsync(Defect driver);
         Task<bool> UpdateDefectAsync(Defect driver);
         Task<bool> DeleteDefectAsync(int id);
+
+        Task<List<Warehouse>> GetAllWarehousesAsync(string filter = "");
+        Task<int> CreateWarehouseAsync(Warehouse warehouse);
+        Task<bool> UpdateWarehouseAsync(Warehouse warehouse);
+        Task<bool> DeleteWarehouseAsync(int id);
+
+        Task<List<Nomenclature>> GetAllNomenclaturesAsync(string filter = "");
+        Task<int> CreateNomenclatureAsync(Nomenclature nomenclature);
+        Task<bool> UpdateNomenclatureAsync(Nomenclature nomenclature);
+        Task<bool> DeleteNomenclatureAsync(int id);
     }
 }

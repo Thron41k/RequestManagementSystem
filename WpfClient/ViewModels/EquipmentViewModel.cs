@@ -5,6 +5,8 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
+using WpfClient.Messages;
+using WpfClient.Services.Interfaces;
 using Dispatcher = System.Windows.Threading.Dispatcher;
 using Timer = System.Timers.Timer;
 
@@ -13,6 +15,7 @@ namespace WpfClient.ViewModels;
 
 public class EquipmentViewModel : INotifyPropertyChanged
 {
+    private readonly IMessageBus _messageBus;
     public event PropertyChangedEventHandler PropertyChanged;
     private readonly IEquipmentService _requestService;
     private Equipment? _selectedEquipment;
@@ -71,9 +74,10 @@ public class EquipmentViewModel : INotifyPropertyChanged
         }
     }
 
-    public EquipmentViewModel(IEquipmentService requestService)
+    public EquipmentViewModel(IEquipmentService requestService, IMessageBus messageBus)
     {
         _requestService = requestService;
+        _messageBus = messageBus;
         LoadEquipmentCommand = new RelayCommand(Execute);
         AddEquipmentCommand = new RelayCommand(Action);
         UpdateEquipmentCommand = new RelayCommand(Execute1);
@@ -135,6 +139,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
             await LoadEquipmentAsync(); // Обновляем список после добавления
             NewEquipmentName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
     }
 
@@ -144,6 +149,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
         {
             await _requestService.UpdateEquipmentAsync(new RequestManagement.Common.Models.Equipment { Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate });
             await LoadEquipmentAsync(); // Обновляем список после изменения
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
     }
 
@@ -155,6 +161,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
             await LoadEquipmentAsync(); // Обновляем список после удаления
             NewEquipmentName = "";
             NewEquipmentLicensePlate = "";
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
     }
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)

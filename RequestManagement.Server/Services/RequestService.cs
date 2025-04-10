@@ -1,22 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+
+using Microsoft.EntityFrameworkCore;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.Server.Data;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace RequestManagement.Server.Services
 {
-    public class RequestService : IRequestService
+    public class RequestService(ApplicationDbContext dbContext) : IRequestService
     {
-        private readonly ApplicationDbContext _dbContext;
-
-        public RequestService(ApplicationDbContext dbContext)
-        {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        }
+        private readonly ApplicationDbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
         public async Task<int> CreateEquipmentAsync(Equipment equipment)
         {
@@ -243,6 +236,125 @@ namespace RequestManagement.Server.Services
                     return false;
 
                 _dbContext.Defects.Remove(defect);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<List<Warehouse>> GetAllWarehousesAsync(string filter = "")
+        {
+            var query = _dbContext.Warehouses.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase)));
+            }
+            return await query
+                .Select(e => new Warehouse
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                })
+                .ToListAsync();
+        }
+
+        public async Task<int> CreateWarehouseAsync(Warehouse warehouse)
+        {
+            _dbContext.Warehouses.Add(warehouse);
+            await _dbContext.SaveChangesAsync();
+            return warehouse.Id;
+        }
+
+        public async Task<bool> UpdateWarehouseAsync(Warehouse warehouse)
+        {
+            var existWarehouse = await _dbContext.Warehouses
+                .FirstOrDefaultAsync(e => e.Id == warehouse.Id);
+
+            if (existWarehouse == null)
+                return false;
+
+            existWarehouse.Name = warehouse.Name;
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteWarehouseAsync(int id)
+        {
+            try
+            {
+                var warehouse = await _dbContext.Warehouses
+                    .FirstOrDefaultAsync(e => e.Id == id);
+
+                if (warehouse == null)
+                    return false;
+
+                _dbContext.Warehouses.Remove(warehouse);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<Nomenclature>> GetAllNomenclaturesAsync(string filter = "")
+        {
+            var query = _dbContext.Nomenclature.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase) || e.Article.ToLower().Contains(phrase) || e.Code.ToLower().Contains(phrase) || e.UnitOfMeasure.ToLower().Contains(phrase)));
+            }
+            return await query
+                .Select(e => new Nomenclature
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Article = e.Article,
+                    Code = e.Code,
+                    UnitOfMeasure = e.UnitOfMeasure
+                })
+                .ToListAsync();
+        }
+
+        public async Task<int> CreateNomenclatureAsync(Nomenclature nomenclature)
+        {
+            _dbContext.Nomenclature.Add(nomenclature);
+            await _dbContext.SaveChangesAsync();
+            return nomenclature.Id;
+        }
+
+        public async Task<bool> UpdateNomenclatureAsync(Nomenclature nomenclature)
+        {
+            var existNomenclature = await _dbContext.Nomenclature
+                .FirstOrDefaultAsync(e => e.Id == nomenclature.Id);
+
+            if (existNomenclature == null)
+                return false;
+
+            existNomenclature.Name = nomenclature.Name;
+            existNomenclature.Article = nomenclature.Article;
+            existNomenclature.Code = nomenclature.Code;
+            existNomenclature.UnitOfMeasure = nomenclature.UnitOfMeasure;
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteNomenclatureAsync(int id)
+        {
+            try
+            {
+                var nomenclature = await _dbContext.Nomenclature
+                    .FirstOrDefaultAsync(e => e.Id == id);
+
+                if (nomenclature == null)
+                    return false;
+
+                _dbContext.Nomenclature.Remove(nomenclature);
                 await _dbContext.SaveChangesAsync();
                 return true;
             }

@@ -7,18 +7,17 @@ using System.Threading.Tasks;
 using RequestManagement.Server.Controllers;
 using WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services
-{
-    public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFactory
-    {
-        public AuthService.AuthServiceClient CreateAuthClient()
-        {
-            return serviceProvider.GetRequiredService<AuthService.AuthServiceClient>();
-        }
+namespace WpfClient.Services;
 
-        public RequestService.RequestServiceClient CreateRequestClient()
-        {
-            return serviceProvider.GetRequiredService<RequestService.RequestServiceClient>();
-        }
+public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFactory
+{
+    public AuthService.AuthServiceClient CreateAuthClient()
+    {
+        return serviceProvider.GetRequiredService<AuthService.AuthServiceClient>();
+    }
+
+    public RequestService.RequestServiceClient CreateRequestClient()
+    {
+        return serviceProvider.GetRequiredService<RequestService.RequestServiceClient>();
     }
 }

@@ -7,11 +7,14 @@ using Timer = System.Timers.Timer;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
+using WpfClient.Services.Interfaces;
+using WpfClient.Messages;
 
 namespace WpfClient.ViewModels;
 
 public class DriverViewModel : INotifyPropertyChanged
 {
+    private readonly IMessageBus _messageBus;
     public event PropertyChangedEventHandler? PropertyChanged;
     private readonly IDriverService _requestService;
     private Driver? _selectedDriver;
@@ -29,9 +32,10 @@ public class DriverViewModel : INotifyPropertyChanged
     public ICommand DeleteDriverCommand { get; }
     public ICommand SelectRowCommand { get; }
 
-    public DriverViewModel(IDriverService requestService)
+    public DriverViewModel(IDriverService requestService, IMessageBus messageBus)
     {
         _requestService = requestService;
+        _messageBus = messageBus;
         LoadDriverCommand = new RelayCommand(Execute1);
         AddDriverCommand = new RelayCommand(Execute2);
         UpdateDriverCommand = new RelayCommand(Execute3);
@@ -73,6 +77,7 @@ public class DriverViewModel : INotifyPropertyChanged
             NewDriverFullName = string.Empty;
             NewDriverShortName = string.Empty;
             NewDriverPosition = string.Empty;
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DriverUpdated));
         }
     }
     private async Task LoadDriverAsync()
@@ -95,6 +100,7 @@ public class DriverViewModel : INotifyPropertyChanged
         {
             await _requestService.UpdateDriverAsync(new RequestManagement.Common.Models.Driver { Id = _selectedDriver.Id, FullName = NewDriverFullName, ShortName = NewDriverShortName, Position = NewDriverPosition });
             await LoadDriverAsync();
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DriverUpdated));
         }
     }
     private async Task AddDriverAsync()
@@ -106,6 +112,7 @@ public class DriverViewModel : INotifyPropertyChanged
             NewDriverFullName = string.Empty;
             NewDriverShortName = string.Empty;
             NewDriverPosition = string.Empty;
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DriverUpdated));
         }
     }
 

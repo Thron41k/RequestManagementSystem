@@ -22,8 +22,9 @@
                 <MenuItem Header="Машины" Command="{Binding ShowEquipmentCommand}"/>
                 <MenuItem Header="Водители" Command="{Binding ShowDriverCommand}"/>
                 <MenuItem Header="Группы дефектов" Command="{Binding ShowDefectGroupCommand}"/>
-                <MenuItem Header="Деффекты" Command="{Binding ShowDefectCommand}"/>
-                <MenuItem Header="Номенклатура" Command="{Binding EditNomenclatureCommand}"/>
+                <MenuItem Header="Дефекты" Command="{Binding ShowDefectCommand}"/>
+                <MenuItem Header="Склады" Command="{Binding ShowWarehouseCommand}"/>
+                <MenuItem Header="Номенклатура" Command="{Binding ShowNomenclatureCommand}"/>
             </MenuItem>
         </Menu>
 

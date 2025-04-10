@@ -5,11 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using RequestManagement.Server.Controllers;
 
-namespace WpfClient.Services.Interfaces
+namespace WpfClient.Services.Interfaces;
+
+public interface IGrpcClientFactory
 {
-    public interface IGrpcClientFactory
-    {
-        AuthService.AuthServiceClient CreateAuthClient();
-        RequestService.RequestServiceClient CreateRequestClient();
-    }
+    AuthService.AuthServiceClient CreateAuthClient();
+    RequestService.RequestServiceClient CreateRequestClient();
 }

@@ -8,11 +8,14 @@ using WpfClient.Services;
 using RequestManagement.Server.Controllers;
 using System.Runtime.CompilerServices;
 using RequestManagement.Common.Interfaces;
+using WpfClient.Services.Interfaces;
+using WpfClient.Messages;
 
 namespace WpfClient.ViewModels;
 
 public class DefectGroupViewModel : INotifyPropertyChanged
 {
+    private readonly IMessageBus _messageBus;
     public event PropertyChangedEventHandler? PropertyChanged;
     private readonly IDefectService _requestService;
     private DefectGroup ? _selectedDefectGroup;
@@ -27,9 +30,10 @@ public class DefectGroupViewModel : INotifyPropertyChanged
     public ICommand UpdateDefectGroupCommand { get; }
     public ICommand DeleteDefectGroupCommand { get; }
     public ICommand SelectRowCommand { get; }
-    public DefectGroupViewModel(IDefectService requestService)
+    public DefectGroupViewModel(IDefectService requestService, IMessageBus messageBus)
     {
         _requestService = requestService;
+        _messageBus = messageBus;
         LoadDefectGroupCommand = new RelayCommand(Execute1);
         AddDefectGroupCommand = new RelayCommand(Execute2);
         UpdateDefectGroupCommand = new RelayCommand(Execute3);
@@ -68,6 +72,7 @@ public class DefectGroupViewModel : INotifyPropertyChanged
             await _requestService.DeleteDefectGroupAsync(_selectedDefectGroup.Id);
             await LoadDefectGroupAsync(); // Обновляем список после удаления
             NewDefectGroupName = string.Empty;
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DefectGroupUpdated));
         }
     }
     private async Task LoadDefectGroupAsync()
@@ -94,6 +99,7 @@ public class DefectGroupViewModel : INotifyPropertyChanged
                 Name = _selectedDefectGroup.Name,
             });
             await LoadDefectGroupAsync();
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DefectGroupUpdated));
         }
     }
     private async Task AddDefectGroupAsync()
@@ -106,6 +112,7 @@ public class DefectGroupViewModel : INotifyPropertyChanged
             });
             await LoadDefectGroupAsync();
             NewDefectGroupName = string.Empty;
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DefectGroupUpdated));
         }
     }
     public DefectGroup? SelectedDefectGroup

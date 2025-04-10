@@ -25,13 +25,6 @@ namespace RequestManagement.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Отношение Nomenclature -> Warehouse
-            modelBuilder.Entity<Nomenclature>()
-                .HasOne(n => n.Warehouse)
-                .WithMany()
-                .HasForeignKey(n => n.WarehouseId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // Отношения для NomenclatureAnalogs
             modelBuilder.Entity<NomenclatureAnalog>()
                 .HasKey(na => na.Id);
@@ -119,11 +112,6 @@ namespace RequestManagement.Server.Data
                     Name = "Турбокомпрессор ТКР 7С-6 левый КАМАЗ Евро 2",
                     Article = "7406.1118013",
                     UnitOfMeasure = "шт",
-                    InitialQuantity = 5,
-                    Receipt = 0,
-                    Consumption = 0,
-                    FinalQuantity = 5,
-                    WarehouseId = 1
                 },
                 new Nomenclature
                 {
@@ -132,11 +120,6 @@ namespace RequestManagement.Server.Data
                     Name = "Аккумулятор 6СТ-190",
                     Article = "6СТ-190",
                     UnitOfMeasure = "шт",
-                    InitialQuantity = 10,
-                    Receipt = 0,
-                    Consumption = 0,
-                    FinalQuantity = 10,
-                    WarehouseId = 1
                 },
                 new Nomenclature
                 {
@@ -145,11 +128,6 @@ namespace RequestManagement.Server.Data
                     Name = "Аккумулятор 6СТ-200 (аналог 6СТ-190)",
                     Article = "6СТ-200",
                     UnitOfMeasure = "шт",
-                    InitialQuantity = 3,
-                    Receipt = 0,
-                    Consumption = 0,
-                    FinalQuantity = 3,
-                    WarehouseId = 2
                 }
             );
 

@@ -3,22 +3,18 @@ using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using RequestManagement.Server.Services;
 
 namespace RequestManagement.Server.Controllers
 {
     /// <summary>
     /// gRPC-контроллер для работы с оборудованием
     /// </summary>
-    public class RequestController : RequestService.RequestServiceBase
+    public class RequestController(IRequestService requestService, ILogger<RequestController> logger)
+        : RequestService.RequestServiceBase
     {
-        private readonly IRequestService _requestService;
-        private readonly ILogger<RequestController> _logger;
-
-        public RequestController(IRequestService requestService, ILogger<RequestController> logger)
-        {
-            _requestService = requestService ?? throw new ArgumentNullException(nameof(requestService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        private readonly IRequestService _requestService = requestService ?? throw new ArgumentNullException(nameof(requestService));
+        private readonly ILogger<RequestController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         /// <summary>
         /// Получает список всех единиц оборудования
@@ -116,7 +112,7 @@ namespace RequestManagement.Server.Controllers
 
         public override async Task<CreateDriverResponse> CreateDriver(CreateDriverRequest request, ServerCallContext context)
         {
-            _logger.LogInformation("Creating new driver with full name and position: {Name} - {Position}", request.Driver.FullName,request.Driver.Position);
+            _logger.LogInformation("Creating new driver with full name and position: {Name} - {Position}", request.Driver.FullName, request.Driver.Position);
 
             var driver = new RequestManagement.Common.Models.Driver
             {
@@ -262,6 +258,125 @@ namespace RequestManagement.Server.Controllers
 
             var success = await _requestService.DeleteDefectAsync(request.Id);
             return new DeleteDefectResponse { Success = success };
+        }
+
+        public override async Task<GetAllWarehousesResponse> GetAllWarehouses(GetAllWarehousesRequest request, ServerCallContext context)
+        {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
+
+            logger.LogInformation("Getting all warehouses by filter");
+
+            var warehouseList = await requestService.GetAllWarehousesAsync(request.Filter);
+            var response = new GetAllWarehousesResponse();
+            response.Warehouse.AddRange(warehouseList.Select(e => new Warehouse
+            {
+                Id = e.Id,
+                Name = e.Name
+            }));
+
+            return response;
+        }
+        public override async Task<CreateWarehouseResponse> CreateWarehouse(CreateWarehouseRequest request, ServerCallContext context)
+        {
+            logger.LogInformation("Creating new warehouse with name: {Name}", request.Warehouse.Name);
+
+            var warehouse = new RequestManagement.Common.Models.Warehouse
+            {
+                Name = request.Warehouse.Name,
+            };
+
+            var id = await requestService.CreateWarehouseAsync(warehouse);
+            return new CreateWarehouseResponse { Id = id };
+        }
+
+        public override async Task<UpdateWarehouseResponse> UpdateWarehouse(UpdateWarehouseRequest request, ServerCallContext context)
+        {
+            logger.LogInformation("Updating warehouse with ID: {Id}", request.Warehouse.Id);
+
+            var warehouse = new RequestManagement.Common.Models.Warehouse
+            {
+                Id = request.Warehouse.Id,
+                Name = request.Warehouse.Name,
+            };
+
+            var success = await requestService.UpdateWarehouseAsync(warehouse);
+            return new UpdateWarehouseResponse { Success = success };
+        }
+
+        public override async Task<DeleteWarehouseResponse> DeleteWarehouse(DeleteWarehouseRequest request, ServerCallContext context)
+        {
+            logger.LogInformation("Deleting warehouse with ID: {Id}", request.Id);
+
+            var success = await requestService.DeleteWarehouseAsync(request.Id);
+            return new DeleteWarehouseResponse { Success = success };
+        }
+
+        public override async Task<GetAllNomenclaturesResponse> GetAllNomenclatures(GetAllNomenclaturesRequest request, ServerCallContext context)
+        {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
+
+            logger.LogInformation("Getting all nomenclatures by filter");
+
+            var nomenclatureList = await requestService.GetAllNomenclaturesAsync(request.Filter);
+            var response = new GetAllNomenclaturesResponse();
+            response.Nomenclature.AddRange(nomenclatureList.Select(e => new Nomenclature
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Code = e.Code,
+                UnitOfMeasure = e.UnitOfMeasure,
+                Article = e.Article
+            }));
+
+            return response;
+        }
+        public override async Task<CreateNomenclatureResponse> CreateNomenclature(CreateNomenclatureRequest request, ServerCallContext context)
+        {
+            logger.LogInformation("Creating new nomenclature with name: {Name}", request.Nomenclature.Name);
+
+            var nomenclature = new RequestManagement.Common.Models.Nomenclature
+            {
+                Name = request.Nomenclature.Name,
+                Code = request.Nomenclature.Code,
+                UnitOfMeasure = request.Nomenclature.UnitOfMeasure,
+                Article = request.Nomenclature.Article
+            };
+
+            var id = await requestService.CreateNomenclatureAsync(nomenclature);
+            return new CreateNomenclatureResponse { Id = id };
+        }
+
+        public override async Task<UpdateNomenclatureResponse> UpdateNomenclature(UpdateNomenclatureRequest request, ServerCallContext context)
+        {
+            logger.LogInformation("Updating nomenclature with ID: {Id}", request.Nomenclature.Id);
+
+            var nomenclature = new RequestManagement.Common.Models.Nomenclature
+            {
+                Id = request.Nomenclature.Id,
+                Name = request.Nomenclature.Name,
+                Code = request.Nomenclature.Code,
+                UnitOfMeasure = request.Nomenclature.UnitOfMeasure,
+                Article = request.Nomenclature.Article
+            };
+
+            var success = await requestService.UpdateNomenclatureAsync(nomenclature);
+            return new UpdateNomenclatureResponse { Success = success };
+        }
+
+        public override async Task<DeleteNomenclatureResponse> DeleteNomenclature(DeleteNomenclatureRequest request, ServerCallContext context)
+        {
+            logger.LogInformation("Deleting nomenclature with ID: {Id}", request.Id);
+
+            var success = await requestService.DeleteNomenclatureAsync(request.Id);
+            return new DeleteNomenclatureResponse { Success = success };
         }
     }
 }
