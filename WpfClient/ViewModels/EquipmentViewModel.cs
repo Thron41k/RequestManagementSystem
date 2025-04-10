@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
-using WpfClient.Services;
 using Dispatcher = System.Windows.Threading.Dispatcher;
 using Timer = System.Timers.Timer;
 
@@ -14,7 +14,7 @@ namespace WpfClient.ViewModels;
 public class EquipmentViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler PropertyChanged;
-    private readonly GrpcRequestService _requestService;
+    private readonly IEquipmentService _requestService;
     private Equipment? _selectedEquipment;
     private string _newEquipmentLicensePlate;
     private string _newEquipmentName;
@@ -71,7 +71,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
         }
     }
 
-    public EquipmentViewModel(GrpcRequestService requestService)
+    public EquipmentViewModel(IEquipmentService requestService)
     {
         _requestService = requestService;
         LoadEquipmentCommand = new RelayCommand(Execute);
@@ -84,13 +84,9 @@ public class EquipmentViewModel : INotifyPropertyChanged
         _filterTimer.Elapsed += async (s, e) => await LoadEquipmentAsync();
         return;
 
-
         async void Action1() => await DeleteEquipmentAsync();
-
         async void Execute1() => await UpdateEquipmentAsync();
-
         async void Action() => await AddEquipmentAsync();
-
         async void Execute() => await LoadEquipmentAsync();
         async void Action2() => await SelectAndClose();
     }
@@ -116,7 +112,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
             EquipmentList.Clear();
             foreach (var item in equipmentList)
             {
-                EquipmentList.Add(item);
+                EquipmentList.Add(new Equipment { Id = item.Id, Name = item.Name, LicensePlate = item.StateNumber });
             }
             return Task.CompletedTask;
         });
@@ -135,12 +131,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
     {
         if (!string.IsNullOrWhiteSpace(NewEquipmentName))
         {
-            var request = new CreateEquipmentRequest
-            {
-                Name = NewEquipmentName,
-                LicensePlate = NewEquipmentLicensePlate ?? ""
-            };
-            await _requestService.CreateEquipmentAsync(request);
+            await _requestService.CreateEquipmentAsync(new RequestManagement.Common.Models.Equipment { Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate });
             await LoadEquipmentAsync(); // Обновляем список после добавления
             NewEquipmentName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
@@ -151,13 +142,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
     {
         if (_selectedEquipment != null && !string.IsNullOrEmpty(NewEquipmentName.Trim()))
         {
-            var request = new UpdateEquipmentRequest
-            {
-                Id = _selectedEquipment.Id,
-                Name = NewEquipmentName,
-                LicensePlate = NewEquipmentLicensePlate
-            };
-            await _requestService.UpdateEquipmentAsync(request);
+            await _requestService.UpdateEquipmentAsync(new RequestManagement.Common.Models.Equipment { Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate });
             await LoadEquipmentAsync(); // Обновляем список после изменения
         }
     }
@@ -166,8 +151,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
     {
         if (_selectedEquipment != null)
         {
-            var request = new DeleteEquipmentRequest { Id = _selectedEquipment.Id };
-            await _requestService.DeleteEquipmentAsync(request);
+            await _requestService.DeleteEquipmentAsync(_selectedEquipment.Id);
             await LoadEquipmentAsync(); // Обновляем список после удаления
             NewEquipmentName = "";
             NewEquipmentLicensePlate = "";

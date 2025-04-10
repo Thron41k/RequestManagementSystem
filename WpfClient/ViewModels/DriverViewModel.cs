@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using RequestManagement.Server.Controllers;
 using System.Windows.Threading;
-using WpfClient.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Timer = System.Timers.Timer;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.Input;
-using System.CodeDom.Compiler;
+using RequestManagement.Common.Interfaces;
 
 namespace WpfClient.ViewModels;
 
 public class DriverViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
-    private readonly GrpcRequestService _requestService;
+    private readonly IDriverService _requestService;
     private Driver? _selectedDriver;
     private string _newDriverFullName;
     private string _newDriverShortName;
@@ -32,7 +29,7 @@ public class DriverViewModel : INotifyPropertyChanged
     public ICommand DeleteDriverCommand { get; }
     public ICommand SelectRowCommand { get; }
 
-    public DriverViewModel(GrpcRequestService requestService)
+    public DriverViewModel(IDriverService requestService)
     {
         _requestService = requestService;
         LoadDriverCommand = new RelayCommand(Execute1);
@@ -71,8 +68,7 @@ public class DriverViewModel : INotifyPropertyChanged
     {
         if (_selectedDriver != null)
         {
-            var request = new DeleteDriverRequest { Id = _selectedDriver.Id };
-            await _requestService.DeleteDriverAsync(request);
+            await _requestService.DeleteDriverAsync(_selectedDriver.Id);
             await LoadDriverAsync(); // Обновляем список после удаления
             NewDriverFullName = string.Empty;
             NewDriverShortName = string.Empty;
@@ -88,7 +84,7 @@ public class DriverViewModel : INotifyPropertyChanged
             DriverList.Clear();
             foreach (var item in driverList)
             {
-                DriverList.Add(item);
+                DriverList.Add(new Driver { Id = item.Id, FullName = item.FullName, ShortName = item.ShortName, Position = item.Position });
             }
             return Task.CompletedTask;
         });
@@ -97,17 +93,7 @@ public class DriverViewModel : INotifyPropertyChanged
     {
         if (_selectedDriver != null && !string.IsNullOrEmpty(NewDriverFullName.Trim()) && !string.IsNullOrEmpty(NewDriverShortName.Trim()) && !string.IsNullOrEmpty(NewDriverPosition.Trim()))
         {
-            var request = new UpdateDriverRequest
-            {
-                Driver = new Driver
-                {
-                    Id = _selectedDriver.Id,
-                    FullName = NewDriverFullName,
-                    ShortName = NewDriverShortName,
-                    Position = NewDriverPosition
-                }
-            };
-            await _requestService.UpdateDriverAsync(request);
+            await _requestService.UpdateDriverAsync(new RequestManagement.Common.Models.Driver { Id = _selectedDriver.Id, FullName = NewDriverFullName, ShortName = NewDriverShortName, Position = NewDriverPosition });
             await LoadDriverAsync();
         }
     }
@@ -115,16 +101,7 @@ public class DriverViewModel : INotifyPropertyChanged
     {
         if (!string.IsNullOrWhiteSpace(NewDriverFullName.Trim()) && !string.IsNullOrWhiteSpace(NewDriverShortName.Trim()) && !string.IsNullOrWhiteSpace(NewDriverPosition.Trim()))
         {
-            var request = new CreateDriverRequest
-            {
-                Driver = new Driver
-                {
-                    FullName = NewDriverFullName,
-                    ShortName = NewDriverShortName,
-                    Position = NewDriverPosition
-                }
-            };
-            await _requestService.CreateDriverAsync(request);
+            await _requestService.CreateDriverAsync(new RequestManagement.Common.Models.Driver { FullName = NewDriverFullName, ShortName = NewDriverShortName, Position = NewDriverPosition });
             await LoadDriverAsync();
             NewDriverFullName = string.Empty;
             NewDriverShortName = string.Empty;

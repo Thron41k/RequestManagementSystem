@@ -1,25 +1,20 @@
 ﻿using Grpc.Core;
 using RequestManagement.Server.Controllers;
+using WpfClient.Services.Interfaces;
 
 namespace WpfClient.Services;
 
-public class GrpcAuthService
+public class GrpcAuthService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore)
 {
-    private readonly AuthService.AuthServiceClient _authClient;
-    private readonly AuthTokenStore _tokenStore;
-
-    public GrpcAuthService(AuthService.AuthServiceClient authClient, AuthTokenStore tokenStore)
-    {
-        _authClient = authClient ?? throw new ArgumentNullException(nameof(authClient));
-        _tokenStore = tokenStore ?? throw new ArgumentNullException(nameof(tokenStore));
-    }
+    private readonly AuthTokenStore _tokenStore = tokenStore ?? throw new ArgumentNullException(nameof(tokenStore));
 
     public async Task<AuthenticateResponse> AuthenticateAsync(string login, string password)
     {
         try
         {
             var request = new AuthenticateRequest { Login = login, Password = password };
-            var response = await _authClient.AuthenticateAsync(request);
+            var authClient = clientFactory.CreateAuthClient();
+            var response = await authClient.AuthenticateAsync(request);
             var token = response.Token;
 
             // Сохраняем токен в AuthTokenStore
@@ -27,7 +22,7 @@ public class GrpcAuthService
             {
                 _tokenStore.SetToken(token);
             }
-            return response.UserId == 0 ? null : response;
+            return (response.UserId == 0 ? null : response)!;
         }
         catch (RpcException ex)
         {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Timer = System.Timers.Timer;
 using System.Windows.Input;
@@ -9,19 +7,18 @@ using CommunityToolkit.Mvvm.Input;
 using WpfClient.Services;
 using RequestManagement.Server.Controllers;
 using System.Runtime.CompilerServices;
-using RequestManagement.Common.Models;
-using DefectGroup = RequestManagement.Server.Controllers.DefectGroup;
+using RequestManagement.Common.Interfaces;
 
 namespace WpfClient.ViewModels;
 
 public class DefectViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
-    private readonly GrpcRequestService _requestService;
+    private readonly IDefectService _requestService;
     private DefectViewItem? _selectedDefect;
     private int _selectedDefectGroupIndex;
-    private List<DefectGroup> _defectGroupList = [];
-    private List<RequestManagement.Server.Controllers.Defect> _defectList = [];
+    private List<RequestManagement.Common.Models.DefectGroup> _defectGroupList = [];
+    private List<RequestManagement.Common.Models.Defect> _defectList = [];
     private string _newDefectName;
     private readonly Timer _filterTimer;
     private string _filterText;
@@ -34,7 +31,9 @@ public class DefectViewModel : INotifyPropertyChanged
     public ICommand UpdateDefectCommand { get; }
     public ICommand DeleteDefectCommand { get; }
     public ICommand SelectRowCommand { get; }
-    public DefectViewModel(GrpcRequestService requestService)
+    public ICommand UpdateDefectGroupListCommand { get; }
+
+    public DefectViewModel(IDefectService requestService)
     {
         _requestService = requestService;
         LoadDefectCommand = new RelayCommand(Execute1);
@@ -42,6 +41,7 @@ public class DefectViewModel : INotifyPropertyChanged
         UpdateDefectCommand = new RelayCommand(Execute3);
         DeleteDefectCommand = new RelayCommand(Execute4);
         SelectRowCommand = new RelayCommand(Execute5);
+        UpdateDefectGroupListCommand = new RelayCommand(Execute6);
         _dispatcher = Dispatcher.CurrentDispatcher;
         _filterTimer = new Timer(1000) { AutoReset = false }; // Задержка 1 секунда
         _filterTimer.Elapsed += async (s, e) => await LoadDefectAsync();
@@ -51,6 +51,7 @@ public class DefectViewModel : INotifyPropertyChanged
         async void Execute2() => await AddDefectAsync();
         async void Execute1() => await LoadDefectAsync();
         void Execute5() => SelectAndClose();
+        async void Execute6() => await LoadDefectGroupAsync();
     }
 
     public string NewDefectName
@@ -73,8 +74,7 @@ public class DefectViewModel : INotifyPropertyChanged
     {
         if (_selectedDefect != null)
         {
-            var request = new DeleteDefectRequest { Id = _selectedDefect.Id };
-            await _requestService.DeleteDefectAsync(request);
+            await _requestService.DeleteDefectAsync(_selectedDefect.Id);
             await LoadDefectAsync(); // Обновляем список после удаления
             NewDefectName = string.Empty;
         }
@@ -113,16 +113,12 @@ public class DefectViewModel : INotifyPropertyChanged
     {
         if (_selectedDefect != null && !string.IsNullOrEmpty(NewDefectName.Trim()) && SelectedDefectGroupIndex != -1)
         {
-            var request = new UpdateDefectRequest
+            await _requestService.UpdateDefectAsync(new RequestManagement.Common.Models.Defect
             {
-                Defect = new RequestManagement.Server.Controllers.Defect
-                {
-                    Id = _selectedDefect.Id,
-                    Name = _selectedDefect.Name,
-                    DefectGroupId = _defectGroupList[_selectedDefectGroupIndex].Id
-                }
-            };
-            await _requestService.UpdateDefectAsync(request);
+                Id = _selectedDefect.Id,
+                Name = _selectedDefect.Name,
+                DefectGroupId = _defectGroupList[_selectedDefectGroupIndex].Id
+            });
             await LoadDefectAsync();
         }
     }
@@ -130,15 +126,11 @@ public class DefectViewModel : INotifyPropertyChanged
     {
         if (!string.IsNullOrWhiteSpace(NewDefectName.Trim()) && SelectedDefectGroupIndex != -1)
         {
-            var request = new CreateDefectRequest
+            await _requestService.CreateDefectAsync(new RequestManagement.Common.Models.Defect
             {
-                Defect = new RequestManagement.Server.Controllers.Defect
-                {
-                    Name = NewDefectName,
-                    DefectGroupId = _defectGroupList[_selectedDefectGroupIndex].Id
-                }
-            };
-            await _requestService.CreateDefectAsync(request);
+                Name = NewDefectName,
+                DefectGroupId = _defectGroupList[_selectedDefectGroupIndex].Id
+            });
             await LoadDefectAsync();
             NewDefectName = string.Empty;
         }
@@ -198,11 +190,11 @@ public class DefectViewModel : INotifyPropertyChanged
 
 
 
-    public class DefectViewItem(RequestManagement.Server.Controllers.Defect defect, string defectGroupName)
+    public class DefectViewItem(RequestManagement.Common.Models.Defect defect, string defectGroupName)
     {
         public int Id { get; set; } = defect.Id;
         public string Name { get; set; } = defect.Name;
         public int DefectGroupId { get; set; } = defect.DefectGroupId;
-        public string DefectGroupName { get; set; } = defectGroupName; 
+        public string DefectGroupName { get; set; } = defectGroupName;
     }
 }
