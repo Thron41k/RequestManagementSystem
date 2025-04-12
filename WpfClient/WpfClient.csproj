@@ -26,6 +26,9 @@
   <ItemGroup>
     <Protobuf Include="..\RequestManagement.Server\Protos\request.proto" GrpcServices="Client" Link="Protos\request.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\auth.proto" GrpcServices="Client" Link="Protos\auth.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\stock.proto" GrpcServices="Client" Link="Protos\stock.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\expense.proto" GrpcServices="Client" Link="Protos\expense.proto" />
+
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +38,9 @@
 
   <ItemGroup>
     <Compile Update="Views\DriverView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\StockView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\NomenclatureView.xaml.cs">

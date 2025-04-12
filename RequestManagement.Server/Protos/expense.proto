@@ -1,0 +1,109 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service ExpenseService {
+  rpc GetAllExpenses (GetAllExpensesRequest) returns (GetAllExpensesResponse);
+  rpc CreateExpense (CreateExpenseRequest) returns (CreateExpenseResponse);
+  rpc UpdateExpense (UpdateExpenseRequest) returns (UpdateExpenseResponse);
+  rpc DeleteExpense (DeleteExpenseRequest) returns (DeleteExpenseResponse);
+}
+
+message GetAllExpensesRequest {
+  string filter = 1;
+}
+
+message GetAllExpensesResponse {
+  repeated Expense expenses = 1;
+}
+
+message Expense {
+  int32 id = 1;
+  ExpenseStock stock = 2;
+  double quantity = 3;
+  ExpenseEquipment equipment = 4;
+  ExpenseDriver driver = 5;
+  ExpenseDefect defect = 6;
+  string date = 7;
+}
+
+message ExpenseDefectGroup {
+    int32 id = 1;
+    string name = 2;   
+}
+
+message ExpenseDefect {
+    int32 id = 1;
+    string name = 2;
+    ExpenseDefectGroup defectGroup = 3;
+}
+
+message ExpenseDriver {
+    int32 id = 1;
+    string full_name = 2;
+    string short_name = 3; 
+    string position = 4;
+}
+
+message ExpenseEquipment {
+    int32 id = 1;
+    string name = 2;
+    string license_plate = 3;
+}
+
+message ExpenseWarehouse {
+    int32 id = 1;
+    string name = 2;
+}
+
+message ExpenseStock {
+    int32 id = 1;
+    ExpenseWarehouse warehouse = 2;
+    double initial_quantity = 3;
+    double received_quantity = 4;
+    double consumed_quantity = 5;
+    ExpenseNomenclature nomenclature = 6;
+}
+
+message ExpenseNomenclature {
+    int32 id = 1;
+    string code = 2;
+    string name = 3;
+    string article = 4;
+    string unitOfMeasure = 5;
+}
+
+message CreateExpenseRequest {
+  int32 stock_id = 1;
+  double quantity = 2;
+  int32 equipment_id = 3;
+  int32 driver_id = 4;
+  int32 defect_id = 5;
+  string date = 6;
+}
+
+message CreateExpenseResponse {
+  int32 id = 1;
+}
+
+message UpdateExpenseRequest {
+  int32 id = 1;
+  int32 stock_id = 2;
+  double quantity = 3;
+  int32 equipment_id = 4;
+  int32 driver_id = 5;
+  int32 defect_id = 6;
+  string date = 7;
+}
+
+message UpdateExpenseResponse {
+  bool success = 1;
+}
+
+message DeleteExpenseRequest {
+  int32 id = 1;
+}
+
+message DeleteExpenseResponse {
+  bool success = 1;
+}

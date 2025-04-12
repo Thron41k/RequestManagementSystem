@@ -1,16 +1,12 @@
 ﻿using RequestManagement.Common.Models.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using RequestManagement.Common.Models.Interfaces;
 
 namespace RequestManagement.Common.Models;
 
 /// <summary>
 /// Модель пользователя системы
 /// </summary>
-public class User
+public class User : IEntity
 {
     /// <summary>
     /// Уникальный идентификатор пользователя

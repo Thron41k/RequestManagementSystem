@@ -1,42 +1,36 @@
 ﻿using RequestManagement.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RequestManagement.Common.Interfaces
+namespace RequestManagement.Common.Interfaces;
+
+public interface IRequestService
 {
-    public interface IRequestService
-    {
-        Task<int> CreateEquipmentAsync(Equipment equipment);
-        Task<bool> UpdateEquipmentAsync(Equipment equipment);
-        Task<bool> DeleteEquipmentAsync(int id);
-        Task<List<Equipment>> GetAllEquipmentAsync(string filter = "");
+    Task<int> CreateEquipmentAsync(Equipment equipment);
+    Task<bool> UpdateEquipmentAsync(Equipment equipment);
+    Task<bool> DeleteEquipmentAsync(int id);
+    Task<List<Equipment>> GetAllEquipmentAsync(string filter = "");
 
-        Task<List<Driver>> GetAllDriversAsync(string filter = "");
-        Task<int> CreateDriverAsync(Driver driver);
-        Task<bool> UpdateDriverAsync(Driver driver);
-        Task<bool> DeleteDriverAsync(int id);
+    Task<List<Driver>> GetAllDriversAsync(string filter = "");
+    Task<int> CreateDriverAsync(Driver driver);
+    Task<bool> UpdateDriverAsync(Driver driver);
+    Task<bool> DeleteDriverAsync(int id);
 
-        Task<List<DefectGroup>> GetAllDefectGroupsAsync(string filter = "");
-        Task<int> CreateDefectGroupAsync(DefectGroup driver);
-        Task<bool> UpdateDefectGroupAsync(DefectGroup driver);
-        Task<bool> DeleteDefectGroupAsync(int id);
+    Task<List<DefectGroup>> GetAllDefectGroupsAsync(string filter = "");
+    Task<int> CreateDefectGroupAsync(DefectGroup driver);
+    Task<bool> UpdateDefectGroupAsync(DefectGroup driver);
+    Task<bool> DeleteDefectGroupAsync(int id);
 
-        Task<List<Defect>> GetAllDefectsAsync(string filter = "");
-        Task<int> CreateDefectAsync(Defect driver);
-        Task<bool> UpdateDefectAsync(Defect driver);
-        Task<bool> DeleteDefectAsync(int id);
+    Task<List<Defect>> GetAllDefectsAsync(string filter = "");
+    Task<int> CreateDefectAsync(Defect driver);
+    Task<bool> UpdateDefectAsync(Defect driver);
+    Task<bool> DeleteDefectAsync(int id);
 
-        Task<List<Warehouse>> GetAllWarehousesAsync(string filter = "");
-        Task<int> CreateWarehouseAsync(Warehouse warehouse);
-        Task<bool> UpdateWarehouseAsync(Warehouse warehouse);
-        Task<bool> DeleteWarehouseAsync(int id);
+    Task<List<Warehouse>> GetAllWarehousesAsync(string filter = "");
+    Task<int> CreateWarehouseAsync(Warehouse warehouse);
+    Task<bool> UpdateWarehouseAsync(Warehouse warehouse);
+    Task<bool> DeleteWarehouseAsync(int id);
 
-        Task<List<Nomenclature>> GetAllNomenclaturesAsync(string filter = "");
-        Task<int> CreateNomenclatureAsync(Nomenclature nomenclature);
-        Task<bool> UpdateNomenclatureAsync(Nomenclature nomenclature);
-        Task<bool> DeleteNomenclatureAsync(int id);
-    }
+    Task<List<Nomenclature>> GetAllNomenclaturesAsync(string filter = "");
+    Task<int> CreateNomenclatureAsync(Nomenclature nomenclature);
+    Task<bool> UpdateNomenclatureAsync(Nomenclature nomenclature);
+    Task<bool> DeleteNomenclatureAsync(int id);
 }

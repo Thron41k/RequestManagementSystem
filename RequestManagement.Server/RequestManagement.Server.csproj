@@ -30,5 +30,10 @@
 <ItemGroup>
     <Protobuf Include="Protos\auth.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\request.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\stock.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\expense.proto" GrpcServices="Server" />
+</ItemGroup>
+<ItemGroup>
+  <Folder Include="Migrations\" />
 </ItemGroup>  
 </Project>

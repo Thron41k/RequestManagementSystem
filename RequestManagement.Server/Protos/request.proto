@@ -2,8 +2,6 @@
 
 option csharp_namespace = "RequestManagement.Server.Controllers";
 
-import "google/protobuf/timestamp.proto";
-
 service RequestService {
     rpc GetAllEquipment (GetAllEquipmentRequest) returns (GetAllEquipmentResponse);
     rpc CreateEquipment (CreateEquipmentRequest) returns (CreateEquipmentResponse);

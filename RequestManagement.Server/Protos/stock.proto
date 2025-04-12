@@ -1,0 +1,72 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service StockService {
+    rpc GetAllStock (GetAllStocksRequest) returns (GetAllStocksResponse);
+    rpc CreateStock (CreateStockRequest) returns (CreateStockResponse);
+    rpc UpdateStock (UpdateStockRequest) returns (UpdateStockResponse);
+    rpc DeleteStock (DeleteStockRequest) returns (DeleteStockResponse);
+}
+
+message GetAllStocksRequest {
+    int32 warehouseId = 1;
+    string filter = 2;
+    int32 initialQuantityFilterType = 3;
+    double initialQuantity = 4;
+    int32 receivedQuantityFilterType = 5;
+    double receivedQuantity = 6;
+    int32 consumedQuantityFilterType = 7;
+    double consumedQuantity = 8;
+    int32 finalQuantityFilterType = 9;
+    double finalQuantity = 10;
+}
+
+message GetAllStocksResponse {
+    repeated Stock stocks = 1;
+}
+
+message CreateStockRequest {
+    int32 warehouse_id = 1;
+    int32 nomenclature_id = 2;
+    double initial_quantity = 3;
+}
+
+message CreateStockResponse {
+    int32 id = 1;
+}
+
+message UpdateStockRequest {
+    int32 id = 1;
+    int32 nomenclature_id = 3;
+    double initial_quantity = 4;
+}
+
+message UpdateStockResponse {
+    bool success = 1;
+}
+
+message DeleteStockRequest {
+    int32 id = 1;
+}
+
+message DeleteStockResponse {
+    bool success = 1;
+}
+
+message Stock {
+    int32 id = 1;
+    int32 warehouse_id = 2;
+    int32 nomenclature_id = 3;
+    double initial_quantity = 4;
+    double received_quantity = 5;
+    double consumed_quantity = 6;
+    StockNomenclature nomenclature = 7;
+}
+
+message StockNomenclature {
+    string code = 2;
+    string name = 3;
+    string article = 4;
+    string unitOfMeasure = 5;
+}

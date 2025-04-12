@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
-using System.Windows;
 using WpfClient.Services;
 using WpfClient.Services.Interfaces;
 using WpfClient.ViewModels;
@@ -17,14 +16,10 @@ public class ServiceConfigurator
         var serviceCollection = new ServiceCollection();
 
         // gRPC клиенты
-        serviceCollection.AddGrpcClient<AuthService.AuthServiceClient>(o =>
-        {
-            o.Address = new Uri("http://localhost:5001");
-        });
-        serviceCollection.AddGrpcClient<RequestService.RequestServiceClient>(o =>
-        {
-            o.Address = new Uri("http://localhost:5001");
-        });
+        serviceCollection.AddGrpcClient<AuthService.AuthServiceClient>(o => {o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<RequestService.RequestServiceClient>(o => {o.Address = new Uri("http://localhost:5001");});
+        serviceCollection.AddGrpcClient<StockService.StockServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<AuthTokenStore>();
@@ -40,11 +35,14 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<DefectViewModel>();
         serviceCollection.AddScoped<WarehouseViewModel>();
         serviceCollection.AddScoped<NomenclatureViewModel>();
+        serviceCollection.AddScoped<StockViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
         serviceCollection.AddScoped<IWarehouseService, GrpcWarehouseService>();
         serviceCollection.AddScoped<INomenclatureService, GrpcNomenclatureService>();
+        serviceCollection.AddScoped<IStockService, GrpcStockService>();
+        serviceCollection.AddScoped<IExpenseService, GrpcExpenseService>();
 
         // Представления
         serviceCollection.AddTransient<MainWindow>();
@@ -55,6 +53,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<DefectView>();
         serviceCollection.AddTransient<WarehouseView>();
         serviceCollection.AddTransient<NomenclatureView>();
+        serviceCollection.AddTransient<StockView>();
 
         return serviceCollection.BuildServiceProvider();
     }

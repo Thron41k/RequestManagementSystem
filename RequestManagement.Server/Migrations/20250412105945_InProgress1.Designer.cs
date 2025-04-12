@@ -12,8 +12,8 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250410113543_InProgress_1")]
-    partial class InProgress_1
+    [Migration("20250412105945_InProgress1")]
+    partial class InProgress1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,96 +24,6 @@ namespace RequestManagement.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("RequestManagement.Common.Models.Consumption", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("DriverId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("EquipmentId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Number")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("WarehouseId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DriverId");
-
-                    b.HasIndex("EquipmentId");
-
-                    b.HasIndex("Number")
-                        .IsUnique();
-
-                    b.HasIndex("WarehouseId");
-
-                    b.ToTable("Consumptions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Date = new DateTime(2025, 4, 3, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DriverId = 1,
-                            EquipmentId = 1,
-                            Number = "РСХ0001",
-                            WarehouseId = 1
-                        });
-                });
-
-            modelBuilder.Entity("RequestManagement.Common.Models.ConsumptionItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ConsumptionId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("DefectId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("NomenclatureId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConsumptionId");
-
-                    b.HasIndex("DefectId");
-
-                    b.HasIndex("NomenclatureId");
-
-                    b.ToTable("ConsumptionItems");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ConsumptionId = 1,
-                            DefectId = 2,
-                            NomenclatureId = 2,
-                            Quantity = 1
-                        });
-                });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
                 {
@@ -249,6 +159,57 @@ namespace RequestManagement.Server.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RequestManagement.Common.Models.Expense", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DefectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DriverId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DefectId");
+
+                    b.HasIndex("DriverId");
+
+                    b.HasIndex("EquipmentId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Expenses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Date = new DateTime(2025, 4, 12, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DefectId = 1,
+                            DriverId = 1,
+                            EquipmentId = 1,
+                            Quantity = 5m,
+                            StockId = 1
+                        });
+                });
+
             modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>
                 {
                     b.Property<int>("Id")
@@ -304,7 +265,7 @@ namespace RequestManagement.Server.Migrations
                         });
                 });
 
-            modelBuilder.Entity("RequestManagement.Common.Models.NomenclatureAnalog", b =>
+            modelBuilder.Entity("RequestManagement.Common.Models.Stock", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -312,26 +273,65 @@ namespace RequestManagement.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AnalogNomenclatureId")
+                    b.Property<decimal>("ConsumedQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("InitialQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("NomenclatureId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("MainNomenclatureId")
+                    b.Property<decimal>("ReceivedQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("WarehouseId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AnalogNomenclatureId");
+                    b.HasIndex("NomenclatureId");
 
-                    b.HasIndex("MainNomenclatureId");
+                    b.HasIndex("WarehouseId");
 
-                    b.ToTable("NomenclatureAnalogs");
+                    b.ToTable("Stocks");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            AnalogNomenclatureId = 3,
-                            MainNomenclatureId = 2
+                            ConsumedQuantity = 0m,
+                            InitialQuantity = 70m,
+                            NomenclatureId = 1,
+                            ReceivedQuantity = 0m,
+                            WarehouseId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ConsumedQuantity = 0m,
+                            InitialQuantity = 10m,
+                            NomenclatureId = 2,
+                            ReceivedQuantity = 0m,
+                            WarehouseId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ConsumedQuantity = 0m,
+                            InitialQuantity = 40m,
+                            NomenclatureId = 1,
+                            ReceivedQuantity = 0m,
+                            WarehouseId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ConsumedQuantity = 0m,
+                            InitialQuantity = 20m,
+                            NomenclatureId = 2,
+                            ReceivedQuantity = 0m,
+                            WarehouseId = 2
                         });
                 });
 
@@ -400,8 +400,25 @@ namespace RequestManagement.Server.Migrations
                         });
                 });
 
-            modelBuilder.Entity("RequestManagement.Common.Models.Consumption", b =>
+            modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
                 {
+                    b.HasOne("RequestManagement.Common.Models.DefectGroup", "DefectGroup")
+                        .WithMany("Defects")
+                        .HasForeignKey("DefectGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DefectGroup");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Expense", b =>
+                {
+                    b.HasOne("RequestManagement.Common.Models.Defect", "Defect")
+                        .WithMany()
+                        .HasForeignKey("DefectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("RequestManagement.Common.Models.Driver", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId")
@@ -414,84 +431,53 @@ namespace RequestManagement.Server.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RequestManagement.Common.Models.Warehouse", "Warehouse")
+                    b.HasOne("RequestManagement.Common.Models.Stock", "Stock")
                         .WithMany()
-                        .HasForeignKey("WarehouseId")
+                        .HasForeignKey("StockId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Defect");
 
                     b.Navigation("Driver");
 
                     b.Navigation("Equipment");
 
-                    b.Navigation("Warehouse");
+                    b.Navigation("Stock");
                 });
 
-            modelBuilder.Entity("RequestManagement.Common.Models.ConsumptionItem", b =>
+            modelBuilder.Entity("RequestManagement.Common.Models.Stock", b =>
                 {
-                    b.HasOne("RequestManagement.Common.Models.Consumption", "Consumption")
-                        .WithMany("Items")
-                        .HasForeignKey("ConsumptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RequestManagement.Common.Models.Defect", "Defect")
-                        .WithMany()
-                        .HasForeignKey("DefectId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("RequestManagement.Common.Models.Nomenclature", "Nomenclature")
-                        .WithMany()
+                        .WithMany("Stocks")
                         .HasForeignKey("NomenclatureId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Consumption");
-
-                    b.Navigation("Defect");
+                    b.HasOne("RequestManagement.Common.Models.Warehouse", "Warehouse")
+                        .WithMany("Stocks")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Nomenclature");
-                });
 
-            modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
-                {
-                    b.HasOne("RequestManagement.Common.Models.DefectGroup", "DefectGroup")
-                        .WithMany("Defects")
-                        .HasForeignKey("DefectGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DefectGroup");
-                });
-
-            modelBuilder.Entity("RequestManagement.Common.Models.NomenclatureAnalog", b =>
-                {
-                    b.HasOne("RequestManagement.Common.Models.Nomenclature", "AnalogNomenclature")
-                        .WithMany()
-                        .HasForeignKey("AnalogNomenclatureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("RequestManagement.Common.Models.Nomenclature", "MainNomenclature")
-                        .WithMany()
-                        .HasForeignKey("MainNomenclatureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AnalogNomenclature");
-
-                    b.Navigation("MainNomenclature");
-                });
-
-            modelBuilder.Entity("RequestManagement.Common.Models.Consumption", b =>
-                {
-                    b.Navigation("Items");
+                    b.Navigation("Warehouse");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.DefectGroup", b =>
                 {
                     b.Navigation("Defects");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>
+                {
+                    b.Navigation("Stocks");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Warehouse", b =>
+                {
+                    b.Navigation("Stocks");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,14 +1,8 @@
 ﻿using RequestManagement.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RequestManagement.Server.Controllers;
 using Defect = RequestManagement.Common.Models.Defect;
 using DefectGroup = RequestManagement.Common.Models.DefectGroup;
 using Grpc.Core;
-using RequestManagement.Common.Models;
 using WpfClient.Services.Interfaces;
 
 namespace WpfClient.Services;

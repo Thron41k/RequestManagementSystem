@@ -1,6 +1,5 @@
 ﻿using RequestManagement.Common.Models;
 using RequestManagement.Common.Models.Enums;
-using System.Threading.Tasks;
 
 namespace RequestManagement.Common.Interfaces;
 

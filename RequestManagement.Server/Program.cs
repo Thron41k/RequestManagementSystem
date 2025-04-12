@@ -14,8 +14,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Регистрация сервисов
 builder.Services.AddScoped<IRequestService, RequestService>();
+builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
 // Настройка JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]); // Ключ должен быть минимум 32 байта
@@ -40,13 +42,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddGrpc();
 
 var app = builder.Build();
-
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Настройка конвейера обработки запросов
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGrpcService<RequestManagement.Server.Controllers.RequestController>();
+app.MapGrpcService<RequestManagement.Server.Controllers.StockController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.AuthController>();
+app.MapGrpcService<RequestManagement.Server.Controllers.ExpenseController>();
 
 app.Run();

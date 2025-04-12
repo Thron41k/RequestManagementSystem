@@ -16,56 +16,61 @@ namespace RequestManagement.Server.Data
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<Nomenclature> Nomenclature { get; set; }
-        public DbSet<NomenclatureAnalog> NomenclatureAnalogs { get; set; }
-        public DbSet<Consumption> Consumptions { get; set; }
         public DbSet<DefectGroup> DefectGroups { get; set; }
         public DbSet<Defect> Defects { get; set; }
-        public DbSet<ConsumptionItem> ConsumptionItems { get; set; }
         public DbSet<Driver> Drivers { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Отношения для NomenclatureAnalogs
-            modelBuilder.Entity<NomenclatureAnalog>()
-                .HasKey(na => na.Id);
+            modelBuilder.Entity<Expense>(entity =>
+            {
+                entity.HasKey(e => e.Id);
 
-            modelBuilder.Entity<NomenclatureAnalog>()
-                .HasOne(na => na.MainNomenclature)
-                .WithMany()
-                .HasForeignKey(na => na.MainNomenclatureId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(e => e.Quantity)
+                    .HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<NomenclatureAnalog>()
-                .HasOne(na => na.AnalogNomenclature)
-                .WithMany()
-                .HasForeignKey(na => na.AnalogNomenclatureId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(e => e.Date)
+                    .HasColumnType("timestamp with time zone");
 
-            // Отношения для Consumption
-            modelBuilder.Entity<Consumption>()
-                .HasOne(c => c.Warehouse)
-                .WithMany()
-                .HasForeignKey(c => c.WarehouseId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Stock)
+                    .WithMany() // Если нужно, можно добавить коллекцию Expenses в Stock
+                    .HasForeignKey(e => e.StockId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Consumption>()
-                .HasOne(c => c.Equipment)
-                .WithMany()
-                .HasForeignKey(c => c.EquipmentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Equipment)
+                    .WithMany()
+                    .HasForeignKey(e => e.EquipmentId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Consumption>()
-                .HasOne(c => c.Driver)
-                .WithMany()
-                .HasForeignKey(c => c.DriverId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Driver)
+                    .WithMany()
+                    .HasForeignKey(e => e.DriverId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Consumption>()
-                .HasMany(c => c.Items)
-                .WithOne(ci => ci.Consumption)
-                .HasForeignKey(ci => ci.ConsumptionId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Defect)
+                    .WithMany()
+                    .HasForeignKey(e => e.DefectId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<Stock>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+                entity.Property(s => s.InitialQuantity).HasColumnType("decimal(18,2)");
+                entity.Property(s => s.ReceivedQuantity).HasColumnType("decimal(18,2)");
+                entity.Property(s => s.ConsumedQuantity).HasColumnType("decimal(18,2)");
 
+                entity.HasOne(s => s.Warehouse)
+                    .WithMany(w => w.Stocks)
+                    .HasForeignKey(s => s.WarehouseId)
+                    .OnDelete(DeleteBehavior.Restrict); // Запрет удаления склада, если есть запасы
+
+                entity.HasOne(s => s.Nomenclature)
+                    .WithMany(n => n.Stocks)
+                    .HasForeignKey(s => s.NomenclatureId)
+                    .OnDelete(DeleteBehavior.Restrict); // Запрет удаления номенклатуры, если есть запасы
+            });
             // Отношения для DefectGroup и Defect
             modelBuilder.Entity<DefectGroup>()
                 .HasMany(dg => dg.Defects)
@@ -73,18 +78,18 @@ namespace RequestManagement.Server.Data
                 .HasForeignKey(d => d.DefectGroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Отношения для ConsumptionItem
-            modelBuilder.Entity<ConsumptionItem>()
-                .HasOne(ci => ci.Nomenclature)
-                .WithMany()
-                .HasForeignKey(ci => ci.NomenclatureId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ConsumptionItem>()
-                .HasOne(ci => ci.Defect)
-                .WithMany()
-                .HasForeignKey(ci => ci.DefectId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Expense>().HasData(
+                new Expense
+                {
+                    Id = 1,
+                    StockId = 1,
+                    Quantity = 5,
+                    EquipmentId = 1,
+                    DriverId = 1,
+                    DefectId = 1,
+                    Date = DateTime.SpecifyKind(DateTime.Parse("12.04.2025"), DateTimeKind.Utc)
+                }
+            );
 
             // Начальные данные для Users
             modelBuilder.Entity<User>().HasData(
@@ -130,15 +135,43 @@ namespace RequestManagement.Server.Data
                     UnitOfMeasure = "шт",
                 }
             );
-
-            // Начальные данные для NomenclatureAnalogs
-            modelBuilder.Entity<NomenclatureAnalog>().HasData(
-                new NomenclatureAnalog
+            modelBuilder.Entity<Stock>().HasData(
+                new Stock
                 {
                     Id = 1,
-                    MainNomenclatureId = 2,
-                    AnalogNomenclatureId = 3
-                }
+                    NomenclatureId = 1,
+                    WarehouseId = 1,
+                    InitialQuantity = 70,
+                    ReceivedQuantity = 0,
+                    ConsumedQuantity = 0
+                },
+                new Stock
+                {
+                    Id = 2,
+                    NomenclatureId = 2,
+                    WarehouseId = 1,
+                    InitialQuantity = 10,
+                    ReceivedQuantity = 0,
+                    ConsumedQuantity = 0
+                },
+            new Stock
+            {
+                Id = 3,
+                NomenclatureId = 1,
+                WarehouseId = 2,
+                InitialQuantity = 40,
+                ReceivedQuantity = 0,
+                ConsumedQuantity = 0
+            },
+            new Stock
+            {
+                Id = 4,
+                NomenclatureId = 2,
+                WarehouseId = 2,
+                InitialQuantity = 20,
+                ReceivedQuantity = 0,
+                ConsumedQuantity = 0
+            }
             );
 
             // Начальные данные для Drivers
@@ -181,38 +214,9 @@ namespace RequestManagement.Server.Data
                 new Defect { Id = 2, Name = "Короткое замыкание", DefectGroupId = 2 }
             );
 
-            // Начальные данные для Consumptions
-            modelBuilder.Entity<Consumption>().HasData(
-                new Consumption
-                {
-                    Id = 1,
-                    Number = "РСХ0001",
-                    Date = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc),
-                    WarehouseId = 1,
-                    EquipmentId = 1,
-                    DriverId = 1
-                }
-            );
-
-            // Начальные данные для ConsumptionItems
-            modelBuilder.Entity<ConsumptionItem>().HasData(
-                new ConsumptionItem
-                {
-                    Id = 1,
-                    NomenclatureId = 2, // Аккумулятор 6СТ-190
-                    Quantity = 1,
-                    DefectId = 2,       // Короткое замыкание
-                    ConsumptionId = 1
-                }
-            );
-
             // Индексы
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Login)
-                .IsUnique();
-
-            modelBuilder.Entity<Consumption>()
-                .HasIndex(c => c.Number)
                 .IsUnique();
         }
     }

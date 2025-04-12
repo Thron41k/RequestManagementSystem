@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RequestManagement.Common.Models.Interfaces;
 
-namespace RequestManagement.Common.Models
+namespace RequestManagement.Common.Models;
+
+public class DefectGroup : IEntity
 {
-    public class DefectGroup
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }          // Название
-        public List<Defect> Defects { get; set; } // Деффекты в группе
-    }
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public List<Defect> Defects { get; set; } = [];
 }

@@ -1,9 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RequestManagement.Server.Controllers;
 using WpfClient.Services.Interfaces;
 
@@ -19,5 +14,14 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     public RequestService.RequestServiceClient CreateRequestClient()
     {
         return serviceProvider.GetRequiredService<RequestService.RequestServiceClient>();
+    }
+    public StockService.StockServiceClient CreateStockClient()
+    {
+        return serviceProvider.GetRequiredService<StockService.StockServiceClient>();
+    }
+
+    public ExpenseService.ExpenseServiceClient CreateExpenseClient()
+    {
+        return serviceProvider.GetRequiredService<ExpenseService.ExpenseServiceClient>();
     }
 }

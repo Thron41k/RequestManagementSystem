@@ -4,7 +4,6 @@ using Timer = System.Timers.Timer;
 using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Input;
-using WpfClient.Services;
 using RequestManagement.Server.Controllers;
 using System.Runtime.CompilerServices;
 using RequestManagement.Common.Interfaces;

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RequestManagement.Common.Models.Interfaces;
 
-namespace RequestManagement.Common.Models
+namespace RequestManagement.Common.Models;
+
+public class Driver : IEntity
 {
-    public class Driver
-    {
-        public int Id { get; set; }
-        public string FullName { get; set; }         // Полное ФИО
-        public string ShortName { get; set; }        // Фамилия с инициалами
-        public string Position { get; set; }         // Должность
-    }
+    public int Id { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string ShortName { get; set; } = string.Empty;
+    public string Position { get; set; } = string.Empty;
 }
