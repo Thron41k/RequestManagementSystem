@@ -40,6 +40,9 @@
     <Compile Update="Views\DriverView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\ExpenseView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\StockView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

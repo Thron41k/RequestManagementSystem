@@ -36,6 +36,12 @@
         <!-- DataGrid -->
         <DataGrid Grid.Row="1" ItemsSource="{Binding Stocks}" SelectedItem="{Binding SelectedStock}"
                   AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+            <DataGrid.InputBindings>
+                <MouseBinding
+                    MouseAction="LeftDoubleClick"
+                    Command="{Binding DoubleClickCommand}"
+                    CommandParameter="{Binding Stocks/}"/>
+            </DataGrid.InputBindings>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Код" Binding="{Binding Nomenclature.Code}" IsReadOnly="True" Width="*" />
                 <DataGridTextColumn Header="Артикул" Binding="{Binding Nomenclature.Article}" IsReadOnly="True" Width="*" />

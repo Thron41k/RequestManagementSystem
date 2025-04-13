@@ -181,6 +181,9 @@ public class DefectViewModel : INotifyPropertyChanged
             _filterTimer.Start(); // Запускаем таймер заново
         }
     }
+
+    public bool EditMode { get; set; }
+
     private void AddToEdit()
     {
         if (_selectedDefect != null)
@@ -191,7 +194,7 @@ public class DefectViewModel : INotifyPropertyChanged
     }
     private void SelectAndClose()
     {
-        if (_selectedDefect != null)
+        if (!EditMode &&  _selectedDefect != null)
         {
             CloseWindowRequested.Invoke(this, EventArgs.Empty);
         }

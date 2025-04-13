@@ -10,6 +10,11 @@
         NomenclatureUpdated,
         StockUpdated,
         SelectNomenclature,
-        SelectWarehouse
+        SelectWarehouse,
+        ShowExpenseDialog,
+        SelectEquipment,
+        SelectDriver,
+        SelectDefect,
+        SelectDefectGroup
     }
 }

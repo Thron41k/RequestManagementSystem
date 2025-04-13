@@ -4,6 +4,7 @@ using RequestManagement.Common.Interfaces;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows;
+using RequestManagement.Common.Models.Interfaces;
 using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
 using static System.Decimal;
@@ -14,6 +15,7 @@ namespace WpfClient.ViewModels
 {
     public partial class StockViewModel : ObservableObject
     {
+        public bool EditMode { get; set; }
         private readonly IStockService _stockService;
         private readonly INomenclatureService _nomenclatureService;
         private readonly IWarehouseService _warehouseService;
@@ -139,6 +141,12 @@ namespace WpfClient.ViewModels
         }
 
         [RelayCommand]
+        private void DoubleClick()
+        {
+            _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(IStockService), false, _selectedStock, null, null, null));
+        }
+
+        [RelayCommand]
         private async Task Save()
         {
             if (SelectedStock == null)
@@ -195,7 +203,7 @@ namespace WpfClient.ViewModels
         {
             await RefreshStocks();
         }
-
+        public async Task LoadStocksAsync() => await RefreshStocks();
         private async Task RefreshStocks()
         {
             try

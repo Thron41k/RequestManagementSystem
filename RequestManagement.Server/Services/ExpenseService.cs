@@ -34,24 +34,32 @@ namespace RequestManagement.Server.Services
         }
         public async Task<int> CreateExpenseAsync(Expense expense)
         {
-            if (expense == null) throw new ArgumentNullException(nameof(expense));
-
-            // Проверка наличия записи в Stock
-            var stock = await dbContext.Stocks
-                .FirstOrDefaultAsync(s => s.Id == expense.StockId);
-
-            if (stock == null)
+            try
             {
-                throw new InvalidOperationException("Stock with the given ID does not exist.");
+                if (expense == null) throw new ArgumentNullException(nameof(expense));
+
+                // Проверка наличия записи в Stock
+                var stock = await dbContext.Stocks
+                    .FirstOrDefaultAsync(s => s.Id == expense.StockId);
+
+                if (stock == null)
+                {
+                    throw new InvalidOperationException("Stock with the given ID does not exist.");
+                }
+
+                // Обновление ConsumedQuantity
+                stock.ConsumedQuantity += expense.Quantity;
+
+                dbContext.Expenses.Add(expense);
+                await dbContext.SaveChangesAsync();
+
+                return expense.Id;
             }
-
-            // Обновление ConsumedQuantity
-            stock.ConsumedQuantity += expense.Quantity;
-
-            dbContext.Expenses.Add(expense);
-            await dbContext.SaveChangesAsync();
-
-            return expense.Id;
+            catch
+            {
+                return -1;
+            }
+            
         }
         public async Task<bool> UpdateExpenseAsync(Expense expense)
         {

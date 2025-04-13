@@ -6,6 +6,7 @@ using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
 using WpfClient.Views;
 using System.Windows.Controls;
+using RequestManagement.Common.Models.Interfaces;
 
 namespace WpfClient.ViewModels;
 
@@ -18,6 +19,7 @@ public class MainMenuViewModel
     private readonly WarehouseViewModel _warehouseViewModel;
     private readonly NomenclatureViewModel _nomenclatureViewModel;
     private readonly StockViewModel _stockViewModel;
+    private readonly ExpenseViewModel _expenseViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -27,7 +29,7 @@ public class MainMenuViewModel
     public ICommand ShowWarehouseCommand { get; }
     public ICommand ShowNomenclatureCommand { get; }
     public ICommand ShowStockCommand { get; }
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel)
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -37,8 +39,10 @@ public class MainMenuViewModel
         _nomenclatureViewModel = nomenclatureViewModel;
         _messageBus = messageBus;
         _stockViewModel = stockViewModel;
+        _expenseViewModel = expenseViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
+        _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
         ShowEquipmentCommand = new RelayCommand(ShowEquipment);
         ShowDriverCommand = new RelayCommand(ShowDriver);
         ShowDefectGroupCommand = new RelayCommand(ShowDefectGroup);
@@ -85,9 +89,51 @@ public class MainMenuViewModel
             case MessagesEnum.SelectWarehouse:
                 ShowWarehouse(false, arg.Caller);
                 break;
+            case MessagesEnum.SelectDefect:
+                ShowDefect(false, arg.Caller);
+                break;
+            case MessagesEnum.SelectDefectGroup:
+                ShowDefectGroup(false, arg.Caller);
+                break;
+            case MessagesEnum.SelectDriver:
+                ShowDriver(false, arg.Caller);
+                break;
+            case MessagesEnum.SelectEquipment:
+                ShowEquipment(false, arg.Caller);
+                break;
         }
 
         return Task.CompletedTask;
+    }
+    private async Task OnShowDialog(ShowTaskMessage arg)
+    {
+        switch (arg.Message)
+        {
+            case MessagesEnum.ShowExpenseDialog:
+                await ShowExpenseDialog(arg.EditMode, arg.Caller, arg.Item);
+                break;
+        }
+    }
+    private async Task ShowExpenseDialog(bool editMode, Type argCaller, params IEntity?[] entity)
+    {
+        var expenseView = new ExpenseView(_expenseViewModel);
+        var window = new Window
+        {
+            Content = expenseView,
+            Title = editMode ? "Редактирование расхода" : "Добавить расход",
+            Width = 620,
+            Height = 330,
+            ResizeMode = ResizeMode.NoResize
+        };
+        _expenseViewModel.EditMode = editMode;
+        _expenseViewModel.SelectedEquipmentText = "";
+        _expenseViewModel.QuantityForExpense = "";
+        if (entity[0] != null) _expenseViewModel.ExpenseStock = entity[0] as Stock;
+        _expenseViewModel.SelectedEquipment = entity[1] != null ? entity[1] as Equipment : new Equipment();
+        _expenseViewModel.SelectedDriver = entity[2] != null ?  entity[2] as Driver : new Driver();
+        _expenseViewModel.SelectedDefect = entity[3] != null ? entity[3] as Defect : new Defect();
+        window.ShowDialog();
+        await _stockViewModel.LoadStocksAsync();
     }
     private void ShowStock(bool editMode, Type? argCaller = null)
     {
@@ -95,15 +141,16 @@ public class MainMenuViewModel
         var window = new Window
         {
             Content = stockView,
-            Title = "Транспорт и ДСТ",
+            Title = "Остатки на складах",
             Width = 1000,
             Height = 600
         };
+        _stockViewModel.EditMode = editMode;
         window.ShowDialog();
     }
     private void ShowEquipment(bool editMode, Type? argCaller = null)
     {
-        var equipmentView = new EquipmentView(_equipmentViewModel, editMode);
+        var equipmentView = new EquipmentView(_equipmentViewModel);
         var window = new Window
         {
             Content = equipmentView,
@@ -111,12 +158,22 @@ public class MainMenuViewModel
             Width = 800,
             Height = 600
         };
+        _equipmentViewModel.EditMode = editMode;
         _ = _equipmentViewModel.Load();
         window.ShowDialog();
+        if (_equipmentViewModel.SelectedEquipment != null && argCaller != null)
+            _messageBus.Publish(
+                new SelectResultMessage(
+                    MessagesEnum.SelectEquipment, argCaller, new Equipment
+                    {
+                        Id = _equipmentViewModel.SelectedEquipment.Id,
+                        Name = _equipmentViewModel.SelectedEquipment.Name,
+                        StateNumber = _equipmentViewModel.SelectedEquipment.LicensePlate
+                    }));
     }
     private void ShowDriver(bool editMode, Type? argCaller = null)
     {
-        var driverView = new DriverView(_driverViewModel, editMode);
+        var driverView = new DriverView(_driverViewModel);
         var window = new Window
         {
             Content = driverView,
@@ -125,7 +182,17 @@ public class MainMenuViewModel
             Height = 600
         };
         _ = _driverViewModel.Load();
+        _driverViewModel.EditMode = editMode;
         window.ShowDialog();
+        if (_driverViewModel.SelectedDriver != null && argCaller != null)
+            _messageBus.Publish(
+                new SelectResultMessage(
+                    MessagesEnum.SelectDriver, argCaller, new Driver
+                    {
+                        Id = _driverViewModel.SelectedDriver.Id,
+                        FullName = _driverViewModel.SelectedDriver.FullName,
+                        ShortName = _driverViewModel.SelectedDriver.ShortName
+                    }));
     }
     private void ShowDefectGroup(bool editMode, Type? argCaller = null)
     {
@@ -142,7 +209,7 @@ public class MainMenuViewModel
     }
     private void ShowDefect(bool editMode, Type? argCaller = null)
     {
-        var defectView = new DefectView(_defectViewModel, editMode);
+        var defectView = new DefectView(_defectViewModel);
         var window = new Window
         {
             Content = defectView,
@@ -151,7 +218,16 @@ public class MainMenuViewModel
             Height = 600
         };
         _ = _defectViewModel.Load();
+        _defectViewModel.EditMode = editMode;
         window.ShowDialog();
+        if (_defectViewModel.SelectedDefect != null && argCaller != null)
+            _messageBus.Publish(
+                new SelectResultMessage(
+                    MessagesEnum.SelectDefect, argCaller, new Defect
+                    {
+                       Id = _defectViewModel.SelectedDefect.Id,
+                       Name = _defectViewModel.SelectedDefect.Name
+                    }));
     }
     private void ShowWarehouse(bool editMode, Type? argCaller = null)
     {

@@ -159,6 +159,8 @@ public class DriverViewModel : INotifyPropertyChanged
         }
     }
 
+    public bool EditMode { get; set; }
+
     private void AddToEdit()
     {
         if (_selectedDriver != null)
@@ -171,7 +173,7 @@ public class DriverViewModel : INotifyPropertyChanged
 
     private void SelectAndClose()
     {
-        if (_selectedDriver != null)
+        if (!EditMode && _selectedDriver != null)
         {
             CloseWindowRequested?.Invoke(this, EventArgs.Empty);
         }

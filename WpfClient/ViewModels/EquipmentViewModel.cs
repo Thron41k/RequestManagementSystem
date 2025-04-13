@@ -74,6 +74,8 @@ public class EquipmentViewModel : INotifyPropertyChanged
         }
     }
 
+    public bool EditMode { get; set; }
+
     public EquipmentViewModel(IEquipmentService requestService, IMessageBus messageBus)
     {
         _requestService = requestService;
@@ -97,7 +99,7 @@ public class EquipmentViewModel : INotifyPropertyChanged
 
     private async Task SelectAndClose()
     {
-        if (SelectedEquipment != null)
+        if (!EditMode && SelectedEquipment != null)
         {
             CloseWindowRequested?.Invoke(this, EventArgs.Empty);
         }

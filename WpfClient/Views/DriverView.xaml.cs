@@ -8,16 +8,14 @@ namespace WpfClient.Views;
 /// </summary>
 public partial class DriverView
 {
-    private readonly bool _editMode;
-    public DriverView(DriverViewModel viewModel,bool editMode)
+    public DriverView(DriverViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel;
         viewModel.CloseWindowRequested += ViewModel_CloseWindowRequested;
-        _editMode = editMode;
     }
     private void ViewModel_CloseWindowRequested(object? sender, EventArgs e)
     {
-        if(!_editMode) Window.GetWindow(this)?.Close(); // Закрываем окно, содержащее UserControl
+        Window.GetWindow(this)?.Close(); // Закрываем окно, содержащее UserControl
     }
 }
