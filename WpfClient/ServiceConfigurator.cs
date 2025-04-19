@@ -37,6 +37,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<NomenclatureViewModel>();
         serviceCollection.AddScoped<StockViewModel>();
         serviceCollection.AddScoped<ExpenseViewModel>();
+        serviceCollection.AddScoped<ExpenseListViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -56,6 +57,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<NomenclatureView>();
         serviceCollection.AddTransient<StockView>();
         serviceCollection.AddTransient<ExpenseView>();
+        serviceCollection.AddTransient<ExpenseListView>();
 
         return serviceCollection.BuildServiceProvider();
     }

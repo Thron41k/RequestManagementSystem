@@ -21,11 +21,42 @@ namespace RequestManagement.Server.Data
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<UserLastSelection> UserLastSelections { get; set; }
+        public DbSet<NomenclatureDefectMapping> NomenclatureDefectMappings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserLastSelection>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId);
+                entity.HasOne(e => e.Driver)
+                    .WithMany()
+                    .HasForeignKey(e => e.DriverId)
+                    .IsRequired(false);
+                entity.HasOne(e => e.Equipment)
+                    .WithMany()
+                    .HasForeignKey(e => e.EquipmentId)
+                    .IsRequired(false);
+            });
+            modelBuilder.Entity<NomenclatureDefectMapping>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId);
+                entity.HasOne(e => e.Nomenclature)
+                    .WithMany()
+                    .HasForeignKey(e => e.NomenclatureId);
+                entity.HasOne(e => e.Defect)
+                    .WithMany()
+                    .HasForeignKey(e => e.DefectId);
+            });
             modelBuilder.Entity<Expense>(entity =>
             {
+                entity.Ignore(e=>e.IsSelected);
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Quantity)
@@ -97,7 +128,7 @@ namespace RequestManagement.Server.Data
                 {
                     Id = 1,
                     Login = "admin",
-                    Password = "$2a$11$abcdefghijk123456789u.lX7Qz5Z9K8zM8zM8zM8zM8zM8zM8zM8zM",
+                    Password = "$2a$11$IeKuyvG/5SoDYP0NFz3kouC3CPUIuUa6ShTfgVVf9oUlfqbXq8LrC",
                     Role = UserRole.Administrator
                 }
             );

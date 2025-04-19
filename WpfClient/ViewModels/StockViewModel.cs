@@ -4,6 +4,7 @@ using RequestManagement.Common.Interfaces;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows;
+using RequestManagement.Common.Models;
 using RequestManagement.Common.Models.Interfaces;
 using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
@@ -17,12 +18,10 @@ namespace WpfClient.ViewModels
     {
         public bool EditMode { get; set; }
         private readonly IStockService _stockService;
-        private readonly INomenclatureService _nomenclatureService;
-        private readonly IWarehouseService _warehouseService;
         private readonly IMessageBus _messageBus;
-
+        private readonly IExpenseService _expenseService;
         [ObservableProperty]
-        private ObservableCollection<RequestManagement.Common.Models.Stock> _stocks = new();
+        private ObservableCollection<RequestManagement.Common.Models.Stock> _stocks = [];
 
         [ObservableProperty]
         private RequestManagement.Common.Models.Stock? _selectedStock;
@@ -65,16 +64,18 @@ namespace WpfClient.ViewModels
 
         [ObservableProperty]
         private string _nomenclatureFilter = string.Empty;
+
+        private Driver? _lastSelectedDriver = null;
+        private Equipment? _lastSelectedEquipment = null;
         public StockViewModel()
         {
             // Для дизайнера
         }
-        public StockViewModel(IStockService stockService, INomenclatureService nomenclatureService, IWarehouseService warehouseService, IMessageBus messageBus)
+        public StockViewModel(IStockService stockService, IMessageBus messageBus, IExpenseService expenseService)
         {
             _stockService = stockService ?? throw new ArgumentNullException(nameof(stockService));
-            _nomenclatureService = nomenclatureService ?? throw new ArgumentNullException(nameof(nomenclatureService));
-            _warehouseService = warehouseService ?? throw new ArgumentNullException(nameof(warehouseService));
             _messageBus = messageBus;
+            _expenseService = expenseService;
             _messageBus.Subscribe<SelectResultMessage>(OnSelect);
             //RefreshCommand.Execute(null);
         }
@@ -143,7 +144,7 @@ namespace WpfClient.ViewModels
         [RelayCommand]
         private void DoubleClick()
         {
-            _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(IStockService), false, _selectedStock, null, null, null));
+            _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(IStockService), false,-1,null,0, SelectedStock, _lastSelectedEquipment, _lastSelectedDriver, null));
         }
 
         [RelayCommand]
@@ -204,6 +205,18 @@ namespace WpfClient.ViewModels
             await RefreshStocks();
         }
         public async Task LoadStocksAsync() => await RefreshStocks();
+        public async Task LoadLastSelectionHistoryAsync()
+        {
+            if (SelectedStock != null)
+            {
+                var result = await _expenseService.GetUserLastSelectionAsync(SelectedStock.NomenclatureId);
+                if (result != null)
+                {
+                    _lastSelectedDriver = result.Driver;
+                    _lastSelectedEquipment = result.Equipment;
+                }
+            }
+        }
         private async Task RefreshStocks()
         {
             try

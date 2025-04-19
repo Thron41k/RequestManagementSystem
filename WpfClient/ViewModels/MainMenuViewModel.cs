@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Globalization;
+using System.Windows;
 using System.Windows.Input;
 using RequestManagement.Common.Models;
 using WpfClient.Helpers;
@@ -7,6 +8,7 @@ using WpfClient.Services.Interfaces;
 using WpfClient.Views;
 using System.Windows.Controls;
 using RequestManagement.Common.Models.Interfaces;
+using System.Windows.Media;
 
 namespace WpfClient.ViewModels;
 
@@ -20,6 +22,7 @@ public class MainMenuViewModel
     private readonly NomenclatureViewModel _nomenclatureViewModel;
     private readonly StockViewModel _stockViewModel;
     private readonly ExpenseViewModel _expenseViewModel;
+    private readonly ExpenseListViewModel _expenseListViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -29,7 +32,9 @@ public class MainMenuViewModel
     public ICommand ShowWarehouseCommand { get; }
     public ICommand ShowNomenclatureCommand { get; }
     public ICommand ShowStockCommand { get; }
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel)
+    public ICommand ShowIncomeCommand { get; }
+    public ICommand ShowExpensesCommand { get; }
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -40,6 +45,7 @@ public class MainMenuViewModel
         _messageBus = messageBus;
         _stockViewModel = stockViewModel;
         _expenseViewModel = expenseViewModel;
+        _expenseListViewModel = expenseListViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
@@ -50,6 +56,27 @@ public class MainMenuViewModel
         ShowWarehouseCommand = new RelayCommand(ShowWarehouse);
         ShowNomenclatureCommand = new RelayCommand(ShowNomenclature);
         ShowStockCommand = new RelayCommand(ShowStock);
+        ShowIncomeCommand = new RelayCommand(ShowIncome);
+        ShowExpensesCommand = new RelayCommand(ShowExpenses);
+    }
+
+    private void ShowIncome()
+    {
+
+    }
+
+    private async void ShowExpenses()
+    {
+        var expenseView = new ExpenseListView(_expenseListViewModel);
+        var window = new Window
+        {
+            Content = expenseView,
+            Title = "Расходы",
+            Width = 620,
+            Height = 330
+        };
+        await _expenseListViewModel.Load();
+        window.ShowDialog();
     }
     private void ShowStock()
     {
@@ -110,11 +137,11 @@ public class MainMenuViewModel
         switch (arg.Message)
         {
             case MessagesEnum.ShowExpenseDialog:
-                await ShowExpenseDialog(arg.EditMode, arg.Caller, arg.Item);
+                await ShowExpenseDialog(arg.EditMode, arg.Caller, arg.Id, arg.Date, arg.Quantity, arg.Item);
                 break;
         }
     }
-    private async Task ShowExpenseDialog(bool editMode, Type argCaller, params IEntity?[] entity)
+    private async Task ShowExpenseDialog(bool editMode, Type argCaller, int id, DateTime? date, decimal quantity, params IEntity?[] entity)
     {
         var expenseView = new ExpenseView(_expenseViewModel);
         var window = new Window
@@ -125,15 +152,31 @@ public class MainMenuViewModel
             Height = 330,
             ResizeMode = ResizeMode.NoResize
         };
+        _expenseViewModel.SetExpenseId(id);
+        _expenseViewModel.DialogResult = false;
         _expenseViewModel.EditMode = editMode;
         _expenseViewModel.SelectedEquipmentText = "";
         _expenseViewModel.QuantityForExpense = "";
+        if (date != null) _expenseViewModel.SelectedDate = date.Value;
+        _expenseViewModel.SetCurrentQuantity(quantity);
         if (entity[0] != null) _expenseViewModel.ExpenseStock = entity[0] as Stock;
-        _expenseViewModel.SelectedEquipment = entity[1] != null ? entity[1] as Equipment : new Equipment();
-        _expenseViewModel.SelectedDriver = entity[2] != null ?  entity[2] as Driver : new Driver();
-        _expenseViewModel.SelectedDefect = entity[3] != null ? entity[3] as Defect : new Defect();
+        _expenseViewModel.SetEquipment(entity[1] != null ? entity[1] as Equipment : new Equipment());
+        _expenseViewModel.SelectedDriver = entity[2] != null ? entity[2] as Driver : new Driver();
+        _expenseViewModel.SelectedDefect = entity[3] != null ? entity[3] as Defect : _expenseViewModel.SelectedDefect;
+        await _expenseViewModel.LoadNomenclatureMapingAsync();
         window.ShowDialog();
-        await _stockViewModel.LoadStocksAsync();
+        if (_expenseViewModel.DialogResult)
+        {
+            if (editMode)
+            {
+                await _expenseListViewModel.Load();
+            }
+            else
+            {
+                await _stockViewModel.LoadLastSelectionHistoryAsync();
+                await _stockViewModel.LoadStocksAsync();
+            }
+        }
     }
     private void ShowStock(bool editMode, Type? argCaller = null)
     {
@@ -225,8 +268,8 @@ public class MainMenuViewModel
                 new SelectResultMessage(
                     MessagesEnum.SelectDefect, argCaller, new Defect
                     {
-                       Id = _defectViewModel.SelectedDefect.Id,
-                       Name = _defectViewModel.SelectedDefect.Name
+                        Id = _defectViewModel.SelectedDefect.Id,
+                        Name = _defectViewModel.SelectedDefect.Name
                     }));
     }
     private void ShowWarehouse(bool editMode, Type? argCaller = null)

@@ -7,10 +7,19 @@ service ExpenseService {
   rpc CreateExpense (CreateExpenseRequest) returns (CreateExpenseResponse);
   rpc UpdateExpense (UpdateExpenseRequest) returns (UpdateExpenseResponse);
   rpc DeleteExpense (DeleteExpenseRequest) returns (DeleteExpenseResponse);
+  rpc DeleteExpenses (DeleteExpensesRequest) returns (DeleteExpenseResponse);
+  rpc GetLastSelection (GetLastSelectionRequest) returns (GetLastSelectionResponse);
+  rpc GetNomenclatureMaping (GetNomenclatureMapingRequest) returns (GetNomenclatureMapingResponse);
 }
 
 message GetAllExpensesRequest {
   string filter = 1;
+  int32 warehouse_id = 2;
+  int32 equipment_id = 3;
+  int32 driver_id = 4;
+  int32 defect_id = 5;
+  string from_date = 6;
+  string to_date = 7;
 }
 
 message GetAllExpensesResponse {
@@ -104,6 +113,28 @@ message DeleteExpenseRequest {
   int32 id = 1;
 }
 
+message DeleteExpensesRequest {
+  repeated int32 id = 1;
+}
+
 message DeleteExpenseResponse {
   bool success = 1;
+}
+
+message GetLastSelectionResponse {
+  ExpenseDriver driver = 1;
+  ExpenseEquipment equipment = 2;
+  ExpenseDefect defect = 3;
+}
+
+message GetLastSelectionRequest {
+  int32 nomenclature_id = 1;
+}
+
+message GetNomenclatureMapingRequest {
+  int32 nomenclature_id = 1;
+}
+
+message GetNomenclatureMapingResponse {
+  ExpenseDefect defect = 1;
 }

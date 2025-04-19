@@ -1,6 +1,7 @@
 ﻿using RequestManagement.Common.Models.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,8 @@ namespace RequestManagement.Common.Models
 {
     public class Expense : IEntity
     {
+        [NotMapped]
+        public bool IsSelected { get; set; }
         public int Id { get; set; }
         public int StockId { get; set; }
         public Stock Stock { get; set; } = null!;

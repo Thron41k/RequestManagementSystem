@@ -1,15 +1,19 @@
 ﻿using System.Globalization;
+using Google.Protobuf.Collections;
 using RequestManagement.Common.Interfaces;
 using Grpc.Core;
+using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
 using WpfClient.Services.Interfaces;
+using Expense = RequestManagement.Common.Models.Expense;
 using Stock = RequestManagement.Common.Models.Stock;
 
 namespace WpfClient.Services;
 
 internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IExpenseService
 {
-    public async Task<List<RequestManagement.Common.Models.Expense>> GetAllExpensesAsync(string filter = "")
+    public async Task<List<Expense>> GetAllExpensesAsync(string filter, int requestWarehouseId, int requestEquipmentId, int requestDriverId,
+        int requestDefectId, string requestFromDate, string requestToDate)
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
@@ -20,9 +24,15 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         var response = await client.GetAllExpensesAsync(
             new GetAllExpensesRequest
             {
-                Filter = filter
+                Filter = filter,
+                WarehouseId = requestWarehouseId,
+                EquipmentId = requestEquipmentId,
+                DriverId = requestDriverId,
+                DefectId = requestDefectId,
+                FromDate = requestFromDate,
+                ToDate = requestToDate
             }, headers);
-        return response.Expenses.Select(expense => new RequestManagement.Common.Models.Expense
+        return response.Expenses.Select(expense => new Expense
         {
             Id = expense.Id,
             StockId = expense.Stock.Id,
@@ -80,7 +90,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         }).ToList();
     }
 
-    public async Task<int> CreateExpenseAsync(RequestManagement.Common.Models.Expense expense)
+    public async Task<Expense> CreateExpenseAsync(Expense expense)
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
@@ -98,10 +108,11 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 Date = expense.Date.ToString(CultureInfo.CurrentCulture),
                 Quantity = (double)expense.Quantity
             }, headers);
-        return result.Id;
+        expense.Id = result.Id;
+        return expense;
     }
 
-    public async Task<bool> UpdateExpenseAsync(RequestManagement.Common.Models.Expense expense)
+    public async Task<bool> UpdateExpenseAsync(Expense expense)
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
@@ -112,6 +123,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         var result = await client.UpdateExpenseAsync(
             new UpdateExpenseRequest
             {
+                Id = expense.Id,
                 StockId = expense.StockId,
                 EquipmentId = expense.EquipmentId,
                 DriverId = expense.DriverId,
@@ -131,6 +143,60 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         }
         var client = clientFactory.CreateExpenseClient();
         var result = await client.DeleteExpenseAsync(new DeleteExpenseRequest { Id = id }, headers);
+        return result.Success;
+    }
+
+    public async Task<UserLastSelection?> GetUserLastSelectionAsync(int userId)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateExpenseClient();
+        var result = await client.GetLastSelectionAsync(new GetLastSelectionRequest { NomenclatureId = userId }, headers);
+        return new UserLastSelection
+        {
+            Driver = new RequestManagement.Common.Models.Driver { Id = result.Driver.Id, FullName = result.Driver.FullName, ShortName = result.Driver.ShortName, Position = result.Driver.Position },
+            Equipment = new RequestManagement.Common.Models.Equipment { Id = result.Equipment.Id, Name = result.Equipment.Name, StateNumber = result.Equipment.LicensePlate },
+            
+        };
+    }
+
+    public Task SaveUserLastSelectionAsync(int userId, int? driverId, int? equipmentId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<NomenclatureDefectMapping?> GetLastNomenclatureDefectMappingAsync(int userId, int nomenclatureId)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateExpenseClient();
+        var result = await client.GetNomenclatureMapingAsync(new GetNomenclatureMapingRequest { NomenclatureId = nomenclatureId }, headers);
+        return new NomenclatureDefectMapping
+        {
+            Defect = new RequestManagement.Common.Models.Defect { Id = result.Defect.Id, Name = result.Defect.Name },
+        };
+    }
+
+    public Task SaveNomenclatureDefectMappingAsync(int userId, int nomenclatureId, int defectId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<bool> DeleteExpensesAsync(List<int> requestIds)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateExpenseClient();
+        var result = await client.DeleteExpensesAsync(new DeleteExpensesRequest {Id = { requestIds } }, headers);
         return result.Success;
     }
 }

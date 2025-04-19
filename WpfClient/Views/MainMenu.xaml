@@ -26,6 +26,10 @@
                 <MenuItem Header="Склады" Command="{Binding ShowWarehouseCommand}"/>
                 <MenuItem Header="Номенклатура" Command="{Binding ShowNomenclatureCommand}"/>
             </MenuItem>
+            <MenuItem Header="Движения">
+                <MenuItem Header="Приходы" Command="{Binding ShowIncomeCommand}"/>
+                <MenuItem Header="Расходы" Command="{Binding ShowExpensesCommand}"/>
+            </MenuItem>
         </Menu>
 
         <!-- Контент -->

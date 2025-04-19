@@ -1,0 +1,107 @@
+﻿<UserControl x:Class="WpfClient.Views.ExpenseListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:WpfClient.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200" MinHeight="800" MinWidth="1200">
+    <UserControl.DataContext>
+        <vm:ExpenseListViewModel />
+    </UserControl.DataContext>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="5,5,0,5">
+                    <Label Content="Период: с " Margin="0,5"/>
+                    <DatePicker Margin="0,7,0,3" SelectedDate="{Binding FromDate}"/>
+                    <Label Content="по" Margin="0,5"/>
+                    <DatePicker Margin="0,7,0,3" SelectedDate="{Binding ToDate}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,5,0,5">
+                    <TextBox Text="{Binding SelectedWarehouse.Name, Mode=OneWay}" IsReadOnly="True" Width="200" />
+                    <Button Content="Выбрать склад" Command="{Binding SelectWarehouseCommand}" Margin="5,0,0,0" Width="110"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,5,0,5">
+                    <TextBox Text="{Binding SelectedDefect.Name, Mode=OneWay}" IsReadOnly="True" Width="200" />
+                    <Button Content="Выбрать дефект" Command="{Binding SelectDefectCommand}" Margin="5,0,0,0" Width="110"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="10,15,0,13">
+                    <TextBox Text="{Binding SearchText, Mode=OneWayToSource}" Width="308" />
+                </StackPanel>
+                <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,5,0,5">
+                    <TextBox Text="{Binding SelectedEquipment.Name, Mode=OneWay}" IsReadOnly="True" Width="200" />
+                    <Button Content="Выбрать технику" Command="{Binding SelectEquipmentCommand}" Margin="5,0,0,0" Width="110"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,5,0,5">
+                    <TextBox Text="{Binding SelectedDriver.ShortName, Mode=OneWay}" IsReadOnly="True" Width="200" />
+                    <Button Content="Выбрать водителя" Command="{Binding SelectDriverCommand}" Margin="5,0,0,0" Width="110"/>
+                </StackPanel>
+            </Grid>
+            <StackPanel Grid.Column="2"  Orientation="Horizontal" Margin="30,5,0,5">
+                <Button Content="Сформировать" Command="{Binding LoadExpensesCommand}" Margin="5,0,0,0" Height="23" />
+            </StackPanel>
+        </Grid>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Expenses}" SelectedItem="{Binding SelectedExpense}"
+                  AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow">
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
+            </DataGrid.Resources>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Удалить выбранный" Command="{Binding ExpenseDeleteCommand}"/>
+                    <MenuItem Header="{Binding MenuDeleteItemText}" Command="{Binding ExpenseDeleteRangeCommand}"/>
+                    <MenuItem Header="Редактировать" Command="{Binding DoubleClickCommand}"/>
+                    <MenuItem Header="Отметить все" Command="{Binding SelectAllCommand}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.InputBindings>
+                <MouseBinding
+                    MouseAction="LeftDoubleClick"
+                    Command="{Binding DoubleClickCommand}"
+                    CommandParameter="{Binding Expenses/}"/>
+            </DataGrid.InputBindings>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="" SortMemberPath="IsSelected" CanUserSort="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Command="{Binding DataContext.ExpenseListCheckedUpdateCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="80" />
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Ед.изм." Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="50" />
+                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="70" />
+                <DataGridTextColumn Header="Техника" Binding="{Binding Equipment.Name}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="г.н." Binding="{Binding Equipment.StateNumber}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Водитель" Binding="{Binding Driver.ShortName}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Дефект" Binding="{Binding Defect.Name}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Склад" Binding="{Binding Stock.Warehouse.Name}" IsReadOnly="True" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

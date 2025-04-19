@@ -13,8 +13,8 @@ public class LoginViewModel
     private readonly MainMenuViewModel _mainMenuViewModel;
     private readonly AuthTokenStore _authTokenStore;
 
-    public string Login { get; set; }
-    public string Password { get; set; }
+    public string Login { get; set; } = "admin";
+    public string Password { get; set; } = "12345";
     public ICommand LoginCommand { get; }
 
     public LoginViewModel(GrpcAuthService authService, MainMenuViewModel mainMenuViewModel,AuthTokenStore authTokenStore)

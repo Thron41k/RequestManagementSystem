@@ -1,7 +1,9 @@
 ﻿using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Models;
 using RequestManagement.Server.Services;
+using System.Security.Claims;
 
 namespace RequestManagement.Server.Controllers
 {
@@ -9,6 +11,80 @@ namespace RequestManagement.Server.Controllers
     {
         private readonly IExpenseService _expenseService = expenseService ?? throw new ArgumentNullException(nameof(expenseService));
         private readonly ILogger<RequestController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        public override async Task<GetNomenclatureMapingResponse> GetNomenclatureMaping(
+            GetNomenclatureMapingRequest request, ServerCallContext context)
+        {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
+
+            var value = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var response = new GetNomenclatureMapingResponse();
+            if (value != null)
+            {
+                var userId = int.Parse(value);
+                var mapping = await _expenseService.GetLastNomenclatureDefectMappingAsync(userId, request.NomenclatureId);
+                if (mapping != null)
+                {
+                    response.Defect = new ExpenseDefect
+                    {
+                        Id = mapping.Defect.Id,
+                        Name = mapping.Defect.Name,
+                    };
+                }
+            }
+            return response;
+        }
+
+        public override async Task<GetLastSelectionResponse> GetLastSelection(GetLastSelectionRequest request,
+            ServerCallContext context)
+        {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
+
+            var value = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var response = new GetLastSelectionResponse();
+            if (value != null)
+            {
+                var userId = int.Parse(value);
+                var lastSelection = await _expenseService.GetUserLastSelectionAsync(userId);
+                if (lastSelection != null)
+                {
+                    if (lastSelection is { DriverId: not null, Driver: not null })
+                        response.Driver = new ExpenseDriver
+                        {
+                            Id = lastSelection.Driver.Id,
+                            FullName = lastSelection.Driver.FullName,
+                            ShortName = lastSelection.Driver.ShortName,
+                            Position = lastSelection.Driver.Position
+                        };
+                    if (lastSelection is { EquipmentId: not null, Equipment: not null })
+                        response.Equipment = new ExpenseEquipment
+                        {
+                            Id = lastSelection.Equipment.Id,
+                            Name = lastSelection.Equipment.Name,
+                            LicensePlate = lastSelection.Equipment.StateNumber
+                        };
+                }
+                var mapping = await _expenseService.GetLastNomenclatureDefectMappingAsync(userId, request.NomenclatureId);
+                if (mapping != null)
+                {
+                    response.Defect = new ExpenseDefect
+                    {
+                        Id = mapping.Defect.Id,
+                        Name = mapping.Defect.Name,
+                    };
+                }
+            }
+            return response;
+        }
+
         public override async Task<GetAllExpensesResponse> GetAllExpenses(GetAllExpensesRequest request, ServerCallContext context)
         {
             var user = context.GetHttpContext().User;
@@ -19,7 +95,7 @@ namespace RequestManagement.Server.Controllers
 
             _logger.LogInformation("Getting all expenses");
 
-            var expenseList = await _expenseService.GetAllExpensesAsync(request.Filter);
+            var expenseList = await _expenseService.GetAllExpensesAsync(request.Filter,request.WarehouseId,request.EquipmentId,request.DriverId,request.DefectId,request.FromDate,request.ToDate);
             var response = new GetAllExpensesResponse();
             response.Expenses.AddRange(expenseList.Select(e => new Expense
             {
@@ -77,7 +153,6 @@ namespace RequestManagement.Server.Controllers
         public override async Task<CreateExpenseResponse> CreateExpense(CreateExpenseRequest request, ServerCallContext context)
         {
             _logger.LogInformation("Creating new expense");
-
             var expense = new RequestManagement.Common.Models.Expense
             {
                 StockId = request.StockId,
@@ -88,8 +163,17 @@ namespace RequestManagement.Server.Controllers
                 Date = DateTime.Parse(request.Date)
             };
 
-            var id = await _expenseService.CreateExpenseAsync(expense);
-            return new CreateExpenseResponse { Id = id };
+            var newExpense = await _expenseService.CreateExpenseAsync(expense);
+            var user = context.GetHttpContext().User;
+            var value = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (value != null)
+            {
+                var userId = int.Parse(value);
+                await _expenseService.SaveUserLastSelectionAsync(userId, request.DriverId, request.EquipmentId);
+                await _expenseService.SaveNomenclatureDefectMappingAsync(userId, newExpense.Stock.NomenclatureId, request.DefectId);
+            }
+
+            return new CreateExpenseResponse { Id = newExpense.Id };
         }
 
         public override async Task<UpdateExpenseResponse> UpdateExpense(UpdateExpenseRequest request, ServerCallContext context)
@@ -116,6 +200,13 @@ namespace RequestManagement.Server.Controllers
             _logger.LogInformation("Deleting expense with ID: {Id}", request.Id);
 
             var success = await _expenseService.DeleteExpenseAsync(request.Id);
+            return new DeleteExpenseResponse { Success = success };
+        }
+        public override async Task<DeleteExpenseResponse> DeleteExpenses(DeleteExpensesRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Deleting expense with IDs : {Id}", request.Id.ToList());
+
+            var success = await _expenseService.DeleteExpensesAsync(request.Id.ToList());
             return new DeleteExpenseResponse { Success = success };
         }
     }

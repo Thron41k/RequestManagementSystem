@@ -7,8 +7,8 @@ namespace RequestManagement.Server.Services
 {
     public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
     {
-        private readonly ApplicationDbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        public async Task<List<Expense>> GetAllExpensesAsync(string filter = "")
+        public async Task<List<Expense>> GetAllExpensesAsync(string filter, int requestWarehouseId, int requestEquipmentId, int requestDriverId,
+            int requestDefectId, string requestFromDate, string requestToDate)
         {
             var query = dbContext.Expenses
                 .Include(e => e.Stock)
@@ -18,21 +18,51 @@ namespace RequestManagement.Server.Services
                 .Include(e => e.Equipment)
                 .Include(e => e.Driver)
                 .Include(e => e.Defect)
+                .ThenInclude(s => s.DefectGroup)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(filter))
+            if (!string.IsNullOrWhiteSpace(filter))
             {
-                query = query.Where(e =>
-                    e.Stock.Nomenclature.Name.Contains(filter) ||
-                    e.Stock.Warehouse.Name.Contains(filter) ||
-                    e.Equipment.Name.Contains(filter) ||
-                    e.Driver.FullName.Contains(filter) ||
-                    e.Defect.Name.Contains(filter));
+                query = query.Where(e => EF.Functions.Like(e.Stock.Nomenclature.Name, $"%{filter}%") ||
+                                         EF.Functions.Like(e.Stock.Nomenclature.Article, $"%{filter}%") ||
+                                         EF.Functions.Like(e.Stock.Nomenclature.Code, $"%{filter}%"));
             }
+            if (requestWarehouseId != 0)
+            {
+                query = query.Where(e => e.Stock.WarehouseId == requestWarehouseId);
+            }
+            if (requestEquipmentId != 0)
+            {
+                query = query.Where(e => e.EquipmentId == requestEquipmentId);
+            }
+            if (requestDriverId != 0)
+            {
+                query = query.Where(e => e.DriverId == requestDriverId);
+            }
+            if (requestDefectId != 0)
+            {
+                query = query.Where(e => e.DefectId == requestDefectId);
+            }
+            if (DateTime.TryParse(requestFromDate, out var fromDate) &&
+                DateTime.TryParse(requestToDate, out var toDate))
+            {
+                query = query.Where(e => e.Date >= fromDate && e.Date < toDate.AddDays(1));
+            }
+            else
+            {
+                if (DateTime.TryParse(requestFromDate, out fromDate))
+                {
+                    query = query.Where(e => e.Date >= fromDate);
+                }
 
+                if (DateTime.TryParse(requestToDate, out toDate))
+                {
+                    query = query.Where(e => e.Date < toDate.AddDays(1));
+                }
+            }
             return await query.ToListAsync();
         }
-        public async Task<int> CreateExpenseAsync(Expense expense)
+        public async Task<Expense> CreateExpenseAsync(Expense expense)
         {
             try
             {
@@ -53,13 +83,13 @@ namespace RequestManagement.Server.Services
                 dbContext.Expenses.Add(expense);
                 await dbContext.SaveChangesAsync();
 
-                return expense.Id;
+                return expense;
             }
             catch
             {
-                return -1;
+                return new Expense();
             }
-            
+
         }
         public async Task<bool> UpdateExpenseAsync(Expense expense)
         {
@@ -123,6 +153,93 @@ namespace RequestManagement.Server.Services
             dbContext.Expenses.Remove(expense);
             await dbContext.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<UserLastSelection?> GetUserLastSelectionAsync(int userId)
+        {
+            return await dbContext.UserLastSelections
+                .Include(s => s.Driver)
+                .Include(s => s.Equipment)
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+        }
+
+        public async Task<NomenclatureDefectMapping?> GetLastNomenclatureDefectMappingAsync(int userId, int nomenclatureId)
+        {
+            return await dbContext.NomenclatureDefectMappings
+                .Include(m => m.Nomenclature)
+                .Include(m => m.Defect)
+                .FirstOrDefaultAsync(m => m.UserId == userId && m.NomenclatureId == nomenclatureId);
+        }
+
+        public async Task SaveUserLastSelectionAsync(int userId, int? driverId, int? equipmentId)
+        {
+            var existing = await dbContext.UserLastSelections
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            if (existing == null)
+            {
+                existing = new UserLastSelection
+                {
+                    UserId = userId,
+                    DriverId = driverId,
+                    EquipmentId = equipmentId,
+                    LastUpdated = DateTime.UtcNow
+                };
+                dbContext.UserLastSelections.Add(existing);
+            }
+            else
+            {
+                existing.DriverId = driverId;
+                existing.EquipmentId = equipmentId;
+                existing.LastUpdated = DateTime.UtcNow;
+            }
+
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task SaveNomenclatureDefectMappingAsync(int userId, int nomenclatureId, int defectId)
+        {
+            var existing = await dbContext.NomenclatureDefectMappings
+                .FirstOrDefaultAsync(m => m.UserId == userId && m.NomenclatureId == nomenclatureId);
+
+            if (existing == null)
+            {
+                existing = new NomenclatureDefectMapping
+                {
+                    UserId = userId,
+                    NomenclatureId = nomenclatureId,
+                    DefectId = defectId,
+                    LastUsed = DateTime.UtcNow
+                };
+                dbContext.NomenclatureDefectMappings.Add(existing);
+            }
+            else
+            {
+                existing.DefectId = defectId;
+                existing.LastUsed = DateTime.UtcNow;
+            }
+
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteExpensesAsync(List<int> requestIds)
+        {
+            var expenses = await dbContext.Expenses
+                .Where(e => requestIds.Contains(e.Id))
+                .Include(e => e.Stock)
+                .ToListAsync();
+            if (!expenses.Any())
+            {
+                return false;
+            }
+
+            foreach (var expense in expenses)
+            {
+                expense.Stock.ConsumedQuantity -= expense.Quantity;
+            }
+            dbContext.Expenses.RemoveRange(expenses);
+            var deletedCount = await dbContext.SaveChangesAsync();
+            return deletedCount > 0;
         }
     }
 }

@@ -20,7 +20,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
 // Настройка JWT
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]); // Ключ должен быть минимум 32 байта
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException());
 builder.Services.AddAuthorization();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

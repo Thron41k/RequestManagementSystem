@@ -1,4 +1,7 @@
-﻿using RequestManagement.Server.Controllers;
+﻿using AuthService = RequestManagement.Server.Controllers.AuthService;
+using ExpenseService = RequestManagement.Server.Controllers.ExpenseService;
+using RequestService = RequestManagement.Server.Controllers.RequestService;
+using StockService = RequestManagement.Server.Controllers.StockService;
 
 namespace WpfClient.Services.Interfaces;
 

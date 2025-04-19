@@ -2,7 +2,7 @@
 
 namespace WpfClient.Messages
 {
-    public class UpdatedMessage(MessagesEnum message,Type? caller = null)
+    public class UpdatedMessage(MessagesEnum message, Type? caller = null)
     {
         public MessagesEnum Message { get; } = message;
     }
@@ -12,11 +12,14 @@ namespace WpfClient.Messages
         public Type Caller { get; } = caller;
     }
 
-    public class ShowTaskMessage(MessagesEnum message, Type caller, bool editMode,params IEntity?[] items)
+    public class ShowTaskMessage(MessagesEnum message, Type caller, bool editMode, int id, DateTime? date, decimal quantity, params IEntity?[] items)
     {
         public MessagesEnum Message { get; } = message;
         public Type Caller { get; } = caller;
         public bool EditMode { get; } = editMode;
+        public int Id { get; } = id;
+        public DateTime? Date { get; } = date;
+        public decimal Quantity { get; } = quantity;
         public IEntity?[] Item { get; } = items;
     }
     public class SelectResultMessage(MessagesEnum message, Type caller, IEntity? item = null)
