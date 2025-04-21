@@ -4,11 +4,14 @@ using RequestManagement.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
 
@@ -27,8 +30,10 @@ namespace WpfClient.ViewModels
         [ObservableProperty] private RequestManagement.Common.Models.Equipment _selectedEquipment = new();
         [ObservableProperty] private RequestManagement.Common.Models.Driver _selectedDriver = new();
         [ObservableProperty] private string _searchText = "";
-        [ObservableProperty] private DateTime _fromDate = DateTime.MinValue;
-        [ObservableProperty] private DateTime _toDate = DateTime.MaxValue;
+        [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.04.2025");
+        [ObservableProperty] private DateTime _toDate = DateTime.Parse("30.04.2025");
+        [ObservableProperty] private CollectionViewSource _expensesViewSource;
+
 
         public ExpenseListViewModel() { }
         public ExpenseListViewModel(IMessageBus messageBus, IExpenseService expenseService)
@@ -36,6 +41,7 @@ namespace WpfClient.ViewModels
             _messageBus = messageBus;
             _expenseService = expenseService;
             _messageBus.Subscribe<SelectResultMessage>(OnSelect);
+            _expensesViewSource = new CollectionViewSource { Source = Expenses };
         }
 
         private Task OnSelect(SelectResultMessage arg)
@@ -46,6 +52,15 @@ namespace WpfClient.ViewModels
                 case MessagesEnum.SelectWarehouse:
                     SelectedWarehouse = (RequestManagement.Common.Models.Warehouse)arg.Item;
                     break;
+                case MessagesEnum.SelectDefect:
+                    SelectedDefect = (RequestManagement.Common.Models.Defect)arg.Item;
+                    break;
+                case MessagesEnum.SelectEquipment:
+                    SelectedEquipment = (RequestManagement.Common.Models.Equipment)arg.Item;
+                    break;
+                case MessagesEnum.SelectDriver:
+                    SelectedDriver = (RequestManagement.Common.Models.Driver)arg.Item;
+                    break;
             }
             return Task.CompletedTask;
         }
@@ -54,8 +69,18 @@ namespace WpfClient.ViewModels
         private async Task LoadExpensesAsync()
         {
             if(FromDate == DateTime.MinValue || ToDate == DateTime.MaxValue && SelectedWarehouse.Id == 0) return;
+            var currentSortDescriptions = ExpensesViewSource.View?.SortDescriptions.ToList() ?? [];
             var expenseList = await _expenseService.GetAllExpensesAsync(SearchText,SelectedWarehouse.Id,SelectedEquipment.Id,SelectedDriver.Id,SelectedDefect.Id,FromDate.ToString(CultureInfo.CurrentCulture),ToDate.ToString(CultureInfo.CurrentCulture));
             Expenses = new ObservableCollection<RequestManagement.Common.Models.Expense>(expenseList);
+            ExpensesViewSource.Source = Expenses;
+            if (currentSortDescriptions.Any())
+            {
+                foreach (var sortDescription in currentSortDescriptions)
+                {
+                    ExpensesViewSource.View?.SortDescriptions.Add(sortDescription);
+                }
+            }
+            ExpenseListCheckedUpdate();
         }
 
 
@@ -108,11 +133,35 @@ namespace WpfClient.ViewModels
         [RelayCommand]
         private void SelectAll()
         {
-            for (var index = 0; index < Expenses.Count; index++)
+            foreach (var expense in Expenses)
             {
-                Expenses[index].IsSelected = true;
-                Expenses.
+                expense.IsSelected = true;
             }
+
+            _expensesViewSource.View.Refresh(); // Принудительно обновляем DataGrid
+            ExpenseListCheckedUpdate();
+        }
+
+        [RelayCommand]
+        private void DeselectAll()
+        {
+            foreach (var expense in Expenses)
+            {
+                expense.IsSelected = false;
+            }
+            _expensesViewSource.View.Refresh(); // Принудительно обновляем DataGrid
+            ExpenseListCheckedUpdate();
+        }
+
+        [RelayCommand]
+        private void InvertSelected()
+        {
+            foreach (var expense in Expenses)
+            {
+                expense.IsSelected = !expense.IsSelected;
+            }
+            _expensesViewSource.View.Refresh(); // Принудительно обновляем DataGrid
+            ExpenseListCheckedUpdate();
         }
 
         [RelayCommand]
@@ -124,19 +173,50 @@ namespace WpfClient.ViewModels
         [RelayCommand]
         private async Task SelectDefect()
         {
-
+            await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDefect, typeof(ExpenseListViewModel)));
         }
 
         [RelayCommand]
         private async Task SelectEquipment()
         {
-
+            await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectEquipment, typeof(ExpenseListViewModel)));
         }
 
         [RelayCommand]
         private async Task SelectDriver()
         {
+            await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDriver, typeof(ExpenseListViewModel)));
+        }
 
+        [RelayCommand]
+        private void ClearSelectedWarehouse()
+        {
+            SelectedWarehouse = new();
+            ExpenseListCheckedUpdate();
+        }
+        [RelayCommand]
+        private void ClearSelectedDefect()
+        {
+            SelectedDefect = new();
+            ExpenseListCheckedUpdate();
+        }
+        [RelayCommand]
+        private void ClearSelectedEquipment()
+        {
+            SelectedEquipment = new();
+            ExpenseListCheckedUpdate();
+        }
+        [RelayCommand]
+        private void ClearSelectedDriver()
+        {
+            SelectedDriver = new();
+            ExpenseListCheckedUpdate();
+        }
+        [RelayCommand]
+        private void ClearSearchText()
+        {
+            SearchText = "";
+            ExpenseListCheckedUpdate();
         }
     }
 }

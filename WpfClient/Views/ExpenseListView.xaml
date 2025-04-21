@@ -4,8 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:WpfClient.ViewModels"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:WpfClient.ViewModels.Behaviors"
+             xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200" MinHeight="800" MinWidth="1200">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/TextBoxClearButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <UserControl.DataContext>
         <vm:ExpenseListViewModel />
     </UserControl.DataContext>
@@ -33,12 +43,22 @@
                     <DatePicker Margin="0,7,0,3" SelectedDate="{Binding ToDate}"/>
                 </StackPanel>
                 <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox Text="{Binding SelectedWarehouse.Name, Mode=OneWay}" IsReadOnly="True" Width="200" />
-                    <Button Content="Выбрать склад" Command="{Binding SelectWarehouseCommand}" Margin="5,0,0,0" Width="110"/>
+                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Склад" Tag="{Binding ClearSelectedWarehouseCommand}" Text="{Binding SelectedWarehouse.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                        <b:Interaction.Behaviors>
+                            <behaviors:ClearButtonBehavior />
+                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                            <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
+                        </b:Interaction.Behaviors>
+                    </TextBox>
                 </StackPanel>
                 <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox Text="{Binding SelectedDefect.Name, Mode=OneWay}" IsReadOnly="True" Width="200" />
-                    <Button Content="Выбрать дефект" Command="{Binding SelectDefectCommand}" Margin="5,0,0,0" Width="110"/>
+                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Дефект" Tag="{Binding ClearSelectedDefectCommand}" Text="{Binding SelectedDefect.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                        <b:Interaction.Behaviors>
+                            <behaviors:ClearButtonBehavior />
+                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                            <behaviors:MouseClickCommandBehavior Command="{Binding SelectDefectCommand}" />
+                        </b:Interaction.Behaviors>
+                    </TextBox>
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="1">
@@ -47,33 +67,51 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="10,15,0,13">
-                    <TextBox Text="{Binding SearchText, Mode=OneWayToSource}" Width="308" />
+                <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="10,9,0,5">
+                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Номенклатура" Tag="{Binding ClearSearchTextCommand}" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                        <b:Interaction.Behaviors>
+                            <behaviors:ClearButtonBehavior />
+                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                            <behaviors:FocusOnClearBehavior ClearFocus="True" />
+                        </b:Interaction.Behaviors>
+                    </TextBox>
                 </StackPanel>
                 <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox Text="{Binding SelectedEquipment.Name, Mode=OneWay}" IsReadOnly="True" Width="200" />
-                    <Button Content="Выбрать технику" Command="{Binding SelectEquipmentCommand}" Margin="5,0,0,0" Width="110"/>
+                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Техника" Tag="{Binding ClearSelectedEquipmentCommand}" Text="{Binding SelectedEquipment.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                        <b:Interaction.Behaviors>
+                            <behaviors:ClearButtonBehavior />
+                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                            <behaviors:MouseClickCommandBehavior Command="{Binding SelectEquipmentCommand}" />
+                        </b:Interaction.Behaviors>
+                    </TextBox>
                 </StackPanel>
                 <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox Text="{Binding SelectedDriver.ShortName, Mode=OneWay}" IsReadOnly="True" Width="200" />
-                    <Button Content="Выбрать водителя" Command="{Binding SelectDriverCommand}" Margin="5,0,0,0" Width="110"/>
+                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Водитель" Tag="{Binding ClearSelectedDriverCommand}" Text="{Binding SelectedDriver.ShortName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                        <b:Interaction.Behaviors>
+                            <behaviors:ClearButtonBehavior />
+                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                            <behaviors:MouseClickCommandBehavior Command="{Binding SelectDriverCommand}" />
+                        </b:Interaction.Behaviors>
+                    </TextBox>
                 </StackPanel>
             </Grid>
             <StackPanel Grid.Column="2"  Orientation="Horizontal" Margin="30,5,0,5">
                 <Button Content="Сформировать" Command="{Binding LoadExpensesCommand}" Margin="5,0,0,0" Height="23" />
             </StackPanel>
         </Grid>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Expenses}" SelectedItem="{Binding SelectedExpense}"
-                  AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding ExpensesViewSource.View}" SelectedItem="{Binding SelectedExpense}"
+                  AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow" Name="ExpenseListDataGrid">
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
             </DataGrid.Resources>
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Удалить выбранный" Command="{Binding ExpenseDeleteCommand}"/>
-                    <MenuItem Header="{Binding MenuDeleteItemText}" Command="{Binding ExpenseDeleteRangeCommand}"/>
                     <MenuItem Header="Редактировать" Command="{Binding DoubleClickCommand}"/>
                     <MenuItem Header="Отметить все" Command="{Binding SelectAllCommand}"/>
+                    <MenuItem Header="Снять отметки со всех" Command="{Binding DeselectAllCommand}"/>
+                    <MenuItem Header="Инвертировать отметки" Command="{Binding InvertSelectedCommand}"/>
+                    <MenuItem Header="Удалить выбранный" Command="{Binding ExpenseDeleteCommand}"/>
+                    <MenuItem Header="{Binding MenuDeleteItemText}" Command="{Binding ExpenseDeleteRangeCommand}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.InputBindings>

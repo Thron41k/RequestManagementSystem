@@ -60,6 +60,7 @@
 
   <ItemGroup>
     <Folder Include="Helpers\Adapters\" />
+    <Folder Include="ViewModels\Новая папка\" />
   </ItemGroup>
 
 </Project>
