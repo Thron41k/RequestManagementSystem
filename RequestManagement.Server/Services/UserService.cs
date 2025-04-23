@@ -2,9 +2,6 @@
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.Server.Data;
-using System;
-using System.Threading.Tasks;
-using BCrypt.Net;
 using RequestManagement.Common.Models.Enums;
 
 namespace RequestManagement.Server.Services

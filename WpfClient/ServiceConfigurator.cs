@@ -20,6 +20,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<RequestService.RequestServiceClient>(o => {o.Address = new Uri("http://localhost:5001");});
         serviceCollection.AddGrpcClient<StockService.StockServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<AuthTokenStore>();
@@ -38,6 +39,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<StockViewModel>();
         serviceCollection.AddScoped<ExpenseViewModel>();
         serviceCollection.AddScoped<ExpenseListViewModel>();
+        serviceCollection.AddScoped<IncomingListViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -45,6 +47,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<INomenclatureService, GrpcNomenclatureService>();
         serviceCollection.AddScoped<IStockService, GrpcStockService>();
         serviceCollection.AddScoped<IExpenseService, GrpcExpenseService>();
+        serviceCollection.AddScoped<IIncomingService, GrpcIncomingService>();
 
         // Представления
         serviceCollection.AddTransient<MainWindow>();
@@ -58,6 +61,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<StockView>();
         serviceCollection.AddTransient<ExpenseView>();
         serviceCollection.AddTransient<ExpenseListView>();
+        serviceCollection.AddTransient<IncomingListView>();
 
         return serviceCollection.BuildServiceProvider();
     }

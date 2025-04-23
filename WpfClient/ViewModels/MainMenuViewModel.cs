@@ -21,6 +21,7 @@ public class MainMenuViewModel
     private readonly StockViewModel _stockViewModel;
     private readonly ExpenseViewModel _expenseViewModel;
     private readonly ExpenseListViewModel _expenseListViewModel;
+    private readonly IncomingListViewModel _incomingListViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -30,9 +31,9 @@ public class MainMenuViewModel
     public ICommand ShowWarehouseCommand { get; }
     public ICommand ShowNomenclatureCommand { get; }
     public ICommand ShowStockCommand { get; }
-    public ICommand ShowIncomeCommand { get; }
     public ICommand ShowExpensesCommand { get; }
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel)
+    public ICommand ShowIncomingListCommand { get; }
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -44,6 +45,7 @@ public class MainMenuViewModel
         _stockViewModel = stockViewModel;
         _expenseViewModel = expenseViewModel;
         _expenseListViewModel = expenseListViewModel;
+        _incomingListViewModel = incomingListViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
@@ -54,13 +56,22 @@ public class MainMenuViewModel
         ShowWarehouseCommand = new RelayCommand(ShowWarehouse);
         ShowNomenclatureCommand = new RelayCommand(ShowNomenclature);
         ShowStockCommand = new RelayCommand(ShowStock);
-        ShowIncomeCommand = new RelayCommand(ShowIncome);
         ShowExpensesCommand = new RelayCommand(ShowExpenses);
+        ShowIncomingListCommand = new RelayCommand(ShowIncomingList);
     }
 
-    private void ShowIncome()
+    private async void ShowIncomingList()
     {
-
+        var incomingView = new IncomingListView(_incomingListViewModel);
+        var window = new Window
+        {
+            Content = incomingView,
+            Title = "Приходы",
+            Width = 620,
+            Height = 330
+        };
+        await _incomingListViewModel.Load();
+        window.ShowDialog();
     }
 
     private async void ShowExpenses()

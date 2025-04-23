@@ -1,0 +1,110 @@
+﻿<UserControl x:Class="WpfClient.Views.IncomingListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:WpfClient.ViewModels"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:WpfClient.ViewModels.Behaviors"
+             xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200" MinHeight="800" MinWidth="1200">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/TextBoxClearButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <UserControl.DataContext>
+        <vm:IncomingListViewModel />
+    </UserControl.DataContext>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="5,5,0,5">
+                <Label Content="Период: с " Margin="0,5"/>
+                <DatePicker Margin="0,7,0,3" SelectedDate="{Binding FromDate}">
+                    <b:Interaction.Behaviors>
+                        <behaviors:DatePickerSelectedDateChangedBehavior Command="{Binding LoadIncomingsCommand}" />
+                    </b:Interaction.Behaviors>
+                </DatePicker>
+                <Label Content="по" Margin="0,5"/>
+                <DatePicker Margin="0,7,0,3" SelectedDate="{Binding ToDate}">
+                    <b:Interaction.Behaviors>
+                        <behaviors:DatePickerSelectedDateChangedBehavior Command="{Binding LoadIncomingsCommand}" />
+                    </b:Interaction.Behaviors>
+                </DatePicker>
+            </StackPanel>
+            <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,5,0,5">
+                <TextBox helpers:PlaceholderHelper.PlaceholderText="Склад" 
+                         Tag="{Binding ClearSelectedWarehouseCommand}" 
+                         Text="{Binding SelectedWarehouse.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                         IsReadOnly="True" Width="338" Style="{StaticResource ClearableTextBoxStyle}">
+                    <b:Interaction.Behaviors>
+                        <behaviors:ClearButtonBehavior />
+                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
+                    </b:Interaction.Behaviors>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,9,0,5">
+                <TextBox helpers:PlaceholderHelper.PlaceholderText="Номенклатура" 
+                         Tag="{Binding ClearSearchTextCommand}" 
+                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Width="338" Style="{StaticResource ClearableTextBoxStyle}">
+                    <b:Interaction.Behaviors>
+                        <behaviors:ClearButtonBehavior />
+                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                        <behaviors:MouseClickCommandBehavior/>
+                    </b:Interaction.Behaviors>
+                </TextBox>
+            </StackPanel>
+        </Grid>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding IncomingsViewSource.View}" SelectedItem="{Binding SelectedIncoming}"
+                  AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow" Name="IncomingListDataGrid">
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
+            </DataGrid.Resources>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Редактировать" Command="{Binding DoubleClickCommand}"/>
+                    <MenuItem Header="Отметить все" Command="{Binding SelectAllCommand}"/>
+                    <MenuItem Header="Снять отметки со всех" Command="{Binding DeselectAllCommand}"/>
+                    <MenuItem Header="Инвертировать отметки" Command="{Binding InvertSelectedCommand}"/>
+                    <MenuItem Header="Удалить выбранный" Command="{Binding IncomingDeleteCommand}"/>
+                    <MenuItem Header="{Binding MenuDeleteItemText}" Command="{Binding IncomingDeleteRangeCommand}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.InputBindings>
+                <MouseBinding
+                    MouseAction="LeftDoubleClick"
+                    Command="{Binding DoubleClickCommand}"
+                    CommandParameter="{Binding Incomings/}"/>
+            </DataGrid.InputBindings>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="" SortMemberPath="IsSelected" CanUserSort="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Command="{Binding DataContext.IncomingListCheckedUpdateCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="80" />
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Ед.изм." Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="50" />
+                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="70" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

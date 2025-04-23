@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RequestManagement.Common.Models;
-using BCrypt.Net;
 using RequestManagement.Common.Models.Enums;
 
 namespace RequestManagement.Server.Data
@@ -21,6 +20,7 @@ namespace RequestManagement.Server.Data
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<Incoming> Incoming { get; set; }
         public DbSet<UserLastSelection> UserLastSelections { get; set; }
         public DbSet<NomenclatureDefectMapping> NomenclatureDefectMappings { get; set; }
 
@@ -53,6 +53,19 @@ namespace RequestManagement.Server.Data
                 entity.HasOne(e => e.Defect)
                     .WithMany()
                     .HasForeignKey(e => e.DefectId);
+            });
+            modelBuilder.Entity<Expense>(entity =>
+            {
+                entity.Ignore(e => e.IsSelected);
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Quantity)
+                    .HasColumnType("decimal(18,2)");
+                entity.Property(e => e.Date)
+                    .HasColumnType("timestamp with time zone");
+                entity.HasOne(e => e.Stock)
+                    .WithMany() 
+                    .HasForeignKey(e => e.StockId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Expense>(entity =>
             {
@@ -121,7 +134,14 @@ namespace RequestManagement.Server.Data
                     Date = DateTime.SpecifyKind(DateTime.Parse("12.04.2025"), DateTimeKind.Utc)
                 }
             );
-
+            modelBuilder.Entity<Incoming>().HasData(
+                new Incoming
+                {
+                    Id = 1,
+                    StockId = 1,
+                    Quantity = 5,
+                    Date = DateTime.SpecifyKind(DateTime.Parse("15.04.2025"), DateTimeKind.Utc)
+                });
             // Начальные данные для Users
             modelBuilder.Entity<User>().HasData(
                 new User

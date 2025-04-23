@@ -39,7 +39,7 @@ public partial class ExpenseListViewModel : ObservableObject
         _expensesViewSource = new CollectionViewSource { Source = Expenses };
         var dispatcher = Dispatcher.CurrentDispatcher;
         _filterTimer = new System.Timers.Timer(1000) { AutoReset = false };
-        _filterTimer.Elapsed += async (s, e) =>
+        _filterTimer.Elapsed += async (_, _) =>
         {
             await dispatcher.InvokeAsync(async () => { await LoadExpensesAsync(); });
         };

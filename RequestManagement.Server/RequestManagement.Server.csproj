@@ -20,7 +20,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
   </ItemGroup>
@@ -33,6 +32,7 @@
     <Protobuf Include="Protos\request.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\stock.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\expense.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\incoming.proto" GrpcServices="Server" />
 </ItemGroup>
 <ItemGroup>
   <Folder Include="Migrations\" />

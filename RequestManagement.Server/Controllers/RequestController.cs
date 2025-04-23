@@ -1,9 +1,5 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
-using RequestManagement.Common.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
-using RequestManagement.Server.Services;
 
 namespace RequestManagement.Server.Controllers
 {

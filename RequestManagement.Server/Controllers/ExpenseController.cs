@@ -1,8 +1,5 @@
 ﻿using Grpc.Core;
-using Microsoft.Extensions.Logging;
 using RequestManagement.Common.Interfaces;
-using RequestManagement.Common.Models;
-using RequestManagement.Server.Services;
 using System.Security.Claims;
 
 namespace RequestManagement.Server.Controllers

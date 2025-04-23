@@ -107,6 +107,8 @@
                   AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow" Name="ExpenseListDataGrid">
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="White"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FFE5E5E5"/>
             </DataGrid.Resources>
             <DataGrid.ContextMenu>
                 <ContextMenu>

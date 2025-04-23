@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RequestManagement.Server.Data;
@@ -11,9 +12,11 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250423112852_add_incoming1")]
+    partial class add_incoming1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,15 +232,6 @@ namespace RequestManagement.Server.Migrations
                     b.HasIndex("StockId");
 
                     b.ToTable("Incoming");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Date = new DateTime(2025, 4, 15, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Quantity = 5m,
-                            StockId = 1
-                        });
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>

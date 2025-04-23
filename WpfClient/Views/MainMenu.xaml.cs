@@ -12,6 +12,5 @@ public partial class MainMenu : Window
     {
         InitializeComponent();
         DataContext = viewModel;
-        
     }
 }

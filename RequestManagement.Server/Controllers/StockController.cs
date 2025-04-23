@@ -1,6 +1,5 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
-using RequestManagement.Common.Models;
 
 namespace RequestManagement.Server.Controllers
 {

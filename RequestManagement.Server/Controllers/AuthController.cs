@@ -1,13 +1,10 @@
 ﻿using Grpc.Core;
-using Microsoft.Extensions.Logging;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
-using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using RequestManagement.Common.Models.Enums;
 
 namespace RequestManagement.Server.Controllers

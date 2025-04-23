@@ -3,7 +3,7 @@
 namespace WpfClient.Views;
 
 /// <summary>
-/// Логика взаимодействия для StockView.xaml
+/// Логика взаимодействия для ExpenseListView.xaml
 /// </summary>
 public partial class ExpenseListView
 {

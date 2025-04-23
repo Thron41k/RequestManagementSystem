@@ -24,4 +24,9 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     {
         return serviceProvider.GetRequiredService<ExpenseService.ExpenseServiceClient>();
     }
+
+    public IncomingService.IncomingServiceClient CreateIncomingClient()
+    {
+        return serviceProvider.GetRequiredService<IncomingService.IncomingServiceClient>();
+    }
 }

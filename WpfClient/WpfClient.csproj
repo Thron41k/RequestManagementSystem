@@ -29,6 +29,7 @@
     <Protobuf Include="..\RequestManagement.Server\Protos\auth.proto" GrpcServices="Client" Link="Protos\auth.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\stock.proto" GrpcServices="Client" Link="Protos\stock.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\expense.proto" GrpcServices="Client" Link="Protos\expense.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\incoming.proto" GrpcServices="Client" Link="Protos\incoming.proto" />
 
   </ItemGroup>
 
