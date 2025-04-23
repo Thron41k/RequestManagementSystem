@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Windows.Input;
-using WpfClient.ViewModels;
+﻿using WpfClient.ViewModels;
 
 namespace WpfClient.Views;
 

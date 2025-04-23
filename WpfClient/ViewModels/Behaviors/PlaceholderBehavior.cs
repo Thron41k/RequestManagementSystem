@@ -1,72 +1,66 @@
 ﻿using Microsoft.Xaml.Behaviors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows;
 
-namespace WpfClient.ViewModels.Behaviors
+namespace WpfClient.ViewModels.Behaviors;
+
+public class PlaceholderBehavior : Behavior<TextBox>
 {
-    public class PlaceholderBehavior : Behavior<TextBox>
+    public static readonly DependencyProperty PlaceholderTargetNameProperty =
+        DependencyProperty.Register(nameof(PlaceholderTargetName), typeof(string), typeof(PlaceholderBehavior));
+
+    public string PlaceholderTargetName
     {
-        public static readonly DependencyProperty PlaceholderTargetNameProperty =
-            DependencyProperty.Register(nameof(PlaceholderTargetName), typeof(string), typeof(PlaceholderBehavior));
+        get => (string)GetValue(PlaceholderTargetNameProperty);
+        set => SetValue(PlaceholderTargetNameProperty, value);
+    }
 
-        public string PlaceholderTargetName
+    private FrameworkElement _placeholderElement;
+
+    protected override void OnAttached()
+    {
+        base.OnAttached();
+
+        AssociatedObject.Loaded += OnLoaded;
+        AssociatedObject.TextChanged += OnStateChanged;
+        AssociatedObject.GotFocus += OnStateChanged;
+        AssociatedObject.LostFocus += OnStateChanged;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (_placeholderElement == null && !string.IsNullOrEmpty(PlaceholderTargetName))
         {
-            get => (string)GetValue(PlaceholderTargetNameProperty);
-            set => SetValue(PlaceholderTargetNameProperty, value);
+            _placeholderElement = AssociatedObject.Template.FindName(PlaceholderTargetName, AssociatedObject) as FrameworkElement;
         }
 
-        private FrameworkElement _placeholderElement;
+        UpdatePlaceholderVisibility();
+    }
 
-        protected override void OnAttached()
-        {
-            base.OnAttached();
+    private void OnStateChanged(object sender, RoutedEventArgs e)
+    {
+        UpdatePlaceholderVisibility();
+    }
 
-            AssociatedObject.Loaded += OnLoaded;
-            AssociatedObject.TextChanged += OnStateChanged;
-            AssociatedObject.GotFocus += OnStateChanged;
-            AssociatedObject.LostFocus += OnStateChanged;
-        }
+    private void UpdatePlaceholderVisibility()
+    {
+        if (_placeholderElement == null) return;
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            if (_placeholderElement == null && !string.IsNullOrEmpty(PlaceholderTargetName))
-            {
-                _placeholderElement = AssociatedObject.Template.FindName(PlaceholderTargetName, AssociatedObject) as FrameworkElement;
-            }
+        bool hasText = !string.IsNullOrEmpty(AssociatedObject.Text);
+        bool hasFocus = AssociatedObject.IsKeyboardFocused;
 
-            UpdatePlaceholderVisibility();
-        }
+        _placeholderElement.Visibility = (!hasText && !hasFocus)
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
 
-        private void OnStateChanged(object sender, RoutedEventArgs e)
-        {
-            UpdatePlaceholderVisibility();
-        }
+    protected override void OnDetaching()
+    {
+        base.OnDetaching();
 
-        private void UpdatePlaceholderVisibility()
-        {
-            if (_placeholderElement == null) return;
-
-            bool hasText = !string.IsNullOrEmpty(AssociatedObject.Text);
-            bool hasFocus = AssociatedObject.IsKeyboardFocused;
-
-            _placeholderElement.Visibility = (!hasText && !hasFocus)
-                ? Visibility.Visible
-                : Visibility.Collapsed;
-        }
-
-        protected override void OnDetaching()
-        {
-            base.OnDetaching();
-
-            AssociatedObject.Loaded -= OnLoaded;
-            AssociatedObject.TextChanged -= OnStateChanged;
-            AssociatedObject.GotFocus -= OnStateChanged;
-            AssociatedObject.LostFocus -= OnStateChanged;
-        }
+        AssociatedObject.Loaded -= OnLoaded;
+        AssociatedObject.TextChanged -= OnStateChanged;
+        AssociatedObject.GotFocus -= OnStateChanged;
+        AssociatedObject.LostFocus -= OnStateChanged;
     }
 }

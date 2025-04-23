@@ -28,7 +28,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
@@ -38,9 +37,17 @@
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="5,5,0,5">
                     <Label Content="Период: с " Margin="0,5"/>
-                    <DatePicker Margin="0,7,0,3" SelectedDate="{Binding FromDate}"/>
+                    <DatePicker Margin="0,7,0,3" SelectedDate="{Binding FromDate}">
+                        <b:Interaction.Behaviors>
+                            <behaviors:DatePickerSelectedDateChangedBehavior Command="{Binding LoadExpensesCommand}" />
+                        </b:Interaction.Behaviors>
+                    </DatePicker>
                     <Label Content="по" Margin="0,5"/>
-                    <DatePicker Margin="0,7,0,3" SelectedDate="{Binding ToDate}"/>
+                    <DatePicker Margin="0,7,0,3" SelectedDate="{Binding ToDate}">
+                        <b:Interaction.Behaviors>
+                            <behaviors:DatePickerSelectedDateChangedBehavior Command="{Binding LoadExpensesCommand}" />
+                        </b:Interaction.Behaviors>
+                    </DatePicker>
                 </StackPanel>
                 <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,5,0,5">
                     <TextBox helpers:PlaceholderHelper.PlaceholderText="Склад" Tag="{Binding ClearSelectedWarehouseCommand}" Text="{Binding SelectedWarehouse.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
@@ -52,7 +59,7 @@
                     </TextBox>
                 </StackPanel>
                 <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Дефект" Tag="{Binding ClearSelectedDefectCommand}" Text="{Binding SelectedDefect.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Дефект"   Tag="{Binding ClearSelectedDefectCommand}"  Text="{Binding SelectedDefect.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
                         <b:Interaction.Behaviors>
                             <behaviors:ClearButtonBehavior />
                             <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
@@ -72,7 +79,7 @@
                         <b:Interaction.Behaviors>
                             <behaviors:ClearButtonBehavior />
                             <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                            <behaviors:FocusOnClearBehavior ClearFocus="True" />
+                            <behaviors:MouseClickCommandBehavior/>
                         </b:Interaction.Behaviors>
                     </TextBox>
                 </StackPanel>
@@ -95,9 +102,6 @@
                     </TextBox>
                 </StackPanel>
             </Grid>
-            <StackPanel Grid.Column="2"  Orientation="Horizontal" Margin="30,5,0,5">
-                <Button Content="Сформировать" Command="{Binding LoadExpensesCommand}" Margin="5,0,0,0" Height="23" />
-            </StackPanel>
         </Grid>
         <DataGrid Grid.Row="1" ItemsSource="{Binding ExpensesViewSource.View}" SelectedItem="{Binding SelectedExpense}"
                   AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow" Name="ExpenseListDataGrid">

@@ -1,20 +1,19 @@
-﻿namespace WpfClient.Messages
+﻿namespace WpfClient.Messages;
+
+public enum MessagesEnum
 {
-    public enum MessagesEnum
-    {
-        DefectGroupUpdated,
-        EquipmentUpdated,
-        DriverUpdated,
-        DefectUpdated,
-        WarehouseUpdated,
-        NomenclatureUpdated,
-        StockUpdated,
-        SelectNomenclature,
-        SelectWarehouse,
-        ShowExpenseDialog,
-        SelectEquipment,
-        SelectDriver,
-        SelectDefect,
-        SelectDefectGroup
-    }
+    DefectGroupUpdated,
+    EquipmentUpdated,
+    DriverUpdated,
+    DefectUpdated,
+    WarehouseUpdated,
+    NomenclatureUpdated,
+    StockUpdated,
+    SelectNomenclature,
+    SelectWarehouse,
+    ShowExpenseDialog,
+    SelectEquipment,
+    SelectDriver,
+    SelectDefect,
+    SelectDefectGroup
 }

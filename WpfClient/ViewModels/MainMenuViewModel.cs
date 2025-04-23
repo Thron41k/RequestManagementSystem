@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using RequestManagement.Common.Models;
 using WpfClient.Helpers;
@@ -8,7 +7,6 @@ using WpfClient.Services.Interfaces;
 using WpfClient.Views;
 using System.Windows.Controls;
 using RequestManagement.Common.Models.Interfaces;
-using System.Windows.Media;
 
 namespace WpfClient.ViewModels;
 

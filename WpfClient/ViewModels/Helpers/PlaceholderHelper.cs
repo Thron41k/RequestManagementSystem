@@ -1,29 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
-namespace WpfClient.ViewModels.Helpers
+namespace WpfClient.ViewModels.Helpers;
+
+public static class PlaceholderHelper
 {
-    public static class PlaceholderHelper
+    public static readonly DependencyProperty PlaceholderTextProperty =
+        DependencyProperty.RegisterAttached(
+            "PlaceholderText",
+            typeof(string),
+            typeof(PlaceholderHelper),
+            new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.Inherits));
+
+    public static void SetPlaceholderText(DependencyObject element, string value)
     {
-        public static readonly DependencyProperty PlaceholderTextProperty =
-            DependencyProperty.RegisterAttached(
-                "PlaceholderText",
-                typeof(string),
-                typeof(PlaceholderHelper),
-                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.Inherits));
+        element.SetValue(PlaceholderTextProperty, value);
+    }
 
-        public static void SetPlaceholderText(DependencyObject element, string value)
-        {
-            element.SetValue(PlaceholderTextProperty, value);
-        }
-
-        public static string GetPlaceholderText(DependencyObject element)
-        {
-            return (string)element.GetValue(PlaceholderTextProperty);
-        }
+    public static string GetPlaceholderText(DependencyObject element)
+    {
+        return (string)element.GetValue(PlaceholderTextProperty);
     }
 }
