@@ -1,11 +1,11 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using RequestManagement.Common.Models;
-using WpfClient.Helpers;
 using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
 using WpfClient.Views;
 using System.Windows.Controls;
+using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Models.Interfaces;
 
 namespace WpfClient.ViewModels;
@@ -22,6 +22,7 @@ public class MainMenuViewModel
     private readonly ExpenseViewModel _expenseViewModel;
     private readonly ExpenseListViewModel _expenseListViewModel;
     private readonly IncomingListViewModel _incomingListViewModel;
+    private readonly StartDataLoadViewModel _startDataLoadViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -33,7 +34,9 @@ public class MainMenuViewModel
     public ICommand ShowStockCommand { get; }
     public ICommand ShowExpensesCommand { get; }
     public ICommand ShowIncomingListCommand { get; }
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel)
+    public ICommand ShowStartDataLoadingCommand { get; }
+
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -46,6 +49,7 @@ public class MainMenuViewModel
         _expenseViewModel = expenseViewModel;
         _expenseListViewModel = expenseListViewModel;
         _incomingListViewModel = incomingListViewModel;
+        _startDataLoadViewModel = startDataLoadViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
@@ -58,6 +62,22 @@ public class MainMenuViewModel
         ShowStockCommand = new RelayCommand(ShowStock);
         ShowExpensesCommand = new RelayCommand(ShowExpenses);
         ShowIncomingListCommand = new RelayCommand(ShowIncomingList);
+        ShowStartDataLoadingCommand = new RelayCommand(ShowStartDataLoading);
+    }
+
+    private void ShowStartDataLoading()
+    {
+        var startDataLoadView = new StartDataLoadView(_startDataLoadViewModel);
+        var window = new Window
+        {
+            Content = startDataLoadView,
+            Title = "Загрузка начальных остатков",
+            Width = 520,
+            Height = 240,
+            ResizeMode = ResizeMode.NoResize
+        };
+        //await _startDataLoadViewModel.Load();
+        window.ShowDialog();
     }
 
     private async void ShowIncomingList()

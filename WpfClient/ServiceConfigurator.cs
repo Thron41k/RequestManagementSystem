@@ -26,6 +26,7 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<AuthTokenStore>();
         serviceCollection.AddSingleton<IMessageBus, MessageBusService>();
         serviceCollection.AddSingleton<IGrpcClientFactory, GrpcClientFactory>();
+        serviceCollection.AddSingleton<IExcelReaderService, ExcelReaderService>();
 
         serviceCollection.AddScoped<GrpcAuthService>();
         serviceCollection.AddScoped<LoginViewModel>();
@@ -40,6 +41,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<ExpenseViewModel>();
         serviceCollection.AddScoped<ExpenseListViewModel>();
         serviceCollection.AddScoped<IncomingListViewModel>();
+        serviceCollection.AddScoped<StartDataLoadViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -62,6 +64,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<ExpenseView>();
         serviceCollection.AddTransient<ExpenseListView>();
         serviceCollection.AddTransient<IncomingListView>();
+        serviceCollection.AddTransient<StartDataLoadView>();
 
         return serviceCollection.BuildServiceProvider();
     }
