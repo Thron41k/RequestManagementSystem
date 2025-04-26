@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
+using WpfClient.Models;
 
 namespace RequestManagement.Server.Controllers
 {
@@ -7,6 +8,21 @@ namespace RequestManagement.Server.Controllers
     {
         private readonly IStockService _requestService = requestService ?? throw new ArgumentNullException(nameof(requestService));
         private readonly ILogger<RequestController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        public override async Task<UploadMaterialStockResponse> UploadMaterialStock(UploadMaterialStockRequest request, ServerCallContext context)
+        {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
+
+            _logger.LogInformation("Upload Materials to stock");
+            var materialList = request.Materials.Select(e => new MaterialStock { ItemName = e.Name, Code = e.Code,Article = e.Article,Unit = e.Unit,FinalBalance = e.FinalBalance}).ToList();
+            var result = await _requestService.UploadMaterialsStockAsync(materialList, request.WarehouseId, DateTime.Parse(request.Date));
+            return new UploadMaterialStockResponse{ Success = result };
+        }
+
         public override async Task<GetAllStocksResponse> GetAllStock(GetAllStocksRequest request, ServerCallContext context)
         {
             var user = context.GetHttpContext().User;

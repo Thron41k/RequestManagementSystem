@@ -29,4 +29,9 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     {
         return serviceProvider.GetRequiredService<IncomingService.IncomingServiceClient>();
     }
+
+    public WarehouseService.WarehouseServiceClient CreateWarehouseClient()
+    {
+        return serviceProvider.GetRequiredService<WarehouseService.WarehouseServiceClient>();
+    }
 }

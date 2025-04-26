@@ -93,9 +93,8 @@ public partial class ExpenseViewModel : ObservableObject
     {
         if (ExpenseStock != null && !EditMode)
         {
-            var result =
-                await _expenseService.GetLastNomenclatureDefectMappingAsync(-1, ExpenseStock.NomenclatureId);
-            if (result is not null && SelectedDefect != null && SelectedDefect.Id != result.Defect.Id)
+            var result = await _expenseService.GetLastNomenclatureDefectMappingAsync(-1, ExpenseStock.NomenclatureId);
+            if (result is { Defect: not null } && SelectedDefect != null && SelectedDefect.Id != result.Defect.Id)
             {
                 SelectedDefect = result.Defect;
             }

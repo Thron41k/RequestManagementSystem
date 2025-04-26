@@ -1,7 +1,10 @@
 ﻿using RequestManagement.Common.Interfaces;
 using Grpc.Core;
 using RequestManagement.Server.Controllers;
+using WpfClient.Models;
 using WpfClient.Services.Interfaces;
+using RequestManagement.Common.Models;
+using System.Globalization;
 
 namespace WpfClient.Services;
 
@@ -50,6 +53,20 @@ internal class GrpcStockService(IGrpcClientFactory clientFactory, AuthTokenStore
             ConsumedQuantity = (decimal)stock.ConsumedQuantity,
             Nomenclature = new RequestManagement.Common.Models.Nomenclature{Code = stock.Nomenclature.Code, Name = stock.Nomenclature.Name, Article = stock.Nomenclature.Article, UnitOfMeasure = stock.Nomenclature.UnitOfMeasure},
         }).ToList();
+    }
+
+    public async Task<bool> UploadMaterialsStockAsync(List<MaterialStock>? materials, int warehouseId, DateTime date)
+    {
+        if(materials == null) return false;
+        if (materials.Count == 0) return false;
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateStockClient();
+        var result = await client.UploadMaterialStockAsync(new UploadMaterialStockRequest { Materials = { materials.Select(material => new MaterialStockMessage { Name = material.ItemName, Article = material.Article, Code = material.Code, Unit = material.Unit, FinalBalance = material.FinalBalance}) }, WarehouseId = warehouseId, Date = date.ToString(CultureInfo.CurrentCulture) }, headers);
+        return result.Success;
     }
 
     public async Task<int> CreateStockAsync(RequestManagement.Common.Models.Stock stock)

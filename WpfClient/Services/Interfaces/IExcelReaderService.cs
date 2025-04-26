@@ -4,6 +4,6 @@ namespace WpfClient.Services.Interfaces
 {
     public interface IExcelReaderService
     {
-        List<MaterialStock> ReadMaterialStock(string filePath);
+        (List<MaterialStock> materialStocks, string? date, string? warehouse) ReadMaterialStock(string filePath);
     }
 }

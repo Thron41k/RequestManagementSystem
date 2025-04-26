@@ -24,11 +24,6 @@ public interface IRequestService
     Task<bool> UpdateDefectAsync(Defect driver);
     Task<bool> DeleteDefectAsync(int id);
 
-    Task<List<Warehouse>> GetAllWarehousesAsync(string filter = "");
-    Task<int> CreateWarehouseAsync(Warehouse warehouse);
-    Task<bool> UpdateWarehouseAsync(Warehouse warehouse);
-    Task<bool> DeleteWarehouseAsync(int id);
-
     Task<List<Nomenclature>> GetAllNomenclaturesAsync(string filter = "");
     Task<int> CreateNomenclatureAsync(Nomenclature nomenclature);
     Task<bool> UpdateNomenclatureAsync(Nomenclature nomenclature);

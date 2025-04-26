@@ -11,14 +11,14 @@ namespace WpfClient.Services
         {
             ExcelPackage.License.SetNonCommercialPersonal("Thron41k");
         }
-        public List<MaterialStock> ReadMaterialStock(string filePath)
+        public (List<MaterialStock> materialStocks, string? date, string? warehouse) ReadMaterialStock(string filePath)
         {
             if (!File.Exists(filePath))
                 throw new FileNotFoundException("Excel file not found.", filePath);
             var materialStocks = new List<MaterialStock>();
             using var package = new ExcelPackage(new FileInfo(filePath));
             var worksheet = package.Workbook.Worksheets[0];
-            var rowCount = worksheet.Dimension?.Rows+2 ?? 0;
+            var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
             const int startRow = 11;
             var date = worksheet.Cells[4, 3].Value.ToString()?.Split('-')[1].Trim();
             var warehouse = worksheet.Cells[10, 1].Value.ToString()?.Trim();
@@ -43,7 +43,7 @@ namespace WpfClient.Services
                     Console.WriteLine($"Error processing row {row}: {ex.Message}");
                 }
             }
-            return materialStocks;
+            return (materialStocks, date, warehouse);
         }
     }
 }

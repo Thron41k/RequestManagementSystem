@@ -244,62 +244,6 @@ namespace RequestManagement.Server.Services
                 return false;
             }
         }
-        public async Task<List<Warehouse>> GetAllWarehousesAsync(string filter = "")
-        {
-            var query = _dbContext.Warehouses.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(filter))
-            {
-                var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase)));
-            }
-            return await query
-                .Select(e => new Warehouse
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                })
-                .ToListAsync();
-        }
-
-        public async Task<int> CreateWarehouseAsync(Warehouse warehouse)
-        {
-            _dbContext.Warehouses.Add(warehouse);
-            await _dbContext.SaveChangesAsync();
-            return warehouse.Id;
-        }
-
-        public async Task<bool> UpdateWarehouseAsync(Warehouse warehouse)
-        {
-            var existWarehouse = await _dbContext.Warehouses
-                .FirstOrDefaultAsync(e => e.Id == warehouse.Id);
-
-            if (existWarehouse == null)
-                return false;
-
-            existWarehouse.Name = warehouse.Name;
-            await _dbContext.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> DeleteWarehouseAsync(int id)
-        {
-            try
-            {
-                var warehouse = await _dbContext.Warehouses
-                    .FirstOrDefaultAsync(e => e.Id == id);
-
-                if (warehouse == null)
-                    return false;
-
-                _dbContext.Warehouses.Remove(warehouse);
-                await _dbContext.SaveChangesAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
 
         public async Task<List<Nomenclature>> GetAllNomenclaturesAsync(string filter = "")
         {

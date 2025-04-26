@@ -1,4 +1,5 @@
 ﻿using RequestManagement.Common.Models;
+using WpfClient.Models;
 
 namespace RequestManagement.Common.Interfaces;
 
@@ -18,4 +19,5 @@ public interface IStockService
         int finalQuantityFilterType = 0,
         double finalQuantityFilter = 0
         );
+    Task<bool> UploadMaterialsStockAsync(List<MaterialStock>? materials, int warehouseId, DateTime date);
 }

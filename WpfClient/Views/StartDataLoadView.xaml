@@ -14,52 +14,72 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/TextBoxClearButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.DataContext>
         <vm:StartDataLoadViewModel />
     </UserControl.DataContext>
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="10,5,0,5">
-            <TextBox helpers:PlaceholderHelper.PlaceholderText="Документ Excel" 
+    <Grid>
+        <Grid Margin="10" x:Name="MainContent" >
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="IsEnabled" Value="True" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="10,5,0,5">
+                <TextBox helpers:PlaceholderHelper.PlaceholderText="Документ Excel" 
                      Tag="{Binding ClearDocumentPathCommand}" 
                      Text="{Binding DocumentPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                      IsReadOnly="True" Width="455" Style="{StaticResource ClearableTextBoxStyle}">
-                <b:Interaction.Behaviors>
-                    <behaviors:ClearButtonBehavior />
-                    <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                    <behaviors:MouseClickCommandBehavior Command="{Binding SelectDocumentPathCommand}" />
-                </b:Interaction.Behaviors>
-            </TextBox>
-        </StackPanel>
-        <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,25,0,5">
-            <Label Content="Всего наименований: "/>
-        </StackPanel>
-        <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,0,0,5">
-            <TextBox helpers:PlaceholderHelper.PlaceholderText="Склад" 
+                    <b:Interaction.Behaviors>
+                        <behaviors:ClearButtonBehavior />
+                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectDocumentPathCommand}" />
+                    </b:Interaction.Behaviors>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,25,0,5">
+                <Label Content="Всего наименований: "/>
+                <Label Margin="-10,0,0,0" Content="{Binding MaterialStocks.Count}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,0,0,5">
+                <TextBox helpers:PlaceholderHelper.PlaceholderText="Склад" 
                      Tag="{Binding ClearSelectedWarehouseCommand}" 
                      Text="{Binding SelectedWarehouse.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                      IsReadOnly="True" Width="338" Style="{StaticResource ClearableTextBoxStyle}">
-                <b:Interaction.Behaviors>
-                    <behaviors:ClearButtonBehavior />
-                    <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                    <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
-                </b:Interaction.Behaviors>
-            </TextBox>
-            <DatePicker Margin="15,3,0,3" SelectedDate="{Binding ToDate}">
-                <b:Interaction.Behaviors>
-                    <behaviors:DatePickerSelectedDateChangedBehavior Command="{Binding LoadIncomingsCommand}" />
-                </b:Interaction.Behaviors>
-            </DatePicker>
-        </StackPanel>
-        <StackPanel Grid.Row="3" HorizontalAlignment="Center" Orientation="Horizontal" Margin="10,15,0,5">
-            <Button Content="Загрузить"/>
-        </StackPanel>
+                    <b:Interaction.Behaviors>
+                        <behaviors:ClearButtonBehavior />
+                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
+                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
+                    </b:Interaction.Behaviors>
+                </TextBox>
+                <DatePicker Margin="10,3,0,3" SelectedDate="{Binding ToDate}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="3" HorizontalAlignment="Center" Orientation="Horizontal" Margin="10,15,0,5">
+                <Button Content="Загрузить" Command="{Binding UploadMaterialsCommand}"/>
+            </StackPanel>
+        </Grid>
+        <Grid Background="#80000000" Panel.ZIndex="1" 
+              Visibility="{Binding IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Background="White" CornerRadius="5" Padding="20" 
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Загрузка..." FontSize="16" HorizontalAlignment="Center" />
+                    <ProgressBar IsIndeterminate="True" Width="100" Height="20" Margin="0,10,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

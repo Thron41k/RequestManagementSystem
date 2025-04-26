@@ -1,0 +1,57 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service WarehouseService {
+    rpc GetAllWarehouses (GetAllWarehousesRequest) returns (GetAllWarehousesResponse);
+    rpc CreateWarehouse(CreateWarehouseRequest) returns (CreateWarehouseResponse);
+    rpc UpdateWarehouse (UpdateWarehouseRequest) returns (UpdateWarehouseResponse);
+    rpc DeleteWarehouse (DeleteWarehouseRequest) returns (DeleteWarehouseResponse);
+    rpc GetOrCreateWarehouse (GetOrCreateWarehouseRequest) returns (GetOrCreateWarehouseResponse);
+}
+
+message GetOrCreateWarehouseRequest{
+    string filter = 1;
+}
+
+message GetOrCreateWarehouseResponse{
+    Warehouse warehouse = 1;
+}
+
+message GetAllWarehousesRequest {
+    string filter = 1;
+}
+
+message GetAllWarehousesResponse {
+    repeated Warehouse warehouse = 1;
+}
+
+message CreateWarehouseRequest {
+    Warehouse warehouse = 1;
+}
+
+message CreateWarehouseResponse {
+    int32 id = 1;
+}
+
+message UpdateWarehouseRequest {
+    Warehouse warehouse = 1;
+}
+
+message UpdateWarehouseResponse {
+    bool success = 1;
+}
+
+message DeleteWarehouseRequest {
+    int32 id = 1;
+}
+
+message DeleteWarehouseResponse {
+    bool success = 1;
+}
+
+message Warehouse {
+    int32 id = 1;
+    string name = 2;
+    string last_updated = 3;
+}

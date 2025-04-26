@@ -21,6 +21,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<StockService.StockServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<WarehouseService.WarehouseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<AuthTokenStore>();
@@ -50,6 +51,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<IStockService, GrpcStockService>();
         serviceCollection.AddScoped<IExpenseService, GrpcExpenseService>();
         serviceCollection.AddScoped<IIncomingService, GrpcIncomingService>();
+        serviceCollection.AddScoped<IWarehouseService, GrpcWarehouseService>();
 
         // Представления
         serviceCollection.AddTransient<MainWindow>();

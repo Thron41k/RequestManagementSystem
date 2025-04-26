@@ -76,7 +76,7 @@ public class MainMenuViewModel
             Height = 240,
             ResizeMode = ResizeMode.NoResize
         };
-        //await _startDataLoadViewModel.Load();
+        _startDataLoadViewModel.Init();
         window.ShowDialog();
     }
 

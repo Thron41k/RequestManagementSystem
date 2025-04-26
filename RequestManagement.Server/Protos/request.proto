@@ -23,11 +23,6 @@ service RequestService {
     rpc UpdateDefect (UpdateDefectRequest) returns (UpdateDefectResponse);
     rpc DeleteDefect (DeleteDefectRequest) returns (DeleteDefectResponse);
 
-    rpc GetAllWarehouses (GetAllWarehousesRequest) returns (GetAllWarehousesResponse);
-    rpc CreateWarehouse(CreateWarehouseRequest) returns (CreateWarehouseResponse);
-    rpc UpdateWarehouse (UpdateWarehouseRequest) returns (UpdateWarehouseResponse);
-    rpc DeleteWarehouse (DeleteWarehouseRequest) returns (DeleteWarehouseResponse);
-
     rpc GetAllNomenclatures (GetAllNomenclaturesRequest) returns (GetAllNomenclaturesResponse);
     rpc CreateNomenclature(CreateNomenclatureRequest) returns (CreateNomenclatureResponse);
     rpc UpdateNomenclature (UpdateNomenclatureRequest) returns (UpdateNomenclatureResponse);
@@ -188,43 +183,6 @@ message Defect {
     int32 id = 1;
     string name = 2;
     int32 defectGroupId = 3;
-}
-
-message GetAllWarehousesRequest {
-    string filter = 1;
-}
-
-message GetAllWarehousesResponse {
-    repeated Warehouse warehouse = 1;
-}
-
-message CreateWarehouseRequest {
-    Warehouse warehouse = 1;
-}
-
-message CreateWarehouseResponse {
-    int32 id = 1;
-}
-
-message UpdateWarehouseRequest {
-    Warehouse warehouse = 1;
-}
-
-message UpdateWarehouseResponse {
-    bool success = 1;
-}
-
-message DeleteWarehouseRequest {
-    int32 id = 1;
-}
-
-message DeleteWarehouseResponse {
-    bool success = 1;
-}
-
-message Warehouse {
-    int32 id = 1;
-    string name = 2;
 }
 
 message GetAllNomenclaturesRequest {

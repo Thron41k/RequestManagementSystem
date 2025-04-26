@@ -256,61 +256,6 @@ namespace RequestManagement.Server.Controllers
             return new DeleteDefectResponse { Success = success };
         }
 
-        public override async Task<GetAllWarehousesResponse> GetAllWarehouses(GetAllWarehousesRequest request, ServerCallContext context)
-        {
-            var user = context.GetHttpContext().User;
-            if (user.Identity is { IsAuthenticated: false })
-            {
-                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
-            }
-
-            logger.LogInformation("Getting all warehouses by filter");
-
-            var warehouseList = await requestService.GetAllWarehousesAsync(request.Filter);
-            var response = new GetAllWarehousesResponse();
-            response.Warehouse.AddRange(warehouseList.Select(e => new Warehouse
-            {
-                Id = e.Id,
-                Name = e.Name
-            }));
-
-            return response;
-        }
-        public override async Task<CreateWarehouseResponse> CreateWarehouse(CreateWarehouseRequest request, ServerCallContext context)
-        {
-            logger.LogInformation("Creating new warehouse with name: {Name}", request.Warehouse.Name);
-
-            var warehouse = new RequestManagement.Common.Models.Warehouse
-            {
-                Name = request.Warehouse.Name,
-            };
-
-            var id = await requestService.CreateWarehouseAsync(warehouse);
-            return new CreateWarehouseResponse { Id = id };
-        }
-
-        public override async Task<UpdateWarehouseResponse> UpdateWarehouse(UpdateWarehouseRequest request, ServerCallContext context)
-        {
-            logger.LogInformation("Updating warehouse with ID: {Id}", request.Warehouse.Id);
-
-            var warehouse = new RequestManagement.Common.Models.Warehouse
-            {
-                Id = request.Warehouse.Id,
-                Name = request.Warehouse.Name,
-            };
-
-            var success = await requestService.UpdateWarehouseAsync(warehouse);
-            return new UpdateWarehouseResponse { Success = success };
-        }
-
-        public override async Task<DeleteWarehouseResponse> DeleteWarehouse(DeleteWarehouseRequest request, ServerCallContext context)
-        {
-            logger.LogInformation("Deleting warehouse with ID: {Id}", request.Id);
-
-            var success = await requestService.DeleteWarehouseAsync(request.Id);
-            return new DeleteWarehouseResponse { Success = success };
-        }
-
         public override async Task<GetAllNomenclaturesResponse> GetAllNomenclatures(GetAllNomenclaturesRequest request, ServerCallContext context)
         {
             var user = context.GetHttpContext().User;

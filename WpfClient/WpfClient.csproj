@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -12,8 +12,8 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="EPPlus" Version="8.0.2" />
     <PackageReference Include="Google.Protobuf" Version="3.30.2" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.70.0" />
-    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.70.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
     <PackageReference Include="Grpc.Tools" Version="2.71.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -31,7 +31,7 @@
     <Protobuf Include="..\RequestManagement.Server\Protos\stock.proto" GrpcServices="Client" Link="Protos\stock.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\expense.proto" GrpcServices="Client" Link="Protos\expense.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\incoming.proto" GrpcServices="Client" Link="Protos\incoming.proto" />
-
+    <Protobuf Include="..\RequestManagement.Server\Protos\warehouse.proto" GrpcServices="Client" Link="Protos\warehouse.proto" />
   </ItemGroup>
 
   <ItemGroup>

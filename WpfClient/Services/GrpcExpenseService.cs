@@ -176,10 +176,13 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         }
         var client = clientFactory.CreateExpenseClient();
         var result = await client.GetNomenclatureMapingAsync(new GetNomenclatureMapingRequest { NomenclatureId = nomenclatureId }, headers);
-        return new NomenclatureDefectMapping
+        var mapping = new NomenclatureDefectMapping();
+        if (result is { Defect: not null })
         {
-            Defect = new RequestManagement.Common.Models.Defect { Id = result.Defect.Id, Name = result.Defect.Name },
-        };
+            mapping.Defect = new RequestManagement.Common.Models.Defect
+                { Id = result.Defect.Id, Name = result.Defect.Name };
+        }
+        return mapping;
     }
 
     public Task SaveNomenclatureDefectMappingAsync(int userId, int nomenclatureId, int defectId)
