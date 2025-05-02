@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
 using WpfClient.Services;
+using WpfClient.Services.ExcelTemplate;
 using WpfClient.Services.Interfaces;
 using WpfClient.ViewModels;
 using WpfClient.Views;
@@ -28,6 +29,10 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<IMessageBus, MessageBusService>();
         serviceCollection.AddSingleton<IGrpcClientFactory, GrpcClientFactory>();
         serviceCollection.AddSingleton<IExcelReaderService, ExcelReaderService>();
+        serviceCollection.AddSingleton<IExcelWriterService, ExcelWriterService>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, ActPartsTemplate>();
+        serviceCollection.AddSingleton<IFileSaveDialogService, FileSaveDialogService>();
+        serviceCollection.AddSingleton<IExcelPrintService, ExcelPrintService>();
 
         serviceCollection.AddScoped<GrpcAuthService>();
         serviceCollection.AddScoped<LoginViewModel>();

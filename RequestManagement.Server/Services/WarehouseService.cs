@@ -23,7 +23,8 @@ namespace RequestManagement.Server.Services
                 {
                     Id = e.Id,
                     Name = e.Name,
-                    LastUpdated = e.LastUpdated
+                    LastUpdated = e.LastUpdated,
+                    Code = e.Code
                 })
                 .ToListAsync();
         }
@@ -41,7 +42,8 @@ namespace RequestManagement.Server.Services
                 {
                     Id = e.Id,
                     Name = e.Name,
-                    LastUpdated = e.LastUpdated
+                    LastUpdated = e.LastUpdated,
+                    Code = e.Code
                 })
                 .ToListAsync();
             if (result.Count != 0) return result[0];

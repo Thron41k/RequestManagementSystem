@@ -23,9 +23,40 @@ namespace RequestManagement.Server.Data
         public DbSet<Incoming> Incoming { get; set; }
         public DbSet<UserLastSelection> UserLastSelections { get; set; }
         public DbSet<NomenclatureDefectMapping> NomenclatureDefectMappings { get; set; }
+        public DbSet<Commissions> Commissions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Commissions>(
+                entity =>
+                {
+                    entity.HasKey(e => e.Id);
+                    entity.HasOne(e => e.Approve)
+                        .WithMany() 
+                        .HasForeignKey(e => e.ApproveId)
+                        .OnDelete(DeleteBehavior.Restrict);
+                    entity.HasOne(e => e.Chairman)
+                        .WithMany()
+                        .HasForeignKey(e => e.ChairmanId)
+                        .OnDelete(DeleteBehavior.Restrict);
+                    entity.HasOne(e => e.Member1)
+                        .WithMany()
+                        .HasForeignKey(e => e.Member1Id)
+                        .OnDelete(DeleteBehavior.Restrict);
+                    entity.HasOne(e => e.Member2)
+                        .WithMany()
+                        .HasForeignKey(e => e.Member2Id)
+                        .OnDelete(DeleteBehavior.Restrict);
+                    entity.HasOne(e => e.Member3)
+                        .WithMany()
+                        .HasForeignKey(e => e.Member3Id)
+                        .OnDelete(DeleteBehavior.Restrict);
+                    entity.HasOne(e => e.Member4)
+                        .WithMany()
+                        .HasForeignKey(e => e.Member4Id)
+                        .OnDelete(DeleteBehavior.Restrict);
+                }
+            );
             modelBuilder.Entity<UserLastSelection>(entity =>
             {
                 entity.HasKey(e => e.Id);

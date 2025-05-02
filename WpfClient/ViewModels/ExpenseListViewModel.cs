@@ -3,12 +3,15 @@ using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Windows.Data;
 using System.Windows.Threading;
 using RequestManagement.Common.Models;
 using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
 using System.Windows;
+using WpfClient.Models.ExcelWriterModels;
+using WpfClient.Services.ExcelTemplate;
 
 namespace WpfClient.ViewModels;
 
@@ -17,6 +20,7 @@ public partial class ExpenseListViewModel : ObservableObject
     public bool EditMode { get; set; }
     private readonly IMessageBus _messageBus;
     private readonly IExpenseService _expenseService;
+    private readonly IExcelWriterService _excelWriterService;
     [ObservableProperty] private string _menuDeleteItemText = "Удалить отмеченные";
     [ObservableProperty] private Expense? _selectedExpense = new();
     [ObservableProperty] private ObservableCollection<Expense> _expenses = [];
@@ -30,11 +34,15 @@ public partial class ExpenseListViewModel : ObservableObject
     [ObservableProperty] private CollectionViewSource _expensesViewSource;
     private readonly System.Timers.Timer _filterTimer;
 
-    public ExpenseListViewModel() { }
-    public ExpenseListViewModel(IMessageBus messageBus, IExpenseService expenseService)
+    public ExpenseListViewModel()
+    {
+     
+    }
+    public ExpenseListViewModel(IMessageBus messageBus, IExpenseService expenseService, IExcelWriterService excelWriterService)
     {
         _messageBus = messageBus;
         _expenseService = expenseService;
+        _excelWriterService = excelWriterService;
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
         _expensesViewSource = new CollectionViewSource { Source = Expenses };
         var dispatcher = Dispatcher.CurrentDispatcher;
@@ -102,6 +110,17 @@ public partial class ExpenseListViewModel : ObservableObject
     private void ExpenseListCheckedUpdate()
     {
         MenuDeleteItemText = $"Удалить отмеченные({Expenses.Count(x => x.IsSelected)})";
+    }
+
+    [RelayCommand]
+    private async Task Print()
+    {
+        var data = new List<ActPartsModel>
+        {
+            new(),
+            new()
+        };
+        _excelWriterService.ExportAndPrint(ExcelTemplateType.ActParts, data);
     }
     [RelayCommand]
     private async Task ExpenseDeleteAsync()

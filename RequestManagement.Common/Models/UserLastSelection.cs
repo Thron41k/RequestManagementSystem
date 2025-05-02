@@ -11,11 +11,13 @@ namespace RequestManagement.Common.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public User? User { get; set; }
         public int? DriverId { get; set; }
         public Driver? Driver { get; set; }
         public int? EquipmentId { get; set; }
         public Equipment? Equipment { get; set; }
+        public int? CommissionsId { get; set; }
+        public Commissions? Commissions { get; set; }
         public DateTime LastUpdated { get; set; }
     }
 }

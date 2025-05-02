@@ -1,0 +1,73 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service CommissionsService {
+    rpc GetAllCommissions (GetAllCommissionsRequest) returns (GetAllCommissionsResponse);
+    rpc CreateCommissions(CreateCommissionsRequest) returns (CreateCommissionsResponse);
+    rpc UpdateCommissions (UpdateCommissionsRequest) returns (UpdateCommissionsResponse);
+    rpc DeleteCommissions (DeleteCommissionsRequest) returns (DeleteCommissionsResponse);
+}
+
+message Commissions {
+    int32 id = 1;
+    string name = 2;
+    CommissionsDriver approve = 3;
+    CommissionsDriver chairman = 4;
+    CommissionsDriver member1 = 5;
+    CommissionsDriver member2 = 6;
+    CommissionsDriver member3 = 7;
+    CommissionsDriver member4 = 8;
+}
+
+message CommissionsDriver{
+    int32 id = 1;
+    string full_name = 2;  
+    string short_name = 3; 
+    string position = 4; 
+}
+
+message GetAllCommissionsRequest {
+	string filter = 1;
+}
+
+message GetAllCommissionsResponse {
+    repeated Commissions commissions = 1;
+}
+
+message CreateCommissionsRequest {
+    string name = 2;
+    int32 approve_id = 3;
+    int32 chairman_id = 4;
+    int32 member1_id = 5;
+    int32 member2_id = 6;
+    int32 member3_id = 7;
+    int32 member4_id = 8;
+}
+
+message CreateCommissionsResponse {
+	int32 id = 1;
+}
+
+message UpdateCommissionsRequest {
+	int32 id = 1;
+	string name = 2;
+	int32 approve_id = 3;
+	int32 chairman_id = 4;
+	int32 member1_id = 5;
+	int32 member2_id = 6;
+	int32 member3_id = 7;
+	int32 member4_id = 8;
+}
+
+message UpdateCommissionsResponse {
+	bool success = 1;
+}
+
+message DeleteCommissionsRequest {
+	int32 id = 1;
+}
+
+message DeleteCommissionsResponse {
+	bool success = 1;
+}

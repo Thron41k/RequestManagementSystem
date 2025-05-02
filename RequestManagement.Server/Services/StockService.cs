@@ -5,6 +5,7 @@ using RequestManagement.Common.Models;
 using RequestManagement.Server.Data;
 using WpfClient.Models;
 using EFCore.BulkExtensions;
+using Windows.UI;
 
 namespace RequestManagement.Server.Services
 {
@@ -89,200 +90,111 @@ namespace RequestManagement.Server.Services
 
         public async Task<bool> UploadMaterialsStockAsync(List<MaterialStock> materials, int warehouseId, DateTime date)
         {
-             if (materials == null || !materials.Any())
+            if (materials == null || !materials.Any())
             {
                 return false;
             }
 
-            // Валидация входных данных MaterialStock
-            foreach (var material in materials)
-            {
-                if (string.IsNullOrWhiteSpace(material.Code))
-                {
-                    throw new ArgumentException("Material Code cannot be null or empty.", nameof(material.Code));
-                }
-                if (string.IsNullOrWhiteSpace(material.ItemName))
-                {
-                    throw new ArgumentException("Material Name cannot be null or empty.", nameof(material.ItemName));
-                }
-                if (string.IsNullOrWhiteSpace(material.Unit))
-                {
-                    throw new ArgumentException("Material Unit cannot be null or empty.", nameof(material.Unit));
-                }
-            }
-
-            // Валидация существования склада
-            var warehouseExists = await _dbContext.Warehouses.AnyAsync(w => w.Id == warehouseId);
-            if (!warehouseExists)
-            {
-                throw new InvalidOperationException($"Warehouse with ID {warehouseId} does not exist.");
-            }
-
             try
             {
-                // Собираем ключи материалов для фильтрации
-                var materialKeys = materials.Select(m => (m.Code, m.Article, m.ItemName, m.Unit)).ToList();
+                // Получаем существующие номенклатуры и склады
+                var existingNomenclatures = await _dbContext.Nomenclature
+                    .Where(n => materials.Select(m => m.Code).Contains(n.Code) &&
+                                materials.Select(m => m.Article).Contains(n.Article) &&
+                                materials.Select(m => m.ItemName).Contains(n.Name) &&
+                                materials.Select(m => m.Unit).Contains(n.UnitOfMeasure))
+                    .ToDictionaryAsync(n => (n.Code, n.Article, n.Name, n.UnitOfMeasure), n => n.Id);
 
-                // Проверяем входные данные на дубликаты
-                var duplicateMaterials = materialKeys
-                    .GroupBy(k => (k.Code, k.Article ?? "", k.ItemName, k.Unit))
-                    .Where(g => g.Count() > 1)
-                    .Select(g => g.Key)
-                    .ToList();
-                if (duplicateMaterials.Any())
+                var warehouseExists = await _dbContext.Warehouses.AnyAsync(w => w.Id == warehouseId);
+                if (!warehouseExists)
                 {
-                    Console.WriteLine($"Found duplicate materials: {string.Join(", ", duplicateMaterials.Select(k => $"Code={k.Code}, Article={k.Item2}, Name={k.ItemName}, Unit={k.Unit}"))}");
-                    materials = materials
-                        .GroupBy(m => (m.Code, m.Article, m.ItemName, m.Unit))
-                        .Select(g => new MaterialStock
-                        {
-                            Code = g.Key.Code,
-                            Article = g.Key.Article,
-                            ItemName = g.Key.ItemName,
-                            Unit = g.Key.Unit,
-                            FinalBalance = g.Sum(m => m.FinalBalance)
-                        })
-                        .ToList();
-                    materialKeys = materials.Select(m => (m.Code, m.Article, m.ItemName, m.Unit)).ToList();
+                    return false;
                 }
 
-                // Загружаем существующие номенклатуры
-                var existingNomenclatures = await _dbContext.Nomenclature
-                    .Where(n => materialKeys.Select(k => k.Code).Contains(n.Code))
-                    .ToListAsync();
+                // Получаем существующие записи Stock для указанного склада
+                var existingStocks = await _dbContext.Stocks
+                    .Include(s => s.Nomenclature)
+                    .Where(s => s.WarehouseId == warehouseId)
+                    .ToDictionaryAsync(s => (s.NomenclatureId, s.WarehouseId), s => s);
 
-                var nomenclatureMap = existingNomenclatures
-                    .Where(n => materialKeys.Any(k =>
-                        k.Code == n.Code &&
-                        (k.Article == n.Article || (k.Article == null && n.Article == null)) &&
-                        k.ItemName == n.Name &&
-                        k.Unit == n.UnitOfMeasure))
-                    .ToDictionary(n => (n.Code, n.Article ?? "", n.Name, n.UnitOfMeasure), n => n);
+                // Подготавливаем данные для обновления или создания
+                var stocksToAdd = new List<Stock>();
+                var stocksToUpdate = new List<Stock>();
 
-                var newNomenclatures = new List<Nomenclature>();
                 foreach (var material in materials)
                 {
-                    var key = (material.Code, material.Article ?? "", material.ItemName, material.Unit);
-                    if (!nomenclatureMap.ContainsKey(key))
+                    // Проверяем, существует ли номенклатура
+                    var nomenclatureKey = (material.Code, material.Article, material.ItemName, material.Unit);
+                    if (!existingNomenclatures.TryGetValue(nomenclatureKey, out var nomenclatureId))
                     {
-                        var nomenclature = new Nomenclature
+                        // Создаем новую номенклатуру, если не существует
+                        var newNomenclature = new Nomenclature
                         {
                             Code = material.Code,
-                            Article = material.Article,
                             Name = material.ItemName,
+                            Article = material.Article,
                             UnitOfMeasure = material.Unit
                         };
-                        newNomenclatures.Add(nomenclature);
+                        _dbContext.Nomenclature.Add(newNomenclature);
+                        await _dbContext.SaveChangesAsync();
+                        nomenclatureId = newNomenclature.Id;
+                        existingNomenclatures[nomenclatureKey] = nomenclatureId;
                     }
-                }
 
-                // Массовая вставка новых номенклатур и обновление nomenclatureMap
-                if (newNomenclatures.Any())
-                {
-                    Console.WriteLine($"Inserting {newNomenclatures.Count} new nomenclatures");
-                    await _dbContext.BulkInsertAsync(newNomenclatures);
-                    // Обновляем nomenclatureMap с новыми Id
-                    foreach (var nomenclature in newNomenclatures)
+                    var stockKey = (nomenclatureId, warehouseId);
+                    if (existingStocks.TryGetValue(stockKey, out var existingStock))
                     {
-                        var key = (nomenclature.Code, nomenclature.Article ?? "", nomenclature.Name, nomenclature.UnitOfMeasure);
-                        nomenclatureMap[key] = nomenclature;
-                    }
-                }
+                        // Обновляем существующую запись
+                        existingStock.InitialQuantity = (decimal)material.FinalBalance;
 
-                // Предварительная загрузка существующих записей Stocks
-                var existingStocks = await _dbContext.Stocks
-                    .Where(s => s.WarehouseId == warehouseId)
-                    .ToDictionaryAsync(s => (s.WarehouseId, s.NomenclatureId), s => s);
+                        // Пересчитываем ReceivedQuantity и ConsumedQuantity
+                        var receivedQuantity = await _dbContext.Incoming
+                            .Where(i => i.StockId == existingStock.Id && i.Date >= date)
+                            .SumAsync(i => i.Quantity);
 
-                // Подготовка записей Stocks
-                var stocksToProcess = new List<Stock>();
-                foreach (var material in materials)
-                {
-                    var key = (material.Code, material.Article ?? "", material.ItemName, material.Unit);
-                    var nomenclature = nomenclatureMap[key];
-                    var stockKey = (warehouseId, nomenclature.Id);
+                        var consumedQuantity = await _dbContext.Expenses
+                            .Where(e => e.StockId == existingStock.Id && e.Date >= date)
+                            .SumAsync(e => e.Quantity);
 
-                    if (existingStocks.TryGetValue(stockKey, out var stock))
-                    {
-                        stock.InitialQuantity = (decimal)material.FinalBalance;
-                        stocksToProcess.Add(stock);
+                        existingStock.ReceivedQuantity = receivedQuantity;
+                        existingStock.ConsumedQuantity = consumedQuantity;
+
+                        stocksToUpdate.Add(existingStock);
                     }
                     else
                     {
-                        stock = new Stock
+                        // Создаем новую запись
+                        var newStock = new Stock
                         {
                             WarehouseId = warehouseId,
-                            NomenclatureId = nomenclature.Id,
+                            NomenclatureId = nomenclatureId,
                             InitialQuantity = (decimal)material.FinalBalance,
                             ReceivedQuantity = 0,
-                            ConsumedQuantity = 0,
-                            Nomenclature = nomenclature
+                            ConsumedQuantity = 0
                         };
-                        stocksToProcess.Add(stock);
+                        stocksToAdd.Add(newStock);
                     }
                 }
 
-                // Проверяем stocksToProcess на дубликаты
-                var duplicateStocks = stocksToProcess
-                    .GroupBy(s => (s.WarehouseId, s.NomenclatureId))
-                    .Where(g => g.Count() > 1)
-                    .Select(g => g.Key)
-                    .ToList();
-                if (duplicateStocks.Any())
+                // Пакетное добавление новых записей
+                if (stocksToAdd.Any())
                 {
-                    Console.WriteLine($"Found duplicate stocks: {string.Join(", ", duplicateStocks.Select(k => $"WarehouseId={k.WarehouseId}, NomenclatureId={k.NomenclatureId}"))}");
-                    stocksToProcess = stocksToProcess
-                        .GroupBy(s => (s.WarehouseId, s.NomenclatureId))
-                        .Select(g => g.Last())
-                        .ToList();
+                    await _dbContext.Stocks.AddRangeAsync(stocksToAdd);
                 }
 
-                // Массовая вставка или обновление записей Stocks
-                Console.WriteLine($"Processing {stocksToProcess.Count} stocks for insert/update");
-                await _dbContext.BulkInsertOrUpdateAsync(stocksToProcess, new BulkConfig
+                // Пакетное обновление существующих записей
+                if (stocksToUpdate.Any())
                 {
-                    UpdateByProperties = new List<string> { nameof(Stock.WarehouseId), nameof(Stock.NomenclatureId) },
-                    PropertiesToInclude = new List<string> { nameof(Stock.InitialQuantity), nameof(Stock.ReceivedQuantity), nameof(Stock.ConsumedQuantity) }
-                });
-
-                // Пересчет ReceivedQuantity и ConsumedQuantity
-                var stockIds = stocksToProcess.Select(s => s.Id).ToList();
-                var incomingSums = await _dbContext.Incoming
-                    .Where(i => stockIds.Contains(i.StockId) && i.Date >= date)
-                    .GroupBy(i => i.StockId)
-                    .Select(g => new { StockId = g.Key, Total = g.Sum(i => i.Quantity) })
-                    .ToDictionaryAsync(x => x.StockId, x => x.Total);
-
-                var expenseSums = await _dbContext.Expenses
-                    .Where(e => stockIds.Contains(e.StockId) && e.Date >= date)
-                    .GroupBy(e => e.StockId)
-                    .Select(g => new { StockId = g.Key, Total = g.Sum(e => e.Quantity) })
-                    .ToDictionaryAsync(x => x.StockId, x => x.Total);
-
-                foreach (var stock in stocksToProcess)
-                {
-                    stock.ReceivedQuantity = incomingSums.TryGetValue(stock.Id, out var received) ? received : 0;
-                    stock.ConsumedQuantity = expenseSums.TryGetValue(stock.Id, out var consumed) ? consumed : 0;
+                    _dbContext.Stocks.UpdateRange(stocksToUpdate);
                 }
 
-                // Массовая обновление ReceivedQuantity и ConsumedQuantity
-                Console.WriteLine($"Updating {stocksToProcess.Count} stocks for quantities");
-                await _dbContext.BulkUpdateAsync(stocksToProcess, new BulkConfig
-                {
-                    UpdateByProperties = new List<string> { nameof(Stock.Id) },
-                    PropertiesToInclude = new List<string> { nameof(Stock.ReceivedQuantity), nameof(Stock.ConsumedQuantity) }
-                });
-
+                // Сохраняем изменения
+                await _dbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in UploadMaterialsStockAsync: {ex}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException}");
-                }
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                // Логирование ошибки (предполагается, что используется ILogger)
                 return false;
             }
         }

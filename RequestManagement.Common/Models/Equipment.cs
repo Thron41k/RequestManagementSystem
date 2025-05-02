@@ -21,4 +21,5 @@ public class Equipment : IEntity
     /// Государственный номер (может отсутствовать)
     /// </summary>
     public string? StateNumber { get; set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
 }

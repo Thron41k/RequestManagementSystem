@@ -13,6 +13,7 @@ namespace RequestManagement.Common.Models
         [NotMapped]
         public bool IsSelected { get; set; }
         public int Id { get; set; }
+        public string? Code { get; set; } = string.Empty;
         public int StockId { get; set; }
         public Stock Stock { get; set; } = null!;
         public decimal Quantity { get; set; }
