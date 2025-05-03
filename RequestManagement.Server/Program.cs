@@ -20,6 +20,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IIncomingService, IncomingService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<ICommissionsService, CommissionsService>();
 
 // Настройка JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException());
@@ -56,5 +57,6 @@ app.MapGrpcService<RequestManagement.Server.Controllers.AuthController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.ExpenseController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.IncomingController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.WarehouseController>();
+app.MapGrpcService<RequestManagement.Server.Controllers.CommissionsController>();
 
 app.Run();

@@ -23,6 +23,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<WarehouseService.WarehouseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<CommissionsService.CommissionsServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<AuthTokenStore>();
@@ -48,6 +49,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<ExpenseListViewModel>();
         serviceCollection.AddScoped<IncomingListViewModel>();
         serviceCollection.AddScoped<StartDataLoadViewModel>();
+        serviceCollection.AddScoped<CommissionsViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -57,6 +59,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<IExpenseService, GrpcExpenseService>();
         serviceCollection.AddScoped<IIncomingService, GrpcIncomingService>();
         serviceCollection.AddScoped<IWarehouseService, GrpcWarehouseService>();
+        serviceCollection.AddScoped<ICommissionsService, GrpcCommissionsService>();
 
         // Представления
         serviceCollection.AddTransient<MainWindow>();
@@ -72,6 +75,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<ExpenseListView>();
         serviceCollection.AddTransient<IncomingListView>();
         serviceCollection.AddTransient<StartDataLoadView>();
+        serviceCollection.AddTransient<CommissionsView>();
 
         return serviceCollection.BuildServiceProvider();
     }

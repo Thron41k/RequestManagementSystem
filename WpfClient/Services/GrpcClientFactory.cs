@@ -34,4 +34,9 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     {
         return serviceProvider.GetRequiredService<WarehouseService.WarehouseServiceClient>();
     }
+
+    public CommissionsService.CommissionsServiceClient CreateCommissionsClient()
+    {
+        return serviceProvider.GetRequiredService<CommissionsService.CommissionsServiceClient>();
+    }
 }

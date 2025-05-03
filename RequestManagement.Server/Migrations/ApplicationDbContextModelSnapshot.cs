@@ -22,6 +22,72 @@ namespace RequestManagement.Server.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("RequestManagement.Common.Models.Commissions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApproveForActId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ApproveForDefectAndLimitId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChairmanId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Member1Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Member2Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Member3Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Member4Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApproveForActId");
+
+                    b.HasIndex("ApproveForDefectAndLimitId");
+
+                    b.HasIndex("ChairmanId");
+
+                    b.HasIndex("Member1Id");
+
+                    b.HasIndex("Member2Id");
+
+                    b.HasIndex("Member3Id");
+
+                    b.HasIndex("Member4Id");
+
+                    b.ToTable("Commissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ApproveForActId = 1,
+                            ApproveForDefectAndLimitId = 1,
+                            ChairmanId = 1,
+                            Member1Id = 1,
+                            Member2Id = 1,
+                            Member3Id = 1,
+                            Member4Id = 1,
+                            Name = "Магический филиал"
+                        });
+                });
+
             modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
                 {
                     b.Property<int>("Id")
@@ -454,6 +520,9 @@ namespace RequestManagement.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CommissionsId")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("DriverId")
                         .HasColumnType("integer");
 
@@ -467,6 +536,8 @@ namespace RequestManagement.Server.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CommissionsId");
 
                     b.HasIndex("DriverId");
 
@@ -514,6 +585,58 @@ namespace RequestManagement.Server.Migrations
                             LastUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Резервный склад"
                         });
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Commissions", b =>
+                {
+                    b.HasOne("RequestManagement.Common.Models.Driver", "ApproveForAct")
+                        .WithMany()
+                        .HasForeignKey("ApproveForActId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "ApproveForDefectAndLimit")
+                        .WithMany()
+                        .HasForeignKey("ApproveForDefectAndLimitId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Chairman")
+                        .WithMany()
+                        .HasForeignKey("ChairmanId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Member1")
+                        .WithMany()
+                        .HasForeignKey("Member1Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Member2")
+                        .WithMany()
+                        .HasForeignKey("Member2Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Member3")
+                        .WithMany()
+                        .HasForeignKey("Member3Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Member4")
+                        .WithMany()
+                        .HasForeignKey("Member4Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApproveForAct");
+
+                    b.Navigation("ApproveForDefectAndLimit");
+
+                    b.Navigation("Chairman");
+
+                    b.Navigation("Member1");
+
+                    b.Navigation("Member2");
+
+                    b.Navigation("Member3");
+
+                    b.Navigation("Member4");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
@@ -621,6 +744,10 @@ namespace RequestManagement.Server.Migrations
 
             modelBuilder.Entity("RequestManagement.Common.Models.UserLastSelection", b =>
                 {
+                    b.HasOne("RequestManagement.Common.Models.Commissions", "Commissions")
+                        .WithMany()
+                        .HasForeignKey("CommissionsId");
+
                     b.HasOne("RequestManagement.Common.Models.Driver", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId");
@@ -634,6 +761,8 @@ namespace RequestManagement.Server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Commissions");
 
                     b.Navigation("Driver");
 

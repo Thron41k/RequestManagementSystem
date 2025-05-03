@@ -23,6 +23,7 @@ public class MainMenuViewModel
     private readonly ExpenseListViewModel _expenseListViewModel;
     private readonly IncomingListViewModel _incomingListViewModel;
     private readonly StartDataLoadViewModel _startDataLoadViewModel;
+    private readonly CommissionsViewModel _commissionsViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -35,8 +36,9 @@ public class MainMenuViewModel
     public ICommand ShowExpensesCommand { get; }
     public ICommand ShowIncomingListCommand { get; }
     public ICommand ShowStartDataLoadingCommand { get; }
+    public ICommand ShowCommissionsCommand { get; }
 
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel)
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -50,6 +52,7 @@ public class MainMenuViewModel
         _expenseListViewModel = expenseListViewModel;
         _incomingListViewModel = incomingListViewModel;
         _startDataLoadViewModel = startDataLoadViewModel;
+        _commissionsViewModel = commissionsViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
@@ -63,6 +66,22 @@ public class MainMenuViewModel
         ShowExpensesCommand = new RelayCommand(ShowExpenses);
         ShowIncomingListCommand = new RelayCommand(ShowIncomingList);
         ShowStartDataLoadingCommand = new RelayCommand(ShowStartDataLoading);
+        ShowCommissionsCommand = new RelayCommand(ShowCommissions);
+    }
+
+    private void ShowCommissions()
+    {
+        var commissionsView = new CommissionsView(_commissionsViewModel);
+        var window = new Window
+        {
+            Content = commissionsView,
+            Title = "Комиссия",
+            Width = 850,
+            Height = 490,
+            ResizeMode = ResizeMode.NoResize
+        };
+        _ = _commissionsViewModel.Load();
+        window.ShowDialog();
     }
 
     private void ShowStartDataLoading()

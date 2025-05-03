@@ -11,8 +11,10 @@ namespace RequestManagement.Common.Models
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public int ApproveId { get; set; } 
-        public Driver? Approve { get; set; }
+        public int ApproveForActId { get; set; }
+        public Driver? ApproveForAct { get; set; } = null;
+        public int ApproveForDefectAndLimitId { get; set; }
+        public Driver? ApproveForDefectAndLimit { get; set; } = null;
         public int ChairmanId { get; set; }
         public Driver? Chairman { get; set; }
         public int Member1Id { get; set; }

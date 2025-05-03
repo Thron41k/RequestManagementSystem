@@ -31,29 +31,40 @@ namespace RequestManagement.Server.Data
                 entity =>
                 {
                     entity.HasKey(e => e.Id);
-                    entity.HasOne(e => e.Approve)
-                        .WithMany() 
-                        .HasForeignKey(e => e.ApproveId)
+                    entity.HasOne(e => e.ApproveForAct)
+                        .WithMany()
+                        .HasForeignKey(e => e.ApproveForActId)
+                        .IsRequired(false)
+                        .OnDelete(DeleteBehavior.Restrict);
+                    entity.HasOne(e => e.ApproveForDefectAndLimit)
+                        .WithMany()
+                        .HasForeignKey(e => e.ApproveForDefectAndLimitId)
+                        .IsRequired(false)
                         .OnDelete(DeleteBehavior.Restrict);
                     entity.HasOne(e => e.Chairman)
                         .WithMany()
                         .HasForeignKey(e => e.ChairmanId)
+                        .IsRequired(false)
                         .OnDelete(DeleteBehavior.Restrict);
                     entity.HasOne(e => e.Member1)
                         .WithMany()
                         .HasForeignKey(e => e.Member1Id)
+                        .IsRequired(false)
                         .OnDelete(DeleteBehavior.Restrict);
                     entity.HasOne(e => e.Member2)
                         .WithMany()
                         .HasForeignKey(e => e.Member2Id)
+                        .IsRequired(false)
                         .OnDelete(DeleteBehavior.Restrict);
                     entity.HasOne(e => e.Member3)
                         .WithMany()
                         .HasForeignKey(e => e.Member3Id)
+                        .IsRequired(false)
                         .OnDelete(DeleteBehavior.Restrict);
                     entity.HasOne(e => e.Member4)
                         .WithMany()
                         .HasForeignKey(e => e.Member4Id)
+                        .IsRequired(false)
                         .OnDelete(DeleteBehavior.Restrict);
                 }
             );
@@ -94,13 +105,13 @@ namespace RequestManagement.Server.Data
                 entity.Property(e => e.Date)
                     .HasColumnType("timestamp with time zone");
                 entity.HasOne(e => e.Stock)
-                    .WithMany() 
+                    .WithMany()
                     .HasForeignKey(e => e.StockId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Expense>(entity =>
             {
-                entity.Ignore(e=>e.IsSelected);
+                entity.Ignore(e => e.IsSelected);
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Quantity)
@@ -255,8 +266,20 @@ namespace RequestManagement.Server.Data
                 ConsumedQuantity = 0
             }
             );
-
-            // Начальные данные для Drivers
+            modelBuilder.Entity<Commissions>().HasData(
+                new Commissions
+                {
+                    Id = 1,
+                    Name = "Магический филиал",
+                    ApproveForActId = 1,
+                    ApproveForDefectAndLimitId = 1,
+                    ChairmanId = 1,
+                    Member1Id = 1,
+                    Member2Id = 1,
+                    Member3Id = 1,
+                    Member4Id = 1
+                }
+            );
             modelBuilder.Entity<Driver>().HasData(
                 new Driver
                 {

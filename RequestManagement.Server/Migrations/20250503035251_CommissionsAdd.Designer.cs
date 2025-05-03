@@ -12,18 +12,84 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250414085214_InProgress2")]
-    partial class InProgress2
+    [Migration("20250503035251_CommissionsAdd")]
+    partial class CommissionsAdd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.3")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Commissions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApproveForActId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ApproveForDefectAndLimitId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChairmanId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Member1Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Member2Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Member3Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Member4Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApproveForActId");
+
+                    b.HasIndex("ApproveForDefectAndLimitId");
+
+                    b.HasIndex("ChairmanId");
+
+                    b.HasIndex("Member1Id");
+
+                    b.HasIndex("Member2Id");
+
+                    b.HasIndex("Member3Id");
+
+                    b.HasIndex("Member4Id");
+
+                    b.ToTable("Commissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ApproveForActId = 1,
+                            ApproveForDefectAndLimitId = 1,
+                            ChairmanId = 1,
+                            Member1Id = 1,
+                            Member2Id = 1,
+                            Member3Id = 1,
+                            Member4Id = 1,
+                            Name = "Магический филиал"
+                        });
+                });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
                 {
@@ -98,6 +164,10 @@ namespace RequestManagement.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -118,6 +188,7 @@ namespace RequestManagement.Server.Migrations
                         new
                         {
                             Id = 1,
+                            Code = "",
                             FullName = "Иванов Иван Иванович",
                             Position = "Водитель",
                             ShortName = "Иванов И.И."
@@ -125,6 +196,7 @@ namespace RequestManagement.Server.Migrations
                         new
                         {
                             Id = 2,
+                            Code = "",
                             FullName = "Петров Петр Петрович",
                             Position = "Водитель",
                             ShortName = "Петров П.П."
@@ -138,6 +210,10 @@ namespace RequestManagement.Server.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -154,6 +230,7 @@ namespace RequestManagement.Server.Migrations
                         new
                         {
                             Id = 1,
+                            Code = "",
                             Name = "КАМАЗ 53215-15",
                             StateNumber = "Н 507 СН"
                         });
@@ -166,6 +243,9 @@ namespace RequestManagement.Server.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
@@ -201,10 +281,44 @@ namespace RequestManagement.Server.Migrations
                         new
                         {
                             Id = 1,
+                            Code = "",
                             Date = new DateTime(2025, 4, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             DefectId = 1,
                             DriverId = 1,
                             EquipmentId = 1,
+                            Quantity = 5m,
+                            StockId = 1
+                        });
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Incoming", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Incoming");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Date = new DateTime(2025, 4, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Quantity = 5m,
                             StockId = 1
                         });
@@ -219,7 +333,6 @@ namespace RequestManagement.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Article")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Code")
@@ -397,7 +510,7 @@ namespace RequestManagement.Server.Migrations
                         {
                             Id = 1,
                             Login = "admin",
-                            Password = "$2a$11$abcdefghijk123456789u.lX7Qz5Z9K8zM8zM8zM8zM8zM8zM8zM8zM",
+                            Password = "$2a$11$IeKuyvG/5SoDYP0NFz3kouC3CPUIuUa6ShTfgVVf9oUlfqbXq8LrC",
                             Role = 0
                         });
                 });
@@ -409,6 +522,9 @@ namespace RequestManagement.Server.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CommissionsId")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("DriverId")
                         .HasColumnType("integer");
@@ -423,6 +539,8 @@ namespace RequestManagement.Server.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CommissionsId");
 
                     b.HasIndex("DriverId");
 
@@ -441,6 +559,12 @@ namespace RequestManagement.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -453,13 +577,69 @@ namespace RequestManagement.Server.Migrations
                         new
                         {
                             Id = 1,
+                            Code = "",
+                            LastUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Основной склад"
                         },
                         new
                         {
                             Id = 2,
+                            Code = "",
+                            LastUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Резервный склад"
                         });
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Commissions", b =>
+                {
+                    b.HasOne("RequestManagement.Common.Models.Driver", "ApproveForAct")
+                        .WithMany()
+                        .HasForeignKey("ApproveForActId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "ApproveForDefectAndLimit")
+                        .WithMany()
+                        .HasForeignKey("ApproveForDefectAndLimitId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Chairman")
+                        .WithMany()
+                        .HasForeignKey("ChairmanId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Member1")
+                        .WithMany()
+                        .HasForeignKey("Member1Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Member2")
+                        .WithMany()
+                        .HasForeignKey("Member2Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Member3")
+                        .WithMany()
+                        .HasForeignKey("Member3Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Member4")
+                        .WithMany()
+                        .HasForeignKey("Member4Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApproveForAct");
+
+                    b.Navigation("ApproveForDefectAndLimit");
+
+                    b.Navigation("Chairman");
+
+                    b.Navigation("Member1");
+
+                    b.Navigation("Member2");
+
+                    b.Navigation("Member3");
+
+                    b.Navigation("Member4");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
@@ -504,6 +684,17 @@ namespace RequestManagement.Server.Migrations
                     b.Navigation("Driver");
 
                     b.Navigation("Equipment");
+
+                    b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Incoming", b =>
+                {
+                    b.HasOne("RequestManagement.Common.Models.Stock", "Stock")
+                        .WithMany()
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Stock");
                 });
@@ -556,6 +747,10 @@ namespace RequestManagement.Server.Migrations
 
             modelBuilder.Entity("RequestManagement.Common.Models.UserLastSelection", b =>
                 {
+                    b.HasOne("RequestManagement.Common.Models.Commissions", "Commissions")
+                        .WithMany()
+                        .HasForeignKey("CommissionsId");
+
                     b.HasOne("RequestManagement.Common.Models.Driver", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId");
@@ -569,6 +764,8 @@ namespace RequestManagement.Server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Commissions");
 
                     b.Navigation("Driver");
 

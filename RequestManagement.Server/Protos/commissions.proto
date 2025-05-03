@@ -12,12 +12,13 @@ service CommissionsService {
 message Commissions {
     int32 id = 1;
     string name = 2;
-    CommissionsDriver approve = 3;
-    CommissionsDriver chairman = 4;
-    CommissionsDriver member1 = 5;
-    CommissionsDriver member2 = 6;
-    CommissionsDriver member3 = 7;
-    CommissionsDriver member4 = 8;
+    CommissionsDriver approve_act = 3;
+    CommissionsDriver approve_defect_and_limit = 4;
+    CommissionsDriver chairman = 5;
+    CommissionsDriver member1 = 6;
+    CommissionsDriver member2 = 7;
+    CommissionsDriver member3 = 8;
+    CommissionsDriver member4 = 9;
 }
 
 message CommissionsDriver{
@@ -36,8 +37,9 @@ message GetAllCommissionsResponse {
 }
 
 message CreateCommissionsRequest {
-    string name = 2;
-    int32 approve_id = 3;
+    string name = 1;
+    int32 approve_act_id = 2;
+    int32 approve_defect_and_limit_id = 3;
     int32 chairman_id = 4;
     int32 member1_id = 5;
     int32 member2_id = 6;
@@ -52,12 +54,13 @@ message CreateCommissionsResponse {
 message UpdateCommissionsRequest {
 	int32 id = 1;
 	string name = 2;
-	int32 approve_id = 3;
-	int32 chairman_id = 4;
-	int32 member1_id = 5;
-	int32 member2_id = 6;
-	int32 member3_id = 7;
-	int32 member4_id = 8;
+	int32 approve_act_id = 3;
+    int32 approve_defect_and_limit_id = 4;
+	int32 chairman_id = 5;
+	int32 member1_id = 6;
+	int32 member2_id = 7;
+	int32 member3_id = 8;
+	int32 member4_id = 9;
 }
 
 message UpdateCommissionsResponse {
