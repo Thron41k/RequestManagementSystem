@@ -3,7 +3,6 @@ using Grpc.Core;
 using RequestManagement.Server.Controllers;
 using WpfClient.Models;
 using WpfClient.Services.Interfaces;
-using RequestManagement.Common.Models;
 using System.Globalization;
 
 namespace WpfClient.Services;

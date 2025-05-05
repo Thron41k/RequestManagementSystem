@@ -1,18 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RequestManagement.Common.Interfaces;
-using RequestManagement.Common.Models;
 using WpfClient.Services.Interfaces;
 using System.Windows.Data;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
 using WpfClient.Messages;
-using RequestManagement.Server.Controllers;
-using System.Globalization;
 using Commissions = RequestManagement.Common.Models.Commissions;
 using Driver = RequestManagement.Common.Models.Driver;
 
@@ -36,6 +28,7 @@ namespace WpfClient.ViewModels
         [ObservableProperty] private Driver _selectedMember4 = new();
         [ObservableProperty] private ObservableCollection<Commissions> _commissionsList = [];
         [ObservableProperty] private CollectionViewSource _commissionsViewSource;
+        public event EventHandler CloseWindowRequested;
 
         private enum CommissionType { None, Act, DefectAndLimit, Chairman, Member1, Member2, Member3, Member4 };
 
@@ -113,7 +106,7 @@ namespace WpfClient.ViewModels
         [RelayCommand]
         private void DoubleClick()
         {
-
+            CloseWindowRequested?.Invoke(this, EventArgs.Empty);
         }
         [RelayCommand]
         private void Click()
@@ -222,7 +215,29 @@ namespace WpfClient.ViewModels
                     Member4 = SelectedMember4,
                 };
                 await _commissionsService.CreateCommissionsAsync(commission);
-                await _commissionsService.GetAllCommissionsAsync();
+                await LoadCommissionAsync();
+            }
+        }
+
+        [RelayCommand]
+        private async Task SaveCommissions()
+        {
+            if (CommissionsName != "")
+            {
+                var commission = new Commissions()
+                {
+                    Id = SelectedCommissions.Id,
+                    Name = CommissionsName,
+                    ApproveForAct = SelectedApproveForAct,
+                    ApproveForDefectAndLimit = SelectedApproveForDefectAndLimit,
+                    Chairman = SelectedChairman,
+                    Member1 = SelectedMember1,
+                    Member2 = SelectedMember2,
+                    Member3 = SelectedMember3,
+                    Member4 = SelectedMember4,
+                };
+                await _commissionsService.UpdateCommissionsAsync(commission);
+                await LoadCommissionAsync();
             }
         }
     }

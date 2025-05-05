@@ -1,4 +1,5 @@
-﻿using RequestManagement.Common.Models.Interfaces;
+﻿using RequestManagement.Common.Models;
+using RequestManagement.Common.Models.Interfaces;
 
 namespace WpfClient.Messages;
 
@@ -21,6 +22,13 @@ public class ShowTaskMessage(MessagesEnum message, Type caller, bool editMode, i
     public DateTime? Date { get; } = date;
     public decimal Quantity { get; } = quantity;
     public IEntity?[] Item { get; } = items;
+}
+public class ShowTaskPrintDialogMessage(MessagesEnum message, Type caller, bool editMode, List<Expense> items)
+{
+    public MessagesEnum Message { get; } = message;
+    public Type Caller { get; } = caller;
+    public bool EditMode { get; } = editMode;
+    public List<Expense> Item { get; } = items;
 }
 public class SelectResultMessage(MessagesEnum message, Type caller, IEntity? item = null)
 {

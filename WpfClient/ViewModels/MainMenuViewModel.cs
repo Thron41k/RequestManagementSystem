@@ -23,7 +23,9 @@ public class MainMenuViewModel
     private readonly ExpenseListViewModel _expenseListViewModel;
     private readonly IncomingListViewModel _incomingListViewModel;
     private readonly StartDataLoadViewModel _startDataLoadViewModel;
+    private readonly ExpenseDataLoadViewModel _expenseDataLoadViewModel;
     private readonly CommissionsViewModel _commissionsViewModel;
+    private readonly PrintReportViewModel _printReportViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -37,8 +39,9 @@ public class MainMenuViewModel
     public ICommand ShowIncomingListCommand { get; }
     public ICommand ShowStartDataLoadingCommand { get; }
     public ICommand ShowCommissionsCommand { get; }
+    public ICommand ShowExpensesDataLoadingCommand { get; }
 
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel)
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -53,9 +56,12 @@ public class MainMenuViewModel
         _incomingListViewModel = incomingListViewModel;
         _startDataLoadViewModel = startDataLoadViewModel;
         _commissionsViewModel = commissionsViewModel;
+        _printReportViewModel = printReportViewModel;
+        _expenseDataLoadViewModel = expenseDataLoadViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
+        _messageBus.Subscribe<ShowTaskPrintDialogMessage>(OnShowPrintDialog);
         ShowEquipmentCommand = new RelayCommand(ShowEquipment);
         ShowDriverCommand = new RelayCommand(ShowDriver);
         ShowDefectGroupCommand = new RelayCommand(ShowDefectGroup);
@@ -67,9 +73,29 @@ public class MainMenuViewModel
         ShowIncomingListCommand = new RelayCommand(ShowIncomingList);
         ShowStartDataLoadingCommand = new RelayCommand(ShowStartDataLoading);
         ShowCommissionsCommand = new RelayCommand(ShowCommissions);
+        ShowExpensesDataLoadingCommand = new RelayCommand(ShowExpensesDataLoading);
     }
 
     private void ShowCommissions()
+    {
+        ShowCommissions(true);
+    }
+    private void ShowPrintReport(List<Expense> list)
+    {
+        var printReportView = new PrintReportView(_printReportViewModel);
+        var window = new Window
+        {
+            Content = printReportView,
+            Title = "Печать отчётов",
+            Width = 850,
+            Height = 490,
+            ResizeMode = ResizeMode.NoResize
+        };
+        _printReportViewModel.Init(list);
+        window.ShowDialog();
+    }
+
+    private void ShowCommissions(bool editMode, Type? argCaller = null)
     {
         var commissionsView = new CommissionsView(_commissionsViewModel);
         var window = new Window
@@ -82,6 +108,10 @@ public class MainMenuViewModel
         };
         _ = _commissionsViewModel.Load();
         window.ShowDialog();
+        if (argCaller != null)
+            _messageBus.Publish(
+                new SelectResultMessage(
+                    MessagesEnum.SelectCommissions, argCaller, _commissionsViewModel.SelectedCommissions));
     }
 
     private void ShowStartDataLoading()
@@ -99,6 +129,20 @@ public class MainMenuViewModel
         window.ShowDialog();
     }
 
+    private void ShowExpensesDataLoading()
+    {
+        var expenseDataLoadView = new ExpenseDataLoadView(_expenseDataLoadViewModel);
+        var window = new Window
+        {
+            Content = expenseDataLoadView,
+            Title = "Загрузка расходов",
+            Width = 520,
+            Height = 240,
+            ResizeMode = ResizeMode.NoResize
+        };
+        _expenseDataLoadViewModel.Init();
+        window.ShowDialog();
+    }
     private async void ShowIncomingList()
     {
         var incomingView = new IncomingListView(_incomingListViewModel);
@@ -176,6 +220,9 @@ public class MainMenuViewModel
             case MessagesEnum.SelectEquipment:
                 ShowEquipment(false, arg.Caller);
                 break;
+            case MessagesEnum.SelectCommissions:
+                ShowCommissions(false, arg.Caller);
+                break;
         }
 
         return Task.CompletedTask;
@@ -186,6 +233,15 @@ public class MainMenuViewModel
         {
             case MessagesEnum.ShowExpenseDialog:
                 await ShowExpenseDialog(arg.EditMode, arg.Caller, arg.Id, arg.Date, arg.Quantity, arg.Item);
+                break;
+        }
+    }
+    private async Task OnShowPrintDialog(ShowTaskPrintDialogMessage arg)
+    {
+        switch (arg.Message)
+        {
+            case MessagesEnum.ShowPrintReportDialog:
+                ShowPrintReport(arg.Item);
                 break;
         }
     }

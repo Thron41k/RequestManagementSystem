@@ -133,7 +133,7 @@
                 </TextBox>
             </StackPanel>
             <StackPanel Grid.Row="8"  Orientation="Horizontal" Margin="5,17,5,5" HorizontalAlignment="Center">
-                <Button Content="Сохранить" Command="{Binding AddCommissionsCommand}" />
+                <Button Content="Сохранить" Command="{Binding SaveCommissionsCommand}" />
             </StackPanel>
         </Grid>
     </Grid>

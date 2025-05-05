@@ -15,5 +15,7 @@ public enum MessagesEnum
     SelectEquipment,
     SelectDriver,
     SelectDefect,
-    SelectDefectGroup
+    SelectDefectGroup,
+    SelectCommissions,
+    ShowPrintReportDialog
 }

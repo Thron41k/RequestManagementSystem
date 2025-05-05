@@ -284,9 +284,9 @@ namespace RequestManagement.Server.Data
                 new Driver
                 {
                     Id = 1,
-                    FullName = "Иванов Иван Иванович",
-                    ShortName = "Иванов И.И.",
-                    Position = "Водитель"
+                    FullName = "",
+                    ShortName = "",
+                    Position = ""
                 },
                 new Driver
                 {

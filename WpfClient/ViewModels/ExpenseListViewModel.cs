@@ -3,15 +3,12 @@ using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.IO;
 using System.Windows.Data;
 using System.Windows.Threading;
 using RequestManagement.Common.Models;
 using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
 using System.Windows;
-using WpfClient.Models.ExcelWriterModels;
-using WpfClient.Services.ExcelTemplate;
 
 namespace WpfClient.ViewModels;
 
@@ -115,12 +112,13 @@ public partial class ExpenseListViewModel : ObservableObject
     [RelayCommand]
     private async Task Print()
     {
-        var data = new List<ActPartsModel>
-        {
-            new(),
-            new()
-        };
-        _excelWriterService.ExportAndPrint(ExcelTemplateType.ActParts, data);
+        //var data = new List<ActPartsModel>
+        //{
+        //    new(),
+        //    new()
+        //};
+        //_excelWriterService.ExportAndPrint(ExcelTemplateType.ActParts, data);
+        await _messageBus.Publish(new ShowTaskPrintDialogMessage(MessagesEnum.ShowPrintReportDialog, typeof(ExpenseListViewModel), false, Expenses.Where(x => x.IsSelected).ToList()));
     }
     [RelayCommand]
     private async Task ExpenseDeleteAsync()

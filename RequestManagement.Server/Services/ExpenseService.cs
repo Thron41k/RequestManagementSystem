@@ -1,13 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
+using RequestManagement.Common.Utilities;
+using RequestManagement.Server.Controllers;
 using RequestManagement.Server.Data;
+using System.Linq;
 
 namespace RequestManagement.Server.Services
 {
     public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
     {
-        public async Task<List<Expense>> GetAllExpensesAsync(string filter, int requestWarehouseId, int requestEquipmentId, int requestDriverId,
+        public readonly record struct NomenclatureKey(string Name, string Code, string Article, string UnitOfMeasure);
+
+        public async Task<List<RequestManagement.Common.Models.Expense>> GetAllExpensesAsync(string filter, int requestWarehouseId, int requestEquipmentId, int requestDriverId,
             int requestDefectId, string requestFromDate, string requestToDate)
         {
             var query = dbContext.Expenses
@@ -62,7 +67,127 @@ namespace RequestManagement.Server.Services
             }
             return await query.ToListAsync();
         }
-        public async Task<Expense> CreateExpenseAsync(Expense expense)
+
+        public async Task<bool> UploadMaterialsExpenseAsync(List<RequestManagement.Common.Models.MaterialExpense>? materials, int warehouseId)
+        {
+
+            if (materials == null || materials.Count == 0)
+                return true;
+
+            try
+            {
+                var driverCodes = materials.Select(m => m.DriverCode).Distinct().ToList();
+                var equipmentCodes = materials.Select(m => m.EquipmentCode).Distinct().ToList();
+                var nomenclatureKeys = materials
+                    .Select(m => new NomenclatureKey(m.NomenclatureName, m.NomenclatureCode, m.NomenclatureArticle, m.NomenlatureUnitOfMeasure))
+                    .Distinct()
+                    .ToList();
+
+                // Загружаем данные из базы одним запросом
+                var existingDrivers = await dbContext.Drivers
+                    .Where(d => driverCodes.Contains(d.Code))
+                    .ToDictionaryAsync(d => d.Code);
+
+                var existingEquipments = await dbContext.Equipments
+                    .Where(e => equipmentCodes.Contains(e.Code))
+                    .ToDictionaryAsync(e => e.Code);
+
+                var existingStocks = await dbContext.Stocks
+                    .Include(s => s.Nomenclature)
+                    .Where(s => s.WarehouseId == warehouseId)
+                    .ToListAsync();
+
+                var stockMap = existingStocks
+                    .Select(s => new
+                    {
+                        Stock = s,
+                        Key = new NomenclatureKey(s.Nomenclature.Name, s.Nomenclature.Code, s.Nomenclature.Article, s.Nomenclature.UnitOfMeasure)
+                    })
+                    .Where(x => nomenclatureKeys.Contains(x.Key))
+                    .ToDictionary(x => x.Key, x => x.Stock);
+
+
+                var nomenclatureIds = stockMap.Values.Select(s => s.NomenclatureId).Distinct().ToList();
+                var defectMappings = await dbContext.NomenclatureDefectMappings
+                    .Where(m => nomenclatureIds.Contains(m.NomenclatureId))
+                    .ToDictionaryAsync(m => m.NomenclatureId, m => m.DefectId);
+
+                // Подготовка к вставке
+                var newDrivers = new List<RequestManagement.Common.Models.Driver>();
+                var newEquipments = new List<RequestManagement.Common.Models.Equipment>();
+                var newExpenses = new List<RequestManagement.Common.Models.Expense>();
+
+                foreach (var material in materials)
+                {
+                    // Драйвер
+                    if (!existingDrivers.TryGetValue(material.DriverCode, out var driver))
+                    {
+                        driver = new RequestManagement.Common.Models.Driver
+                        {
+                            Code = material.DriverCode,
+                            FullName = material.DriverFullName,
+                            Position = "",
+                            ShortName = NameFormatter.FormatToShortName(material.DriverFullName)
+                        };
+                        newDrivers.Add(driver);
+                        existingDrivers[driver.Code] = driver; // Добавляем в словарь, чтобы переиспользовать
+                    }
+
+                    // Оборудование
+                    if (!existingEquipments.TryGetValue(material.EquipmentCode, out var equipment))
+                    {
+                        equipment = new RequestManagement.Common.Models.Equipment
+                        {
+                            Code = material.EquipmentCode,
+                            Name = material.EquipmentName
+                        };
+                        newEquipments.Add(equipment);
+                        existingEquipments[equipment.Code] = equipment;
+                    }
+
+                    // Склад
+                    var key = new NomenclatureKey(
+                        material.NomenclatureName,
+                        material.NomenclatureCode,
+                        material.NomenclatureArticle,
+                        material.NomenlatureUnitOfMeasure);
+
+                    if (!stockMap.TryGetValue(key, out var stock))
+                        continue;
+
+                    var defectId = defectMappings.TryGetValue(stock.NomenclatureId, out var id) ? id : 1;
+
+                    var expense = new RequestManagement.Common.Models.Expense
+                    {
+                        Code = material.Number,
+                        Date = material.Date,
+                        Quantity = material.Quantity,
+                        StockId = stock.Id,
+                        Driver = driver,
+                        Equipment = equipment,
+                        DefectId = defectId
+                    };
+                    stock.ConsumedQuantity += expense.Quantity;
+                    newExpenses.Add(expense);
+                }
+
+                // Добавляем новые сущности
+                await dbContext.Drivers.AddRangeAsync(newDrivers);
+                await dbContext.Equipments.AddRangeAsync(newEquipments);
+                await dbContext.Expenses.AddRangeAsync(newExpenses);
+
+                await dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+
+        public async Task<RequestManagement.Common.Models.Expense> CreateExpenseAsync(RequestManagement.Common.Models.Expense expense)
         {
             try
             {
@@ -87,11 +212,11 @@ namespace RequestManagement.Server.Services
             }
             catch
             {
-                return new Expense();
+                return new RequestManagement.Common.Models.Expense();
             }
 
         }
-        public async Task<bool> UpdateExpenseAsync(Expense expense)
+        public async Task<bool> UpdateExpenseAsync(RequestManagement.Common.Models.Expense expense)
         {
             if (expense == null) throw new ArgumentNullException(nameof(expense));
 

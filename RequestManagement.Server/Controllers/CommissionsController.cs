@@ -82,13 +82,13 @@ namespace RequestManagement.Server.Controllers
             var commissions = new RequestManagement.Common.Models.Commissions
             {
                 Name = request.Name,
-                ApproveForActId = request.ApproveActId,
-                ApproveForDefectAndLimitId = request.ApproveDefectAndLimitId,
-                ChairmanId = request.ChairmanId,
-                Member1Id = request.Member1Id,
-                Member2Id = request.Member2Id,
-                Member3Id = request.Member3Id,
-                Member4Id = request.Member4Id
+                ApproveForActId = request.ApproveActId == 0 ? 1 : request.ApproveActId,
+                ApproveForDefectAndLimitId = request.ApproveDefectAndLimitId == 0 ? 1 : request.ApproveDefectAndLimitId,
+                ChairmanId = request.ChairmanId == 0 ? 1 : request.ChairmanId,
+                Member1Id = request.Member1Id == 0 ? 1 : request.Member1Id,
+                Member2Id = request.Member2Id == 0 ? 1 : request.Member2Id,
+                Member3Id = request.Member3Id == 0 ? 1 : request.Member3Id,
+                Member4Id = request.Member4Id == 0 ? 1 : request.Member4Id
             };
 
             var id = await commissionsService.CreateCommissionsAsync(commissions);
@@ -97,23 +97,31 @@ namespace RequestManagement.Server.Controllers
 
         public override async Task<UpdateCommissionsResponse> UpdateCommissions(UpdateCommissionsRequest request, ServerCallContext context)
         {
-            logger.LogInformation("Updating commissions with ID: {Id}", request.Id);
-
-            var commissions = new RequestManagement.Common.Models.Commissions
+            try
             {
-                Id = request.Id,
-                Name = request.Name,
-                ApproveForActId = request.ApproveActId,
-                ApproveForDefectAndLimitId = request.ApproveDefectAndLimitId,
-                ChairmanId = request.ChairmanId,
-                Member1Id = request.Member1Id,
-                Member2Id = request.Member2Id,
-                Member3Id = request.Member3Id,
-                Member4Id = request.Member4Id
-            };
+                logger.LogInformation("Updating commissions with ID: {Id}", request.Id);
 
-            var success = await commissionsService.UpdateCommissionsAsync(commissions);
-            return new UpdateCommissionsResponse { Success = success };
+                var commissions = new RequestManagement.Common.Models.Commissions
+                {
+                    Id = request.Id,
+                    Name = request.Name,
+                    ApproveForActId = request.ApproveActId == 0 ? 1 : request.ApproveActId,
+                    ApproveForDefectAndLimitId = request.ApproveDefectAndLimitId == 0 ? 1 : request.ApproveDefectAndLimitId,
+                    ChairmanId = request.ChairmanId == 0 ? 1 : request.ChairmanId,
+                    Member1Id = request.Member1Id == 0 ? 1 : request.Member1Id,
+                    Member2Id = request.Member2Id == 0 ? 1 : request.Member2Id,
+                    Member3Id = request.Member3Id == 0 ? 1 : request.Member3Id,
+                    Member4Id = request.Member4Id == 0 ? 1 : request.Member4Id
+                };
+
+                var success = await commissionsService.UpdateCommissionsAsync(commissions);
+                return new UpdateCommissionsResponse { Success = success };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error updating commissions with ID: {Id}", request.Id);
+                return new UpdateCommissionsResponse { Success = false};
+            }
         }
 
         public override async Task<DeleteCommissionsResponse> DeleteCommissions(DeleteCommissionsRequest request, ServerCallContext context)

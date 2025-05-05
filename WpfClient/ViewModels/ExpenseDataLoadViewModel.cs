@@ -1,51 +1,44 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using WpfClient.Messages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using RequestManagement.Common.Interfaces;
 using WpfClient.Services.Interfaces;
 using WpfClient.Models;
+using RequestManagement.Common.Models;
+using WpfClient.Messages;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System.Windows;
-using RequestManagement.Common.Models;
-using RequestManagement.Common.Interfaces;
 
 namespace WpfClient.ViewModels
 {
-    public partial class StartDataLoadViewModel : ObservableObject
+    public partial class ExpenseDataLoadViewModel : ObservableObject
     {
         private readonly IMessageBus _messageBus;
+        private readonly IExpenseService _expenseService;
         private readonly IExcelReaderService _excelReaderService;
         private readonly IWarehouseService _requestService;
-        private readonly IStockService _stockService;
         [ObservableProperty] private bool _isBusy;
         [ObservableProperty] private string _documentPath = "";
-        [ObservableProperty] private List<MaterialStock> _materialStocks = [];
+        [ObservableProperty] private List<MaterialExpense> _materialExpense = [];
         [ObservableProperty] private Warehouse _selectedWarehouse = new();
-        [ObservableProperty] private DateTime _toDate = DateTime.Now;
-        public StartDataLoadViewModel()
+        public ExpenseDataLoadViewModel()
         {
-           
         }
-
-        public StartDataLoadViewModel(IMessageBus messageBus, IExcelReaderService excelReaderService, IWarehouseService requestService, IStockService stockService)
+        public ExpenseDataLoadViewModel(IMessageBus messageBus, IExcelReaderService excelReaderService, IExpenseService expenseService, IWarehouseService requestService)
         {
             _messageBus = messageBus;
             _excelReaderService = excelReaderService;
+            _expenseService = expenseService;
             _requestService = requestService;
-            _stockService = stockService;
             _messageBus.Subscribe<SelectResultMessage>(OnSelect);
         }
-
-        public void Init()
-        {
-            DocumentPath = "";
-            MaterialStocks = [];
-            SelectedWarehouse = new Warehouse();
-            ToDate = DateTime.Now;
-        }
-
         private Task OnSelect(SelectResultMessage arg)
         {
-            if (arg.Caller != typeof(StartDataLoadViewModel) || arg.Item == null) return Task.CompletedTask;
+            if (arg.Caller != typeof(ExpenseDataLoadViewModel) || arg.Item == null) return Task.CompletedTask;
             switch (arg.Message)
             {
                 case MessagesEnum.SelectWarehouse:
@@ -55,13 +48,12 @@ namespace WpfClient.ViewModels
 
             return Task.CompletedTask;
         }
-
-        [RelayCommand]
-        private void ClearDocumentPath()
+        public void Init()
         {
             DocumentPath = "";
+            MaterialExpense = [];
+            SelectedWarehouse = new Warehouse();
         }
-
         [RelayCommand]
         private async Task UploadMaterials()
         {
@@ -69,7 +61,7 @@ namespace WpfClient.ViewModels
             {
                 IsBusy = true;
                 var result =
-                    await _stockService.UploadMaterialsStockAsync(MaterialStocks, SelectedWarehouse.Id, ToDate);
+                    await _expenseService.UploadMaterialsExpenseAsync(MaterialExpense, SelectedWarehouse.Id);
                 if (result)
                 {
                     MessageBox.Show("Data uploaded successfully", "Success", MessageBoxButton.OK,
@@ -89,7 +81,6 @@ namespace WpfClient.ViewModels
                 IsBusy = false;
             }
         }
-
         [RelayCommand]
         private async Task SelectDocumentPath()
         {
@@ -103,11 +94,10 @@ namespace WpfClient.ViewModels
                 if (dialogResult == true && openFile.FileName.Length > 0)
                 {
                     DocumentPath = openFile.FileName;
-                    var result = _excelReaderService.ReadMaterialStock(DocumentPath);
+                    var result = _excelReaderService.ReadExpenses(DocumentPath);
                     if (result.materialStocks is { Count: > 0 })
                     {
-                        MaterialStocks = result.materialStocks;
-                        if (result.date != null) ToDate = DateTime.Parse(result.date);
+                        MaterialExpense = result.materialStocks;
                         if (result.warehouse != null)
                         {
                             SelectedWarehouse = await _requestService.GetOrCreateWarehousesAsync(result.warehouse);
@@ -119,6 +109,11 @@ namespace WpfClient.ViewModels
             {
                 MessageBox.Show($"Error loading Excel file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+        [RelayCommand]
+        private void ClearDocumentPath()
+        {
+            DocumentPath = "";
         }
         [RelayCommand]
         private async Task SelectWarehouse()

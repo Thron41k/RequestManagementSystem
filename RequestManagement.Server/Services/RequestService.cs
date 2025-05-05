@@ -79,6 +79,7 @@ namespace RequestManagement.Server.Services
                 var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.FullName.ToLower().Contains(phrase) || e.Position.ToLower().Contains(phrase)));
             }
+            query = query.Where(e => e.Id != 1);
             return await query
                 .Select(e => new Driver
                 {
@@ -99,6 +100,7 @@ namespace RequestManagement.Server.Services
 
         public async Task<bool> UpdateDriverAsync(Driver driver)
         {
+            if(driver.Id == 1)return true;
             var existDriver = await _dbContext.Drivers
                 .FirstOrDefaultAsync(e => e.Id == driver.Id);
 
@@ -117,6 +119,7 @@ namespace RequestManagement.Server.Services
         {
             try
             {
+                if (id == 1) return true;
                 var driver = await _dbContext.Drivers
                     .FirstOrDefaultAsync(e => e.Id == id);
 

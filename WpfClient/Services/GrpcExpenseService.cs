@@ -5,7 +5,9 @@ using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
 using WpfClient.Services.Interfaces;
 using Expense = RequestManagement.Common.Models.Expense;
+using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
 using Stock = RequestManagement.Common.Models.Stock;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WpfClient.Services;
 
@@ -34,6 +36,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         return response.Expenses.Select(expense => new Expense
         {
             Id = expense.Id,
+            Code = expense.Code,
             StockId = expense.Stock.Id,
             Stock = new Stock
             {
@@ -61,6 +64,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
             Equipment = new RequestManagement.Common.Models.Equipment
             {
                 Id = expense.Equipment.Id,
+                Code = expense.Equipment.Code,
                 Name = expense.Equipment.Name,
                 StateNumber = expense.Equipment.LicensePlate
             },
@@ -68,6 +72,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
             Driver = new RequestManagement.Common.Models.Driver
             {
                 Id = expense.Driver.Id,
+                Code = expense.Driver.Code,
                 FullName = expense.Driver.FullName,
                 ShortName = expense.Driver.ShortName,
                 Position = expense.Driver.Position
@@ -87,6 +92,40 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
             Date = Convert.ToDateTime(expense.Date),
             Quantity = (decimal)expense.Quantity
         }).ToList();
+    }
+
+    public async Task<bool> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId)
+    {
+        if(materials == null) return false;
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateExpenseClient();
+        var result = await client.UploadMaterialExpenseAsync(
+            new UploadMaterialExpenseRequest
+            {
+                MaterialExpenses =
+                {
+                    materials.Select(
+                        material => new RequestManagement.Server.Controllers.MaterialExpense
+                        {
+                            Number = material.Number,
+                            DriverFullName = material.DriverFullName,
+                            DriverCode = material.DriverCode,
+                            EquipmentName = material.EquipmentName,
+                            Date = material.Date.ToString(CultureInfo.CurrentCulture),
+                            EquipmentCode = material.EquipmentCode,
+                            NomenclatureName = material.NomenclatureName,
+                            NomenclatureCode = material.NomenclatureCode,
+                            NomenlatureUnitOfMeasure = material.NomenlatureUnitOfMeasure,
+                            Quantity = (double)material.Quantity,
+                            NomenclatureArticle = material.NomenclatureArticle,
+                        })
+                },WarehouseId = warehouseId
+            }, headers);
+        return result.Success;
     }
 
     public async Task<Expense> CreateExpenseAsync(Expense expense)

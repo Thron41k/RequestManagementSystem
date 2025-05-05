@@ -97,6 +97,7 @@ namespace RequestManagement.Server.Controllers
             response.Expenses.AddRange(expenseList.Select(e => new Expense
             {
                 Id = e.Id,
+                Code = e.Code,
                 Stock = new ExpenseStock
                 {
                     Id = e.StockId,
@@ -122,11 +123,13 @@ namespace RequestManagement.Server.Controllers
                 {
                     Id = e.Equipment.Id,
                     Name = e.Equipment.Name,
+                    Code = e.Equipment.Code,
                     LicensePlate = e.Equipment.StateNumber
                 },
                 Driver = new ExpenseDriver
                 {
                     Id = e.Driver.Id,
+                    Code = e.Driver.Code,
                     FullName = e.Driver.FullName,
                     ShortName = e.Driver.ShortName,
                     Position = e.Driver.Position
@@ -205,6 +208,29 @@ namespace RequestManagement.Server.Controllers
 
             var success = await _expenseService.DeleteExpensesAsync(request.Id.ToList());
             return new DeleteExpenseResponse { Success = success };
+        }
+
+        public override async Task<UploadMaterialExpenseResponse> UploadMaterialExpense(
+            UploadMaterialExpenseRequest request, ServerCallContext context)
+        {
+            _logger.LogInformation("Uploading expense with excel file");
+            var materialExpense =
+                request.MaterialExpenses.Select(x => new RequestManagement.Common.Models.MaterialExpense
+                {
+                    Number = x.Number,
+                    Date = DateTime.Parse(x.Date),
+                    DriverFullName = x.DriverFullName,
+                    EquipmentCode = x.EquipmentCode,
+                    NomenclatureArticle = x.NomenclatureArticle,
+                    NomenlatureUnitOfMeasure = x.NomenlatureUnitOfMeasure,
+                    DriverCode = x.DriverCode,
+                    NomenclatureName = x.NomenclatureName,
+                    EquipmentName = x.EquipmentName,
+                    NomenclatureCode = x.NomenclatureCode,
+                    Quantity = (decimal)x.Quantity
+                }).ToList();
+            var success = await _expenseService.UploadMaterialsExpenseAsync(materialExpense,request.WarehouseId);
+            return new UploadMaterialExpenseResponse { Success = success };
         }
     }
 }

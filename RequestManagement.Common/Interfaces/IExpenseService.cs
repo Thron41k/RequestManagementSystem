@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WpfClient.Models;
 
 namespace RequestManagement.Common.Interfaces
 {
@@ -18,5 +19,6 @@ namespace RequestManagement.Common.Interfaces
         Task SaveNomenclatureDefectMappingAsync(int userId, int nomenclatureId, int defectId);
         Task<bool> DeleteExpensesAsync(List<int> requestId);
         Task<List<Expense>> GetAllExpensesAsync(string requestFilter, int requestWarehouseId, int requestEquipmentId, int requestDriverId, int requestDefectId, string requestFromDate, string requestToDate);
+        Task<bool> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId);
     }
 }

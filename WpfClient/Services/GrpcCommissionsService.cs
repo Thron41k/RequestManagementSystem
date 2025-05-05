@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Grpc.Core;
+﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
-using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
 using WpfClient.Services.Interfaces;
 using Commissions = RequestManagement.Common.Models.Commissions;
@@ -91,13 +85,13 @@ namespace WpfClient.Services
             var result = await client.CreateCommissionsAsync(new CreateCommissionsRequest
             {
                 Name = commissions.Name,
-                ApproveActId = commissions.ApproveForActId,
-                ApproveDefectAndLimitId = commissions.ApproveForDefectAndLimitId,
-                ChairmanId = commissions.ChairmanId,
-                Member1Id = commissions.Member1Id,
-                Member2Id = commissions.Member2Id,
-                Member3Id = commissions.Member3Id,
-                Member4Id = commissions.Member4Id
+                ApproveActId = commissions.ApproveForAct?.Id ?? 0,
+                ApproveDefectAndLimitId = commissions.ApproveForDefectAndLimit?.Id ?? 0,
+                ChairmanId = commissions.Chairman?.Id ?? 0,
+                Member1Id = commissions.Member1?.Id ?? 0,
+                Member2Id = commissions.Member2?.Id ?? 0,
+                Member3Id = commissions.Member3?.Id ?? 0,
+                Member4Id = commissions.Member4?.Id ?? 0
             }, headers);
             return result.Id;
         }
@@ -114,13 +108,13 @@ namespace WpfClient.Services
             {
                 Id = commissions.Id,
                 Name = commissions.Name,
-                ApproveActId = commissions.ApproveForActId,
-                ApproveDefectAndLimitId = commissions.ApproveForDefectAndLimitId,
-                ChairmanId = commissions.ChairmanId,
-                Member1Id = commissions.Member1Id,
-                Member2Id = commissions.Member2Id,
-                Member3Id = commissions.Member3Id,
-                Member4Id = commissions.Member4Id
+                ApproveActId = commissions.ApproveForAct?.Id ?? 0,
+                ApproveDefectAndLimitId = commissions.ApproveForDefectAndLimit?.Id ?? 0,
+                ChairmanId = commissions.Chairman?.Id ?? 0,
+                Member1Id = commissions.Member1?.Id ?? 0,
+                Member2Id = commissions.Member2?.Id ?? 0,
+                Member3Id = commissions.Member3?.Id ?? 0,
+                Member4Id = commissions.Member4?.Id ?? 0
             }, headers);
             return result.Success;
         }

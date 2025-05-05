@@ -26,6 +26,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<CommissionsService.CommissionsServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
 
         // Сервисы и ViewModel'ы
+        serviceCollection.AddSingleton<IPrinterService, PrinterService>();
         serviceCollection.AddSingleton<AuthTokenStore>();
         serviceCollection.AddSingleton<IMessageBus, MessageBusService>();
         serviceCollection.AddSingleton<IGrpcClientFactory, GrpcClientFactory>();
@@ -49,7 +50,9 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<ExpenseListViewModel>();
         serviceCollection.AddScoped<IncomingListViewModel>();
         serviceCollection.AddScoped<StartDataLoadViewModel>();
+        serviceCollection.AddScoped<ExpenseDataLoadViewModel>();
         serviceCollection.AddScoped<CommissionsViewModel>();
+        serviceCollection.AddScoped<PrintReportViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -75,7 +78,9 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<ExpenseListView>();
         serviceCollection.AddTransient<IncomingListView>();
         serviceCollection.AddTransient<StartDataLoadView>();
+        serviceCollection.AddTransient<ExpenseDataLoadView>();
         serviceCollection.AddTransient<CommissionsView>();
+        serviceCollection.AddTransient<PrintReportView>();
 
         return serviceCollection.BuildServiceProvider();
     }

@@ -10,6 +10,30 @@ service ExpenseService {
   rpc DeleteExpenses (DeleteExpensesRequest) returns (DeleteExpenseResponse);
   rpc GetLastSelection (GetLastSelectionRequest) returns (GetLastSelectionResponse);
   rpc GetNomenclatureMaping (GetNomenclatureMapingRequest) returns (GetNomenclatureMapingResponse);
+  rpc UploadMaterialExpense (UploadMaterialExpenseRequest) returns (UploadMaterialExpenseResponse);
+}
+
+message MaterialExpense {
+    string number = 1;
+    string date = 2;
+    string driver_full_name = 3;
+    string driver_code = 4;
+    string equipment_name = 5;
+    string equipment_code = 6;
+    string nomenclature_name = 7;
+    string nomenclature_code = 8;
+    string nomenclature_article = 9;
+    string nomenlature_unit_of_measure = 10;
+    double quantity = 11;
+}
+
+message UploadMaterialExpenseRequest{
+	repeated MaterialExpense materialExpenses = 1;
+    int32 warehouseId = 2;
+}
+
+message UploadMaterialExpenseResponse{
+	bool success = 1;
 }
 
 message GetAllExpensesRequest {
