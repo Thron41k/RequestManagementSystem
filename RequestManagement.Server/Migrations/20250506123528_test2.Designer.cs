@@ -12,8 +12,8 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250503035251_CommissionsAdd")]
-    partial class CommissionsAdd
+    [Migration("20250506123528_test2")]
+    partial class test2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -189,9 +189,9 @@ namespace RequestManagement.Server.Migrations
                         {
                             Id = 1,
                             Code = "",
-                            FullName = "Иванов Иван Иванович",
-                            Position = "Водитель",
-                            ShortName = "Иванов И.И."
+                            FullName = "",
+                            Position = "",
+                            ShortName = ""
                         },
                         new
                         {

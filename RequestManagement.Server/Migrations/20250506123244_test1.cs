@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RequestManagement.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class CommissionsAdd : Migration
+    public partial class test1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -365,7 +365,7 @@ namespace RequestManagement.Server.Migrations
                 columns: new[] { "Id", "Code", "FullName", "Position", "ShortName" },
                 values: new object[,]
                 {
-                    { 1, "", "Иванов Иван Иванович", "Водитель", "Иванов И.И." },
+                    { 1, "", "", "", "" },
                     { 2, "", "Петров Петр Петрович", "Водитель", "Петров П.П." }
                 });
 

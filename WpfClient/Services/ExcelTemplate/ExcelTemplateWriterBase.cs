@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Drawing;
+using System.IO;
 using System.Reflection;
+using OfficeOpenXml.Style;
 using WpfClient.Services.Interfaces;
 
 namespace WpfClient.Services.ExcelTemplate
@@ -32,6 +34,20 @@ namespace WpfClient.Services.ExcelTemplate
 
             return assembly.GetManifestResourceStream(resourceName)
                    ?? throw new InvalidOperationException($"Cannot load template resource stream: '{fileName}'.");
+        }
+        protected double MeasureTextHeight(string text, ExcelFont font, double width)
+        {
+            if (string.IsNullOrEmpty(text)) return 0.0;
+            var bitmap  = new Bitmap(1, 1);
+            var graphics = Graphics.FromImage(bitmap);
+
+            var pixelWidth = Convert.ToInt32(width * 7);  //7 pixels per excel column width
+            var fontSize = font.Size * 1.01f;
+            var drawingFont = new Font(font.Name, fontSize);
+            var size = graphics.MeasureString(text, drawingFont, pixelWidth, new StringFormat { FormatFlags = StringFormatFlags.MeasureTrailingSpaces });
+
+            //72 DPI and 96 points per inch.  Excel height in points with max of 409 per Excel requirements.
+            return Math.Min(Convert.ToDouble(size.Height) * 72 / 96, 409);
         }
     }
 }
