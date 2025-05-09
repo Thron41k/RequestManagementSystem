@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.IO;
 using System.Reflection;
+using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using WpfClient.Services.Interfaces;
 
@@ -48,6 +49,15 @@ namespace WpfClient.Services.ExcelTemplate
 
             //72 DPI and 96 points per inch.  Excel height in points with max of 409 per Excel requirements.
             return Math.Min(Convert.ToDouble(size.Height) * 72 / 96, 409);
+        }
+        public static void AdjustRowHeightForText(ExcelWorksheet worksheet, int row, int column)
+        {
+            var cell = worksheet.Cells[row, column];
+            cell.Style.WrapText = true;
+            var textLength = cell.Text.Length;
+            var width = worksheet.Column(column).Width;
+            var height = Math.Ceiling(textLength / width) * 7;
+            worksheet.Row(row).Height = height;
         }
     }
 }

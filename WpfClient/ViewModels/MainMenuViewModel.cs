@@ -80,7 +80,7 @@ public class MainMenuViewModel
     {
         ShowCommissions(true);
     }
-    private void ShowPrintReport(List<Expense> list)
+    private void ShowPrintReport(List<Expense> list,DateTime startDate,DateTime endDate)
     {
         var printReportView = new PrintReportView(_printReportViewModel);
         var window = new Window
@@ -91,7 +91,7 @@ public class MainMenuViewModel
             Height = 490,
             ResizeMode = ResizeMode.NoResize
         };
-        _printReportViewModel.Init(list);
+        _printReportViewModel.Init(list,startDate,endDate);
         window.ShowDialog();
     }
 
@@ -241,7 +241,7 @@ public class MainMenuViewModel
         switch (arg.Message)
         {
             case MessagesEnum.ShowPrintReportDialog:
-                ShowPrintReport(arg.Item);
+                ShowPrintReport(arg.Item,arg.FromDate,arg.ToDate);
                 break;
         }
     }
@@ -338,7 +338,8 @@ public class MainMenuViewModel
                     {
                         Id = _driverViewModel.SelectedDriver.Id,
                         FullName = _driverViewModel.SelectedDriver.FullName,
-                        ShortName = _driverViewModel.SelectedDriver.ShortName
+                        ShortName = _driverViewModel.SelectedDriver.ShortName,
+                        Position = _driverViewModel.SelectedDriver.Position
                     }));
     }
     private void ShowDefectGroup(bool editMode, Type? argCaller = null)

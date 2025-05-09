@@ -33,6 +33,8 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<IExcelReaderService, ExcelReaderService>();
         serviceCollection.AddSingleton<IExcelWriterService, ExcelWriterService>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, ActPartsTemplate>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, LimitPartsTemplate>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, DefectPartsTemplate>();
         serviceCollection.AddSingleton<IFileSaveDialogService, FileSaveDialogService>();
         serviceCollection.AddSingleton<IExcelPrintService, ExcelPrintService>();
 

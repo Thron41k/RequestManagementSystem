@@ -28,7 +28,7 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var request = new UpdateEquipmentRequest { Name = equipment.Name, LicensePlate = equipment.StateNumber };
+        var request = new UpdateEquipmentRequest { Id = equipment.Id, Name = equipment.Name, LicensePlate = equipment.StateNumber };
         var client = clientFactory.CreateRequestClient();
         var result = await client.UpdateEquipmentAsync(request, headers);
         return result.Success;

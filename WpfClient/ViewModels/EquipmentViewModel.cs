@@ -147,9 +147,9 @@ public class EquipmentViewModel : INotifyPropertyChanged
 
     private async Task UpdateEquipmentAsync()
     {
-        if (_selectedEquipment != null && !string.IsNullOrEmpty(NewEquipmentName.Trim()))
+        if (SelectedEquipment != null && !string.IsNullOrEmpty(NewEquipmentName.Trim()))
         {
-            await _requestService.UpdateEquipmentAsync(new RequestManagement.Common.Models.Equipment { Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate });
+            await _requestService.UpdateEquipmentAsync(new RequestManagement.Common.Models.Equipment { Id = SelectedEquipment.Id, Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate });
             await LoadEquipmentAsync(); // Обновляем список после изменения
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }

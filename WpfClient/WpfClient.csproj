@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <None Remove="Resources\ActPartsTemplate.xlsx" />
+    <None Remove="Resources\DefectPartsTemplate.xlsx" />
+    <None Remove="Resources\LimitPartsTemplate.xlsx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +28,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\ActPartsTemplate.xlsx" />
+    <EmbeddedResource Include="Resources\DefectPartsTemplate.xlsx" />
+    <EmbeddedResource Include="Resources\LimitPartsTemplate.xlsx" />
   </ItemGroup>
 
   <ItemGroup>

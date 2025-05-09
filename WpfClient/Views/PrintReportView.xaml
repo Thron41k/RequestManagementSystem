@@ -8,6 +8,7 @@
              xmlns:behaviors="clr-namespace:WpfClient.ViewModels.Behaviors"
              xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
              xmlns:vm="clr-namespace:WpfClient.ViewModels"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" 
              d:DesignHeight="270" d:DesignWidth="410">
     <UserControl.Resources>
@@ -58,9 +59,14 @@
                       Style="{StaticResource StyledComboBox}"/>
         </StackPanel>
         <StackPanel Grid.Row="3"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
-            <CheckBox IsChecked="{Binding ActPrinted, Mode=TwoWay}" Margin="5" Content="Акты" Style="{StaticResource StyledCheckBox}"/>
-            <CheckBox IsChecked="{Binding LimitPrinted, Mode=TwoWay}" Margin="5" Content="Лимитные ведомости" Style="{StaticResource StyledCheckBox}"/>
-            <CheckBox IsChecked="{Binding DefectPrinted, Mode=TwoWay}" Margin="5" Content="Дефектные ведомости" Style="{StaticResource StyledCheckBox}"/>
+            <ComboBox Width="400"
+                      SelectedIndex="{Binding Path=SelectedTypeDocumentForPrint, Mode=TwoWay}" 
+                      Style="{StaticResource StyledComboBox}">
+                <system:String>Акты</system:String>
+                <system:String>Лимитные карты</system:String>
+                <system:String>Дефектные ведомости</system:String>
+                <system:String>Ведомости выдачи АКБ и Автошин</system:String>
+            </ComboBox>
         </StackPanel>
         <StackPanel Grid.Row="4"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
             <Button Margin="5" Content="Печать" Style="{StaticResource StyledButton}"/>

@@ -1,8 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.Networking;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Font = System.Drawing.Font;
 
 namespace RequestManagement.Common.Utilities
 {
@@ -14,6 +22,27 @@ namespace RequestManagement.Common.Utilities
             var invalidChars = Path.GetInvalidFileNameChars().Concat(['[', ']', '*', '?', '/', '\\']);
             name = invalidChars.Aggregate(name, (current, c) => current.Replace(c, '_'));
             return name.Length > 31 ? name[..31] : name;
+        }
+
+        public static double GetRowHeight(double columnWidth, string fontName, float fontSize, string text,float rowHeight = 13.25f)
+        {
+            const float pixelsPerExcelColumn = 6.11f;
+            var columnWidthInPixels = (float)(columnWidth * pixelsPerExcelColumn)/1.01f;
+            var lineCount =  GetLineCount(columnWidthInPixels, fontName, fontSize, text, rowHeight);
+            return lineCount * rowHeight;
+        }
+        private static int GetLineCount(double columnWidth, string fontName, float fontSize, string text, float rowHeight)
+        {
+            using var bmp = new Bitmap(1, 1);
+            using var g = Graphics.FromImage(bmp);
+            g.TextRenderingHint = TextRenderingHint.AntiAlias;
+            var font = new Font(fontName, fontSize);
+            var maxSize = new SizeF((float)columnWidth, 1000f);
+            var format = new StringFormat(StringFormatFlags.LineLimit);
+            format.Trimming = StringTrimming.Word;
+            var textSize = g.MeasureString(text, font, maxSize, format);
+            var lineCount = (int)Math.Ceiling(textSize.Height / rowHeight);
+            return lineCount;
         }
     }
 }

@@ -29,13 +29,18 @@ namespace WpfClient.Services
         }
         public void ExportAndSave<T>(ExcelTemplateType type, T data, string suggestedFileName)
         {
-            var bytes = Export(type, data);
-
-            var path = _fileDialogService.ShowSaveFileDialog(suggestedFileName, "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*");
-
-            if (!string.IsNullOrWhiteSpace(path))
+            try
             {
-                File.WriteAllBytes(path, bytes);
+                var bytes = Export(type, data);
+                var path = _fileDialogService.ShowSaveFileDialog(suggestedFileName, "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*");
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    File.WriteAllBytes(path, bytes);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
         public void ExportAndPrint<T>(ExcelTemplateType type, T data)

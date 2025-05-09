@@ -16,14 +16,14 @@ namespace WpfClient.ViewModels
         private readonly IMessageBus _messageBus;
         private readonly IPrinterService _printerService;
         private readonly IExcelWriterService _excelWriterService;
+        private DateTime _startDate = DateTime.Now;
+        private DateTime _endDate = DateTime.Now;
         private List<Expense> _listExpense = new();
         [ObservableProperty] private Commissions? _selectedCommissions = new();
         [ObservableProperty] private Driver? _selectedFrp = new();
         [ObservableProperty] private ObservableCollection<string> _printerList = [];
         [ObservableProperty] private string _selectedPrinter = "";
-        [ObservableProperty] private bool _actPrinted = false;
-        [ObservableProperty] private bool _limitPrinted = false;
-        [ObservableProperty] private bool _defectPrinted = false;
+        [ObservableProperty] private int _selectedTypeDocumentForPrint = -1;
         public PrintReportViewModel()
         {
             
@@ -36,11 +36,13 @@ namespace WpfClient.ViewModels
             _messageBus.Subscribe<SelectResultMessage>(OnSelect);
         }
 
-        public void Init(List<Expense> list)
+        public void Init(List<Expense> list,DateTime startDate,DateTime endDate)
         {
             PrinterList = new ObservableCollection<string>(PrinterSettings.InstalledPrinters);
             SelectedPrinter = _printerService.GetDefaultPrinterName();
             _listExpense = list;
+            _startDate = startDate;
+            _endDate = endDate;
         }
         private Task OnSelect(SelectResultMessage arg)
         {
@@ -82,13 +84,41 @@ namespace WpfClient.ViewModels
         private void SaveToFile()
         {
             if(SelectedCommissions == null && SelectedFrp == null) return;
-            var actParts = new ActPartsModel
+            switch (SelectedTypeDocumentForPrint)
             {
-                Commissions = SelectedCommissions,
-                Frp = SelectedFrp,
-                Expenses = _listExpense
-            };
-            _excelWriterService.ExportAndSave(ExcelTemplateType.ActParts, actParts,"Акты");
+                case 0:
+                    var actParts = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.ActParts, actParts, "Акты");
+                    break;
+                case 1:
+                    var limitParts = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.LimitParts, limitParts, "Лимитные карты");
+                    break;
+                case 2:
+                    var defectParts = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.DefectParts, defectParts, "Дефектные ведомости");
+                    break;
+            }
+
         }
     }
 }

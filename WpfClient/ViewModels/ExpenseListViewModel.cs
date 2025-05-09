@@ -118,7 +118,7 @@ public partial class ExpenseListViewModel : ObservableObject
         //    new()
         //};
         //_excelWriterService.ExportAndPrint(ExcelTemplateType.ActParts, data);
-        await _messageBus.Publish(new ShowTaskPrintDialogMessage(MessagesEnum.ShowPrintReportDialog, typeof(ExpenseListViewModel), false, Expenses.Where(x => x.IsSelected).ToList()));
+        await _messageBus.Publish(new ShowTaskPrintDialogMessage(MessagesEnum.ShowPrintReportDialog, typeof(ExpenseListViewModel), false, Expenses.Where(x => x is { IsSelected: true}).ToList(),FromDate, ToDate));
     }
     [RelayCommand]
     private async Task ExpenseDeleteAsync()
