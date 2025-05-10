@@ -35,6 +35,7 @@
             <MenuItem Header="Администратирование">
                 <MenuItem Header="Загрузка начальных остатков" Command="{Binding ShowStartDataLoadingCommand}"/>
                 <MenuItem Header="Загрузка расходов" Command="{Binding ShowExpensesDataLoadingCommand}"/>
+                <MenuItem Header="Загрузка приходов" Command="{Binding ShowIncomingDataLoadingCommand}"/>
             </MenuItem>
         </Menu>
 

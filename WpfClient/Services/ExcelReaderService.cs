@@ -3,6 +3,7 @@ using System.IO;
 using RequestManagement.Common.Models;
 using WpfClient.Models;
 using WpfClient.Services.Interfaces;
+using System;
 
 namespace WpfClient.Services
 {
@@ -89,7 +90,7 @@ namespace WpfClient.Services
             {
                 throw new Exception("Error reading Excel file", ex);
             }
-            
+
 
             return (materialExpenses, warehouse);
         }
@@ -126,6 +127,99 @@ namespace WpfClient.Services
                 }
             }
             return (materialStocks, date, warehouse);
+        }
+
+        public MaterialIncoming ReadMaterialIncoming(string filePath)
+        {
+            try
+            {
+                if (!File.Exists(filePath))
+                    throw new FileNotFoundException("Excel file not found.", filePath);
+                var materialIncoming = new MaterialIncoming
+                {
+                    Items = []
+                };
+                using var package = new ExcelPackage(new FileInfo(filePath));
+                var worksheet = package.Workbook.Worksheets[0];
+                var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
+                materialIncoming.WarehouseName = worksheet.Cells[11, 1].Value.ToString()?.Trim();
+                const int startRow = 12;
+                MaterialIncomingItem? newMaterialIncoming = null;
+                for (var row = startRow; row < rowCount; row++)
+                {
+                    var name = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty;
+                    var code = worksheet.Cells[row, 6].Value?.ToString()?.Trim() ?? string.Empty;
+                    var article = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
+                    var unit = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
+                    var quantity = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
+                    if (string.IsNullOrEmpty(code) && string.IsNullOrEmpty(article) && string.IsNullOrEmpty(unit) &&
+                        string.IsNullOrEmpty(quantity))
+                    {
+                        if (newMaterialIncoming != null)
+                        {
+                            materialIncoming.Items.Add(newMaterialIncoming);
+                        }
+                        var splited = name.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        if (splited.Length == 0)
+                        {
+                            newMaterialIncoming = null;
+                            continue;
+                        }
+                        newMaterialIncoming = new MaterialIncomingItem();
+                        var registrator = splited[0].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        newMaterialIncoming.RegistratorType = registrator[0];
+                        var index = newMaterialIncoming.RegistratorType == "Перемещение" ? 4 : 2;
+                        newMaterialIncoming.RegistratorNumber = registrator[index];
+                        newMaterialIncoming.RegistratorDate = registrator[index + 2];
+                        if (splited.Length > 1 && !string.IsNullOrEmpty(splited[1]))
+                        {
+                            var receiptOrderCleared = splited[1];
+                            var receiptOrder = receiptOrderCleared.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            newMaterialIncoming.ReceiptOrderNumber = receiptOrder[2];
+                            newMaterialIncoming.ReceiptOrderDate = receiptOrder[4];
+                        }
+                        if (splited.Length > 2 && !string.IsNullOrEmpty(splited[2]))
+                        {
+                            var applicationCleared = splited[2];
+                            var application = applicationCleared.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            newMaterialIncoming.ApplicationNumber = application[3];
+                            newMaterialIncoming.ApplicationDate = application[5];
+                        }
+                        if (splited.Length > 3 && !string.IsNullOrEmpty(splited[3]))
+                        {
+                            newMaterialIncoming.ApplicationResponsibleName = splited[3];
+                        }
+                        if (splited.Length > 4 && !string.IsNullOrEmpty(splited[4]))
+                        {
+                            newMaterialIncoming.ApplicationEquipmentName = splited[4];
+                        }
+                        if (splited.Length > 5 && !string.IsNullOrEmpty(splited[5]))
+                        {
+                            newMaterialIncoming.ApplicationEquipmentCode = splited[5];
+                        }
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(newMaterialIncoming?.RegistratorType) && string.IsNullOrEmpty(newMaterialIncoming?.RegistratorNumber) && string.IsNullOrEmpty(newMaterialIncoming?.RegistratorDate)) continue;
+                        newMaterialIncoming.Items ??= [];
+                        newMaterialIncoming.Items.Add(new MaterialStock
+                        {
+                            ItemName = name,
+                            Code = code,
+                            Article = article,
+                            Unit = unit,
+                            FinalBalance = double.TryParse(quantity, out var balance) ? balance : 0
+                        });
+                    }
+                }
+
+                return materialIncoming;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return new MaterialIncoming();
         }
     }
 }

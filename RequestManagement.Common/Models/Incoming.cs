@@ -16,4 +16,7 @@ public class Incoming : IEntity
     public Stock Stock { get; set; } = null!;
     public decimal Quantity { get; set; }
     public DateTime Date { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public Application? Application { get; set; }
+    public int ApplicationId { get; set; }
 }

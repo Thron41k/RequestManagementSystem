@@ -7,5 +7,6 @@ namespace WpfClient.Services.Interfaces
     {
         (List<MaterialExpense> materialStocks, string? warehouse) ReadExpenses(string filePath);
         (List<MaterialStock> materialStocks, string? date, string? warehouse) ReadMaterialStock(string filePath);
+        MaterialIncoming ReadMaterialIncoming(string filePath);
     }
 }

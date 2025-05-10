@@ -57,6 +57,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<CommissionsViewModel>();
         serviceCollection.AddScoped<PrintReportViewModel>();
         serviceCollection.AddScoped<SparePartsAnalogsViewModel>();
+        serviceCollection.AddScoped<IncomingDataLoadViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -87,6 +88,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<CommissionsView>();
         serviceCollection.AddTransient<PrintReportView>();
         serviceCollection.AddTransient<SparePartsAnalogsView>();
+        serviceCollection.AddTransient<IncomingDataLoadView>();
 
         return serviceCollection.BuildServiceProvider();
     }

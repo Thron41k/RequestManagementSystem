@@ -12,10 +12,11 @@ using WpfClient.Messages;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System.Windows;
+using WpfClient.Views;
 
 namespace WpfClient.ViewModels
 {
-    public partial class ExpenseDataLoadViewModel : ObservableObject
+    public partial class IncomingDataLoadViewModel : ObservableObject
     {
         private readonly IMessageBus _messageBus;
         private readonly IExpenseService _expenseService;
@@ -23,12 +24,13 @@ namespace WpfClient.ViewModels
         private readonly IWarehouseService _requestService;
         [ObservableProperty] private bool _isBusy;
         [ObservableProperty] private string _documentPath = "";
-        [ObservableProperty] private List<MaterialExpense> _materialExpense = [];
+        [ObservableProperty] private MaterialIncoming? _materialIncoming = new();
         [ObservableProperty] private Warehouse _selectedWarehouse = new();
-        public ExpenseDataLoadViewModel()
+        [ObservableProperty] private int _materialIncomingCount;
+        public IncomingDataLoadViewModel()
         {
         }
-        public ExpenseDataLoadViewModel(IMessageBus messageBus, IExcelReaderService excelReaderService, IExpenseService expenseService, IWarehouseService requestService)
+        public IncomingDataLoadViewModel(IMessageBus messageBus, IExcelReaderService excelReaderService, IExpenseService expenseService, IWarehouseService requestService)
         {
             _messageBus = messageBus;
             _excelReaderService = excelReaderService;
@@ -38,7 +40,7 @@ namespace WpfClient.ViewModels
         }
         private Task OnSelect(SelectResultMessage arg)
         {
-            if (arg.Caller != typeof(ExpenseDataLoadViewModel) || arg.Item == null) return Task.CompletedTask;
+            if (arg.Caller != typeof(IncomingDataLoadViewModel) || arg.Item == null) return Task.CompletedTask;
             switch (arg.Message)
             {
                 case MessagesEnum.SelectWarehouse:
@@ -51,35 +53,35 @@ namespace WpfClient.ViewModels
         public void Init()
         {
             DocumentPath = "";
-            MaterialExpense = [];
-            SelectedWarehouse = new Warehouse();
+            MaterialIncoming = new();
+            SelectedWarehouse = new ();
         }
         [RelayCommand]
         private async Task UploadMaterials()
         {
-            try
-            {
-                IsBusy = true;
-                var result =
-                    await _expenseService.UploadMaterialsExpenseAsync(MaterialExpense, SelectedWarehouse.Id);
-                if (result)
-                {
-                    MessageBox.Show("Data uploaded successfully", "Success", MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Error uploading data", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading data: {ex.Message}");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            //try
+            //{
+            //    IsBusy = true;
+            //    var result =
+            //        await _expenseService.UploadMaterialsExpenseAsync(MaterialExpense, SelectedWarehouse.Id);
+            //    if (result)
+            //    {
+            //        MessageBox.Show("Data uploaded successfully", "Success", MessageBoxButton.OK,
+            //            MessageBoxImage.Information);
+            //    }
+            //    else
+            //    {
+            //        MessageBox.Show("Error uploading data", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine($"Error loading data: {ex.Message}");
+            //}
+            //finally
+            //{
+            //    IsBusy = false;
+            //}
         }
         [RelayCommand]
         private async Task SelectDocumentPath()
@@ -94,13 +96,14 @@ namespace WpfClient.ViewModels
                 if (dialogResult == true && openFile.FileName.Length > 0)
                 {
                     DocumentPath = openFile.FileName;
-                    var result = _excelReaderService.ReadExpenses(DocumentPath);
-                    if (result.materialStocks is { Count: > 0 })
+                    var result = _excelReaderService.ReadMaterialIncoming(DocumentPath);
+                    if (result.Items is { Count: > 0 })
                     {
-                        MaterialExpense = result.materialStocks;
-                        if (result.warehouse != null)
+                        MaterialIncoming = result;
+                        MaterialIncomingCount = result.Items.SelectMany(x=>x.Items).Count();
+                        if (result.WarehouseName != null)
                         {
-                            SelectedWarehouse = await _requestService.GetOrCreateWarehousesAsync(result.warehouse);
+                            SelectedWarehouse = await _requestService.GetOrCreateWarehousesAsync(result.WarehouseName);
                         }
                     }
                 }
@@ -118,7 +121,7 @@ namespace WpfClient.ViewModels
         [RelayCommand]
         private async Task SelectWarehouse()
         {
-            await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectWarehouse, typeof(ExpenseDataLoadViewModel)));
+            await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectWarehouse, typeof(IncomingDataLoadViewModel)));
         }
         [RelayCommand]
         private void ClearSelectedWarehouse()

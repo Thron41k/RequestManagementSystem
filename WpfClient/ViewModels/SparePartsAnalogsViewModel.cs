@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -26,7 +27,7 @@ namespace WpfClient.ViewModels
         [ObservableProperty] private Nomenclature? _selectedNomenclature;
         [ObservableProperty] private Nomenclature? _selectedNomenclatureAnalog;
         [ObservableProperty] private CollectionViewSource _nomenclatureAnalogViewSource;
-        [ObservableProperty] private string _filterText;
+        [ObservableProperty] private string _filterText = "";
         private readonly System.Timers.Timer _filterTimer;
         public SparePartsAnalogsViewModel()
         {
@@ -47,6 +48,10 @@ namespace WpfClient.ViewModels
             };
         }
 
+        partial void OnSelectedNomenclatureChanged(Nomenclature? value)
+        {
+            _ = LoadNomenclatureAnalogAsync();
+        }
         partial void OnFilterTextChanged(string value)
         {
             _filterTimer.Stop();
@@ -62,7 +67,11 @@ namespace WpfClient.ViewModels
 
         private async Task LoadNomenclatureAsync()
         {
-            if(string.IsNullOrWhiteSpace(FilterText))return;
+            if (string.IsNullOrWhiteSpace(FilterText))
+            {
+                NomenclatureViewSource.Source = new ObservableCollection<Nomenclature>();
+                return;
+            }
             var filter = FilterText.Trim();
             var nomenclatureList = await _nomenclatureService.GetAllNomenclaturesAsync(filter.ToLower());
             NomenclatureList = new ObservableCollection<Nomenclature>(nomenclatureList);

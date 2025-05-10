@@ -12,9 +12,9 @@ namespace RequestManagement.Server.Services
         {
             try
             {
-                return await _dbContext.NomenclatureAnalog
-                    .Where(x => x.AnalogId == filter || x.OriginalId == filter)
-                    .Select(x => x.OriginalId == filter ? x.Analog : x.Original)
+                var allAnalogIds = await GetTransitiveAnalogIdsAsync(filter);
+                return await _dbContext.Nomenclature
+                    .Where(n => allAnalogIds.Contains(n.Id) && n.Id != filter)
                     .Distinct()
                     .ToListAsync();
             }
@@ -24,7 +24,32 @@ namespace RequestManagement.Server.Services
                 return [];
             }
         }
+        private async Task<HashSet<int>> GetTransitiveAnalogIdsAsync(int startId)
+        {
+            var result = new HashSet<int>();
+            var queue = new Queue<int>();
+            queue.Enqueue(startId);
 
+            while (queue.Count > 0)
+            {
+                var currentId = queue.Dequeue();
+
+                // Находим все связанные ID (как оригиналы, так и аналоги)
+                var relatedIds = await _dbContext.NomenclatureAnalog
+                    .Where(x => x.AnalogId == currentId || x.OriginalId == currentId)
+                    .Select(x => x.OriginalId == currentId ? x.AnalogId : x.OriginalId)
+                    .Distinct()
+                    .ToListAsync();
+
+                foreach (var id in relatedIds.Where(id => id != currentId && !result.Contains(id)))
+                {
+                    result.Add(id);
+                    queue.Enqueue(id);
+                }
+            }
+
+            return result;
+        }
         public async Task<int> AddNomenclatureAnalogAsync(NomenclatureAnalog nomenclatureAnalog)
         {
             try

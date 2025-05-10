@@ -8,6 +8,7 @@ service IncomingService {
   rpc UpdateIncoming (UpdateIncomingRequest) returns (UpdateIncomingResponse);
   rpc DeleteIncoming (DeleteIncomingRequest) returns (DeleteIncomingResponse);
   rpc DeleteIncomings (DeleteIncomingsRequest) returns (DeleteIncomingResponse);
+  rpc UploadMaterialIncoming(UploadMaterialIncomingRequest) returns (UploadMaterialIncomingResponse);
 }
 
 message GetAllIncomingsRequest {

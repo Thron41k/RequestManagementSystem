@@ -27,6 +27,7 @@ public class MainMenuViewModel
     private readonly CommissionsViewModel _commissionsViewModel;
     private readonly PrintReportViewModel _printReportViewModel;
     private readonly SparePartsAnalogsViewModel _sparePartsAnalogsViewModel;
+    private readonly IncomingDataLoadViewModel _incomingDataLoadViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -42,8 +43,9 @@ public class MainMenuViewModel
     public ICommand ShowCommissionsCommand { get; }
     public ICommand ShowExpensesDataLoadingCommand { get; }
     public ICommand ShowNomenclatureAnalogCommand { get; }
+    public ICommand ShowIncomingDataLoadingCommand { get; }
 
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel)
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -60,6 +62,8 @@ public class MainMenuViewModel
         _commissionsViewModel = commissionsViewModel;
         _printReportViewModel = printReportViewModel;
         _expenseDataLoadViewModel = expenseDataLoadViewModel;
+        _sparePartsAnalogsViewModel = sparePartsAnalogsViewModel;
+        _incomingDataLoadViewModel = incomingDataLoadViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
@@ -77,6 +81,22 @@ public class MainMenuViewModel
         ShowCommissionsCommand = new RelayCommand(ShowCommissions);
         ShowExpensesDataLoadingCommand = new RelayCommand(ShowExpensesDataLoading);
         ShowNomenclatureAnalogCommand = new RelayCommand(ShowNomenclatureAnalog);
+        ShowIncomingDataLoadingCommand = new RelayCommand(ShowIncomingDataLoading);
+    }
+
+    private void ShowIncomingDataLoading()
+    {
+        var incomingDataLoadView = new IncomingDataLoadView(_incomingDataLoadViewModel);
+        var window = new Window
+        {
+            Content = incomingDataLoadView,
+            Title = "Загрузка начальных остатков",
+            Width = 520,
+            Height = 240,
+            ResizeMode = ResizeMode.NoResize
+        };
+        _incomingDataLoadViewModel.Init();
+        window.ShowDialog();
     }
 
     private void ShowNomenclatureAnalog()
