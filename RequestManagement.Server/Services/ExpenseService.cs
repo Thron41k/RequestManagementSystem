@@ -101,7 +101,7 @@ namespace RequestManagement.Server.Services
                     .Select(s => new
                     {
                         Stock = s,
-                        Key = new NomenclatureKey(s.Nomenclature.Name, s.Nomenclature.Code, s.Nomenclature.Article, s.Nomenclature.UnitOfMeasure)
+                        Key = new NomenclatureKey(s.Nomenclature.Name, s.Nomenclature.Code, s.Nomenclature.Article!, s.Nomenclature.UnitOfMeasure)
                     })
                     .Where(x => nomenclatureKeys.Contains(x.Key))
                     .ToDictionary(x => x.Key, x => x.Stock);
@@ -187,7 +187,7 @@ namespace RequestManagement.Server.Services
         }
 
 
-        public async Task<RequestManagement.Common.Models.Expense> CreateExpenseAsync(RequestManagement.Common.Models.Expense expense)
+        public async Task<Common.Models.Expense> CreateExpenseAsync(Common.Models.Expense expense)
         {
             try
             {
@@ -216,7 +216,7 @@ namespace RequestManagement.Server.Services
             }
 
         }
-        public async Task<bool> UpdateExpenseAsync(RequestManagement.Common.Models.Expense expense)
+        public async Task<bool> UpdateExpenseAsync(Common.Models.Expense expense)
         {
             if (expense == null) throw new ArgumentNullException(nameof(expense));
 
@@ -238,10 +238,8 @@ namespace RequestManagement.Server.Services
             {
                 throw new InvalidOperationException("Stock with the given ID does not exist.");
             }
-
-            // Корректировка ConsumedQuantity
-            oldStock.ConsumedQuantity -= existingExpense.Quantity; // Убираем старое значение
-            newStock.ConsumedQuantity += expense.Quantity; // Добавляем новое значение
+            oldStock.ConsumedQuantity -= existingExpense.Quantity;
+            newStock.ConsumedQuantity += expense.Quantity;
 
             existingExpense.StockId = expense.StockId;
             existingExpense.Quantity = expense.Quantity;
@@ -322,17 +320,19 @@ namespace RequestManagement.Server.Services
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task SaveNomenclatureDefectMappingAsync(int userId, int nomenclatureId, int defectId)
+        public async Task SaveNomenclatureDefectMappingAsync(int userId, int stockId, int defectId)
         {
+            var stock = await dbContext.Stocks.FirstOrDefaultAsync(x => x.Id == stockId);
+            if(stock == null)return;
             var existing = await dbContext.NomenclatureDefectMappings
-                .FirstOrDefaultAsync(m => m.UserId == userId && m.NomenclatureId == nomenclatureId);
+                .FirstOrDefaultAsync(m => m.UserId == userId && m.NomenclatureId == stock.NomenclatureId);
 
             if (existing == null)
             {
                 existing = new NomenclatureDefectMapping
                 {
                     UserId = userId,
-                    NomenclatureId = nomenclatureId,
+                    NomenclatureId = stock.NomenclatureId,
                     DefectId = defectId,
                     LastUsed = DateTime.UtcNow
                 };

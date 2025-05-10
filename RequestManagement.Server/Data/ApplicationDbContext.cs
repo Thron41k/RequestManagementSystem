@@ -24,9 +24,23 @@ namespace RequestManagement.Server.Data
         public DbSet<UserLastSelection> UserLastSelections { get; set; }
         public DbSet<NomenclatureDefectMapping> NomenclatureDefectMappings { get; set; }
         public DbSet<Commissions> Commissions { get; set; }
+        public DbSet<NomenclatureAnalog> NomenclatureAnalog { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<NomenclatureAnalog>(
+                entity =>
+                {
+                    entity.HasKey(e => e.Id);
+                    entity.HasOne(e => e.Original)
+                        .WithMany()
+                        .HasForeignKey(e => e.OriginalId)
+                        .OnDelete(DeleteBehavior.Restrict);
+                    entity.HasOne(e => e.Analog)
+                        .WithMany()
+                        .HasForeignKey(e => e.AnalogId)
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
             modelBuilder.Entity<Commissions>(
                 entity =>
                 {

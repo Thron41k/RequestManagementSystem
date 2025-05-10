@@ -10,8 +10,7 @@ namespace RequestManagement.Common.Models
 {
     public class Expense : IEntity
     {
-        [NotMapped]
-        public bool IsSelected { get; set; }
+        [NotMapped] public bool IsSelected { get; set; }
         public int Id { get; set; }
         public string? Code { get; set; } = string.Empty;
         public int StockId { get; set; }

@@ -40,6 +40,7 @@
     <Protobuf Include="Protos\incoming.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\warehouse.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\commissions.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\nomenclatureanalog.proto" GrpcServices="Server" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\" />

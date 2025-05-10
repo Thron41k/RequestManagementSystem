@@ -17,4 +17,5 @@ public interface IGrpcClientFactory
     IncomingService.IncomingServiceClient CreateIncomingClient();
     WarehouseService.WarehouseServiceClient CreateWarehouseClient();
     CommissionsService.CommissionsServiceClient CreateCommissionsClient();
+    NomenclatureAnalogService.NomenclatureAnalogServiceClient CreateNomenclatureAnalogClient();
 }

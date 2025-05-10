@@ -16,7 +16,7 @@ namespace RequestManagement.Common.Interfaces
         Task<UserLastSelection?> GetUserLastSelectionAsync(int userId);
         Task<NomenclatureDefectMapping?> GetLastNomenclatureDefectMappingAsync(int userId, int nomenclatureId);
         Task SaveUserLastSelectionAsync(int userId, int? driverId, int? equipmentId);
-        Task SaveNomenclatureDefectMappingAsync(int userId, int nomenclatureId, int defectId);
+        Task SaveNomenclatureDefectMappingAsync(int userId, int stockId, int defectId);
         Task<bool> DeleteExpensesAsync(List<int> requestId);
         Task<List<Expense>> GetAllExpensesAsync(string requestFilter, int requestWarehouseId, int requestEquipmentId, int requestDriverId, int requestDefectId, string requestFromDate, string requestToDate);
         Task<bool> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId);

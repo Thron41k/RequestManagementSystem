@@ -224,7 +224,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         return mapping;
     }
 
-    public Task SaveNomenclatureDefectMappingAsync(int userId, int nomenclatureId, int defectId)
+    public Task SaveNomenclatureDefectMappingAsync(int userId, int stockId, int defectId)
     {
         throw new NotImplementedException();
     }

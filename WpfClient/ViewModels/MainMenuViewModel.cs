@@ -26,6 +26,7 @@ public class MainMenuViewModel
     private readonly ExpenseDataLoadViewModel _expenseDataLoadViewModel;
     private readonly CommissionsViewModel _commissionsViewModel;
     private readonly PrintReportViewModel _printReportViewModel;
+    private readonly SparePartsAnalogsViewModel _sparePartsAnalogsViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -40,6 +41,7 @@ public class MainMenuViewModel
     public ICommand ShowStartDataLoadingCommand { get; }
     public ICommand ShowCommissionsCommand { get; }
     public ICommand ShowExpensesDataLoadingCommand { get; }
+    public ICommand ShowNomenclatureAnalogCommand { get; }
 
     public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel)
     {
@@ -74,8 +76,22 @@ public class MainMenuViewModel
         ShowStartDataLoadingCommand = new RelayCommand(ShowStartDataLoading);
         ShowCommissionsCommand = new RelayCommand(ShowCommissions);
         ShowExpensesDataLoadingCommand = new RelayCommand(ShowExpensesDataLoading);
+        ShowNomenclatureAnalogCommand = new RelayCommand(ShowNomenclatureAnalog);
     }
 
+    private void ShowNomenclatureAnalog()
+    {
+        var sparePartsAnalogsView = new SparePartsAnalogsView(_sparePartsAnalogsViewModel);
+        var window = new Window
+        {
+            Content = sparePartsAnalogsView,
+            Title = "Аналоги номенклатуры",
+            Width = 850,
+            Height = 490,
+            ResizeMode = ResizeMode.NoResize
+        };
+        window.ShowDialog();
+    }
     private void ShowCommissions()
     {
         ShowCommissions(true);

@@ -17,7 +17,6 @@ public partial class ExpenseListViewModel : ObservableObject
     public bool EditMode { get; set; }
     private readonly IMessageBus _messageBus;
     private readonly IExpenseService _expenseService;
-    private readonly IExcelWriterService _excelWriterService;
     [ObservableProperty] private string _menuDeleteItemText = "Удалить отмеченные";
     [ObservableProperty] private Expense? _selectedExpense = new();
     [ObservableProperty] private ObservableCollection<Expense> _expenses = [];
@@ -39,7 +38,6 @@ public partial class ExpenseListViewModel : ObservableObject
     {
         _messageBus = messageBus;
         _expenseService = expenseService;
-        _excelWriterService = excelWriterService;
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
         _expensesViewSource = new CollectionViewSource { Source = Expenses };
         var dispatcher = Dispatcher.CurrentDispatcher;

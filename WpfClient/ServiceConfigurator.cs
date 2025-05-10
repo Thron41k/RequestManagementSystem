@@ -24,6 +24,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<WarehouseService.WarehouseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<CommissionsService.CommissionsServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<NomenclatureAnalogService.NomenclatureAnalogServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();
@@ -55,6 +56,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<ExpenseDataLoadViewModel>();
         serviceCollection.AddScoped<CommissionsViewModel>();
         serviceCollection.AddScoped<PrintReportViewModel>();
+        serviceCollection.AddScoped<SparePartsAnalogsViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -65,6 +67,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<IIncomingService, GrpcIncomingService>();
         serviceCollection.AddScoped<IWarehouseService, GrpcWarehouseService>();
         serviceCollection.AddScoped<ICommissionsService, GrpcCommissionsService>();
+        serviceCollection.AddScoped<INomenclatureAnalogService, GrpcNomenclatureAnalogService>();
 
         // Представления
         serviceCollection.AddTransient<MainWindow>();
@@ -83,6 +86,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<ExpenseDataLoadView>();
         serviceCollection.AddTransient<CommissionsView>();
         serviceCollection.AddTransient<PrintReportView>();
+        serviceCollection.AddTransient<SparePartsAnalogsView>();
 
         return serviceCollection.BuildServiceProvider();
     }

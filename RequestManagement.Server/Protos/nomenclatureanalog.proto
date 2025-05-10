@@ -1,0 +1,43 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service NomenclatureAnalogService {
+    rpc GetAllNomenclatureAnalogs (GetAllNomenclatureAnalogsRequest) returns (GetAllNomenclatureAnalogsResponse);
+    rpc AddNomenclatureAnalog(AddNomenclatureAnalogRequest) returns (AddNomenclatureAnalogResponse);
+    rpc DeleteNomenclatureAnalog(DeleteNomenclatureAnalogRequest) returns (DeleteNomenclatureAnalogResponse);
+}
+
+message DeleteNomenclatureAnalogRequest {
+	int32 original = 1;
+    int32 analog = 2;
+}
+
+message DeleteNomenclatureAnalogResponse {
+	bool success = 1;
+}
+
+message GetAllNomenclatureAnalogsRequest {
+	int32 id = 1;
+}
+
+message GetAllNomenclatureAnalogsResponse {
+	repeated AnalogNomenclature nomenclature = 1;
+}
+
+message AddNomenclatureAnalogRequest{
+	int32 original = 1;
+    int32 analog = 2;
+}
+
+message AddNomenclatureAnalogResponse{
+	int32 id = 1;
+}
+
+message AnalogNomenclature {
+    int32 id = 1;
+    string code = 2;
+    string name = 3;
+    string article = 4;
+    string unitOfMeasure = 5;
+}

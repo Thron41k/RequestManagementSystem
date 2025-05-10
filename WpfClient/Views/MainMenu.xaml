@@ -26,6 +26,7 @@
                 <MenuItem Header="Склады" Command="{Binding ShowWarehouseCommand}"/>
                 <MenuItem Header="Номенклатура" Command="{Binding ShowNomenclatureCommand}"/>
                 <MenuItem Header="Комиссия" Command="{Binding ShowCommissionsCommand}"/>
+                <MenuItem Header="Аналоги" Command="{Binding ShowNomenclatureAnalogCommand}"/>
             </MenuItem>
             <MenuItem Header="Движения">
                 <MenuItem Header="Приходы" Command="{Binding ShowIncomingListCommand}"/>

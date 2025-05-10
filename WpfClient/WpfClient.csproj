@@ -59,6 +59,7 @@
     <Protobuf Include="..\RequestManagement.Server\Protos\incoming.proto" GrpcServices="Client" Link="Protos\incoming.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\warehouse.proto" GrpcServices="Client" Link="Protos\warehouse.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\commissions.proto" GrpcServices="Client" Link="Protos\commissions.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\nomenclatureanalog.proto" GrpcServices="Client" Link="Protos\nomenclatureanalog.proto" />
   </ItemGroup>
 
   <ItemGroup>

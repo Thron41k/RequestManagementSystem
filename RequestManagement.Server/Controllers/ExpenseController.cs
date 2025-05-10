@@ -92,7 +92,7 @@ namespace RequestManagement.Server.Controllers
 
             _logger.LogInformation("Getting all expenses");
 
-            var expenseList = await _expenseService.GetAllExpensesAsync(request.Filter,request.WarehouseId,request.EquipmentId,request.DriverId,request.DefectId,request.FromDate,request.ToDate);
+            var expenseList = await _expenseService.GetAllExpensesAsync(request.Filter, request.WarehouseId, request.EquipmentId, request.DriverId, request.DefectId, request.FromDate, request.ToDate);
             var response = new GetAllExpensesResponse();
             response.Expenses.AddRange(expenseList.Select(e => new Expense
             {
@@ -152,6 +152,17 @@ namespace RequestManagement.Server.Controllers
 
         public override async Task<CreateExpenseResponse> CreateExpense(CreateExpenseRequest request, ServerCallContext context)
         {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
+            var userId = 0;
+            var value = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (value != null)
+            {
+                userId = int.Parse(value);
+            }
             _logger.LogInformation("Creating new expense");
             var expense = new RequestManagement.Common.Models.Expense
             {
@@ -162,25 +173,27 @@ namespace RequestManagement.Server.Controllers
                 DefectId = request.DefectId,
                 Date = DateTime.Parse(request.Date)
             };
-
             var newExpense = await _expenseService.CreateExpenseAsync(expense);
-            var user = context.GetHttpContext().User;
-            var value = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (value != null)
-            {
-                var userId = int.Parse(value);
-                await _expenseService.SaveUserLastSelectionAsync(userId, request.DriverId, request.EquipmentId);
-                await _expenseService.SaveNomenclatureDefectMappingAsync(userId, newExpense.Stock.NomenclatureId, request.DefectId);
-            }
-
+            await _expenseService.SaveUserLastSelectionAsync(userId, request.DriverId, request.EquipmentId);
+            await _expenseService.SaveNomenclatureDefectMappingAsync(userId, newExpense.StockId, request.DefectId);
             return new CreateExpenseResponse { Id = newExpense.Id };
         }
 
         public override async Task<UpdateExpenseResponse> UpdateExpense(UpdateExpenseRequest request, ServerCallContext context)
         {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
             _logger.LogInformation("Updating expense with ID: {Id}", request.Id);
-
-            var expense = new RequestManagement.Common.Models.Expense
+            var userId = 0;
+            var value = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (value != null)
+            {
+                userId = int.Parse(value);
+            }
+            var expense = new Common.Models.Expense
             {
                 Id = request.Id,
                 StockId = request.StockId,
@@ -192,6 +205,8 @@ namespace RequestManagement.Server.Controllers
             };
 
             var success = await _expenseService.UpdateExpenseAsync(expense);
+            await _expenseService.SaveUserLastSelectionAsync(userId, request.DriverId, request.EquipmentId);
+            await _expenseService.SaveNomenclatureDefectMappingAsync(userId, expense.StockId, request.DefectId);
             return new UpdateExpenseResponse { Success = success };
         }
 
@@ -229,7 +244,7 @@ namespace RequestManagement.Server.Controllers
                     NomenclatureCode = x.NomenclatureCode,
                     Quantity = (decimal)x.Quantity
                 }).ToList();
-            var success = await _expenseService.UploadMaterialsExpenseAsync(materialExpense,request.WarehouseId);
+            var success = await _expenseService.UploadMaterialsExpenseAsync(materialExpense, request.WarehouseId);
             return new UploadMaterialExpenseResponse { Success = success };
         }
     }
