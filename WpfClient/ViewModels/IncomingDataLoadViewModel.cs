@@ -19,7 +19,7 @@ namespace WpfClient.ViewModels
     public partial class IncomingDataLoadViewModel : ObservableObject
     {
         private readonly IMessageBus _messageBus;
-        private readonly IExpenseService _expenseService;
+        private readonly IIncomingService _incomingService;
         private readonly IExcelReaderService _excelReaderService;
         private readonly IWarehouseService _requestService;
         [ObservableProperty] private bool _isBusy;
@@ -30,11 +30,11 @@ namespace WpfClient.ViewModels
         public IncomingDataLoadViewModel()
         {
         }
-        public IncomingDataLoadViewModel(IMessageBus messageBus, IExcelReaderService excelReaderService, IExpenseService expenseService, IWarehouseService requestService)
+        public IncomingDataLoadViewModel(IMessageBus messageBus, IExcelReaderService excelReaderService, IIncomingService incomingService, IWarehouseService requestService)
         {
             _messageBus = messageBus;
             _excelReaderService = excelReaderService;
-            _expenseService = expenseService;
+            _incomingService = incomingService;
             _requestService = requestService;
             _messageBus.Subscribe<SelectResultMessage>(OnSelect);
         }
@@ -59,29 +59,30 @@ namespace WpfClient.ViewModels
         [RelayCommand]
         private async Task UploadMaterials()
         {
-            //try
-            //{
-            //    IsBusy = true;
-            //    var result =
-            //        await _expenseService.UploadMaterialsExpenseAsync(MaterialExpense, SelectedWarehouse.Id);
-            //    if (result)
-            //    {
-            //        MessageBox.Show("Data uploaded successfully", "Success", MessageBoxButton.OK,
-            //            MessageBoxImage.Information);
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Error uploading data", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine($"Error loading data: {ex.Message}");
-            //}
-            //finally
-            //{
-            //    IsBusy = false;
-            //}
+            try
+            {
+                if(MaterialIncoming == null) return;
+                IsBusy = true;
+                var result =
+                    await _incomingService.UploadIncomingsAsync(MaterialIncoming);
+                if (result)
+                {
+                    MessageBox.Show("Data uploaded successfully", "Success", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Error uploading data", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading data: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
         [RelayCommand]
         private async Task SelectDocumentPath()

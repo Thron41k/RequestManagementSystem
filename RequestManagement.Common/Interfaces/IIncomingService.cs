@@ -14,5 +14,6 @@ namespace RequestManagement.Common.Interfaces
         Task<bool> DeleteIncomingAsync(int id);
         Task<bool> DeleteIncomingsAsync(List<int> requestId);
         Task<List<Incoming>> GetAllIncomingsAsync(string requestFilter, int requestWarehouseId, string requestFromDate, string requestToDate);
+        Task<bool> UploadIncomingsAsync(MaterialIncoming incoming);
     }
 }

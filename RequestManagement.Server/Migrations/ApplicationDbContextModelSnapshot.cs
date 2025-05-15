@@ -17,10 +17,53 @@ namespace RequestManagement.Server.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Application", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("ResponsibleId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EquipmentId");
+
+                    b.HasIndex("Number");
+
+                    b.HasIndex("ResponsibleId");
+
+                    b.ToTable("Applications");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Date = new DateTime(2025, 4, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EquipmentId = 1,
+                            Number = "",
+                            ResponsibleId = 1
+                        });
+                });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Commissions", b =>
                 {
@@ -53,7 +96,8 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -71,21 +115,9 @@ namespace RequestManagement.Server.Migrations
 
                     b.HasIndex("Member4Id");
 
-                    b.ToTable("Commissions");
+                    b.HasIndex("Name");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ApproveForActId = 1,
-                            ApproveForDefectAndLimitId = 1,
-                            ChairmanId = 1,
-                            Member1Id = 1,
-                            Member2Id = 1,
-                            Member3Id = 1,
-                            Member4Id = 1,
-                            Name = "Магический филиал"
-                        });
+                    b.ToTable("Commissions");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
@@ -101,11 +133,14 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DefectGroupId");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("Defects");
 
@@ -114,13 +149,7 @@ namespace RequestManagement.Server.Migrations
                         {
                             Id = 1,
                             DefectGroupId = 1,
-                            Name = "Трещина корпуса"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            DefectGroupId = 2,
-                            Name = "Короткое замыкание"
+                            Name = ""
                         });
                 });
 
@@ -134,7 +163,8 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -144,12 +174,72 @@ namespace RequestManagement.Server.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Механические повреждения"
+                            Name = ""
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Электрические неисправности"
+                            Name = "Выпускная система"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Гидравлика"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "ДВС"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Коробка раздаточная"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Кузов, кабина"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Механизмы управления"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Рабочее оборудование"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Система охлаждения"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Сцепление"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Топливная система"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "Трансмиссия"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Ходовая часть"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "Электрооборудование"
                         });
                 });
 
@@ -163,21 +253,27 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("Position")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ShortName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code");
 
                     b.ToTable("Drivers");
 
@@ -189,14 +285,6 @@ namespace RequestManagement.Server.Migrations
                             FullName = "",
                             Position = "",
                             ShortName = ""
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "",
-                            FullName = "Петров Петр Петрович",
-                            Position = "Водитель",
-                            ShortName = "Петров П.П."
                         });
                 });
 
@@ -210,16 +298,21 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("StateNumber")
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code");
 
                     b.ToTable("Equipments");
 
@@ -228,8 +321,8 @@ namespace RequestManagement.Server.Migrations
                         {
                             Id = 1,
                             Code = "",
-                            Name = "КАМАЗ 53215-15",
-                            StateNumber = "Н 507 СН"
+                            Name = "",
+                            StateNumber = ""
                         });
                 });
 
@@ -242,7 +335,8 @@ namespace RequestManagement.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
@@ -264,6 +358,8 @@ namespace RequestManagement.Server.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Date");
+
                     b.HasIndex("DefectId");
 
                     b.HasIndex("DriverId");
@@ -273,19 +369,6 @@ namespace RequestManagement.Server.Migrations
                     b.HasIndex("StockId");
 
                     b.ToTable("Expenses");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = "",
-                            Date = new DateTime(2025, 4, 12, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DefectId = 1,
-                            DriverId = 1,
-                            EquipmentId = 1,
-                            Quantity = 5m,
-                            StockId = 1
-                        });
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Incoming", b =>
@@ -296,29 +379,36 @@ namespace RequestManagement.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ApplicationId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("DocType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("StockId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApplicationId");
+
+                    b.HasIndex("Date");
+
                     b.HasIndex("StockId");
 
-                    b.ToTable("Incoming");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Date = new DateTime(2025, 4, 15, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Quantity = 5m,
-                            StockId = 1
-                        });
+                    b.ToTable("Incomings");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>
@@ -330,48 +420,38 @@ namespace RequestManagement.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Article")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("UnitOfMeasure")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Nomenclature");
+                    b.HasIndex("Code");
+
+                    b.ToTable("Nomenclatures");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            Article = "7406.1118013",
-                            Code = "ТКР001",
-                            Name = "Турбокомпрессор ТКР 7С-6 левый КАМАЗ Евро 2",
-                            UnitOfMeasure = "шт"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Article = "6СТ-190",
-                            Code = "АКБ001",
-                            Name = "Аккумулятор 6СТ-190",
-                            UnitOfMeasure = "шт"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Article = "6СТ-200",
-                            Code = "АКБ002",
-                            Name = "Аккумулятор 6СТ-200 (аналог 6СТ-190)",
-                            UnitOfMeasure = "шт"
+                            Article = "",
+                            Code = "",
+                            Name = "",
+                            UnitOfMeasure = ""
                         });
                 });
 
@@ -393,9 +473,9 @@ namespace RequestManagement.Server.Migrations
 
                     b.HasIndex("AnalogId");
 
-                    b.HasIndex("OriginalId");
+                    b.HasIndex("OriginalId", "AnalogId");
 
-                    b.ToTable("NomenclatureAnalog");
+                    b.ToTable("NomenclatureAnalogs");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.NomenclatureDefectMapping", b =>
@@ -424,7 +504,7 @@ namespace RequestManagement.Server.Migrations
 
                     b.HasIndex("NomenclatureId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "NomenclatureId");
 
                     b.ToTable("NomenclatureDefectMappings");
                 });
@@ -456,47 +536,9 @@ namespace RequestManagement.Server.Migrations
 
                     b.HasIndex("NomenclatureId");
 
-                    b.HasIndex("WarehouseId");
+                    b.HasIndex("WarehouseId", "NomenclatureId");
 
                     b.ToTable("Stocks");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ConsumedQuantity = 0m,
-                            InitialQuantity = 70m,
-                            NomenclatureId = 1,
-                            ReceivedQuantity = 0m,
-                            WarehouseId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ConsumedQuantity = 0m,
-                            InitialQuantity = 10m,
-                            NomenclatureId = 2,
-                            ReceivedQuantity = 0m,
-                            WarehouseId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ConsumedQuantity = 0m,
-                            InitialQuantity = 40m,
-                            NomenclatureId = 1,
-                            ReceivedQuantity = 0m,
-                            WarehouseId = 2
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ConsumedQuantity = 0m,
-                            InitialQuantity = 20m,
-                            NomenclatureId = 2,
-                            ReceivedQuantity = 0m,
-                            WarehouseId = 2
-                        });
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.User", b =>
@@ -509,11 +551,13 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<int>("Role")
                         .HasColumnType("integer");
@@ -580,34 +624,41 @@ namespace RequestManagement.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Warehouses");
+                    b.HasIndex("Name");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = "",
-                            LastUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Основной склад"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "",
-                            LastUpdated = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Резервный склад"
-                        });
+                    b.ToTable("Warehouses");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Application", b =>
+                {
+                    b.HasOne("RequestManagement.Common.Models.Equipment", "Equipment")
+                        .WithMany()
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "Responsible")
+                        .WithMany()
+                        .HasForeignKey("ResponsibleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Equipment");
+
+                    b.Navigation("Responsible");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Commissions", b =>
@@ -710,11 +761,19 @@ namespace RequestManagement.Server.Migrations
 
             modelBuilder.Entity("RequestManagement.Common.Models.Incoming", b =>
                 {
+                    b.HasOne("RequestManagement.Common.Models.Application", "Application")
+                        .WithMany()
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("RequestManagement.Common.Models.Stock", "Stock")
                         .WithMany()
                         .HasForeignKey("StockId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Application");
 
                     b.Navigation("Stock");
                 });
@@ -743,13 +802,13 @@ namespace RequestManagement.Server.Migrations
                     b.HasOne("RequestManagement.Common.Models.Defect", "Defect")
                         .WithMany()
                         .HasForeignKey("DefectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("RequestManagement.Common.Models.Nomenclature", "Nomenclature")
                         .WithMany()
                         .HasForeignKey("NomenclatureId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("RequestManagement.Common.Models.User", "User")
@@ -788,15 +847,18 @@ namespace RequestManagement.Server.Migrations
                 {
                     b.HasOne("RequestManagement.Common.Models.Commissions", "Commissions")
                         .WithMany()
-                        .HasForeignKey("CommissionsId");
+                        .HasForeignKey("CommissionsId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("RequestManagement.Common.Models.Driver", "Driver")
                         .WithMany()
-                        .HasForeignKey("DriverId");
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("RequestManagement.Common.Models.Equipment", "Equipment")
                         .WithMany()
-                        .HasForeignKey("EquipmentId");
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("RequestManagement.Common.Models.User", "User")
                         .WithMany()

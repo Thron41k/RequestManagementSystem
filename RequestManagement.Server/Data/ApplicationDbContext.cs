@@ -11,109 +11,191 @@ namespace RequestManagement.Server.Data
         {
         }
 
+        // DbSets с правильным именованием (множественное число)
         public DbSet<User> Users { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
-        public DbSet<Nomenclature> Nomenclature { get; set; }
+        public DbSet<Nomenclature> Nomenclatures{ get; set; }
         public DbSet<DefectGroup> DefectGroups { get; set; }
         public DbSet<Defect> Defects { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Expense> Expenses { get; set; }
-        public DbSet<Incoming> Incoming { get; set; }
+        public DbSet<Incoming> Incomings { get; set; }
         public DbSet<UserLastSelection> UserLastSelections { get; set; }
         public DbSet<NomenclatureDefectMapping> NomenclatureDefectMappings { get; set; }
         public DbSet<Commissions> Commissions { get; set; }
-        public DbSet<NomenclatureAnalog> NomenclatureAnalog { get; set; }
+        public DbSet<NomenclatureAnalog> NomenclatureAnalogs { get; set; }
+        public DbSet<Application> Applications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<NomenclatureAnalog>(
-                entity =>
-                {
-                    entity.HasKey(e => e.Id);
-                    entity.HasOne(e => e.Original)
-                        .WithMany()
-                        .HasForeignKey(e => e.OriginalId)
-                        .OnDelete(DeleteBehavior.Restrict);
-                    entity.HasOne(e => e.Analog)
-                        .WithMany()
-                        .HasForeignKey(e => e.AnalogId)
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-            modelBuilder.Entity<Commissions>(
-                entity =>
-                {
-                    entity.HasKey(e => e.Id);
-                    entity.HasOne(e => e.ApproveForAct)
-                        .WithMany()
-                        .HasForeignKey(e => e.ApproveForActId)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.Restrict);
-                    entity.HasOne(e => e.ApproveForDefectAndLimit)
-                        .WithMany()
-                        .HasForeignKey(e => e.ApproveForDefectAndLimitId)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.Restrict);
-                    entity.HasOne(e => e.Chairman)
-                        .WithMany()
-                        .HasForeignKey(e => e.ChairmanId)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.Restrict);
-                    entity.HasOne(e => e.Member1)
-                        .WithMany()
-                        .HasForeignKey(e => e.Member1Id)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.Restrict);
-                    entity.HasOne(e => e.Member2)
-                        .WithMany()
-                        .HasForeignKey(e => e.Member2Id)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.Restrict);
-                    entity.HasOne(e => e.Member3)
-                        .WithMany()
-                        .HasForeignKey(e => e.Member3Id)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.Restrict);
-                    entity.HasOne(e => e.Member4)
-                        .WithMany()
-                        .HasForeignKey(e => e.Member4Id)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.Restrict);
-                }
-            );
-            modelBuilder.Entity<UserLastSelection>(entity =>
+            ConfigureUser(modelBuilder);
+            ConfigureEquipment(modelBuilder);
+            ConfigureWarehouse(modelBuilder);
+            ConfigureNomenclature(modelBuilder);
+            ConfigureDefectGroup(modelBuilder);
+            ConfigureDefect(modelBuilder);
+            ConfigureDriver(modelBuilder);
+            ConfigureStock(modelBuilder);
+            ConfigureExpense(modelBuilder);
+            ConfigureIncoming(modelBuilder);
+            ConfigureUserLastSelection(modelBuilder);
+            ConfigureNomenclatureDefectMapping(modelBuilder);
+            ConfigureCommissions(modelBuilder);
+            ConfigureNomenclatureAnalog(modelBuilder);
+            ConfigureApplication(modelBuilder);
+            SeedInitialData(modelBuilder);
+        }
+
+        private void ConfigureUser(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.HasOne(e => e.User)
-                    .WithMany()
-                    .HasForeignKey(e => e.UserId);
-                entity.HasOne(e => e.Driver)
-                    .WithMany()
-                    .HasForeignKey(e => e.DriverId)
-                    .IsRequired(false);
-                entity.HasOne(e => e.Equipment)
-                    .WithMany()
-                    .HasForeignKey(e => e.EquipmentId)
-                    .IsRequired(false);
+                entity.Property(e => e.Login)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(256);
+                entity.HasIndex(e => e.Login)
+                    .IsUnique();
             });
-            modelBuilder.Entity<NomenclatureDefectMapping>(entity =>
+        }
+
+        private void ConfigureEquipment(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Equipment>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.HasOne(e => e.User)
-                    .WithMany()
-                    .HasForeignKey(e => e.UserId);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+                entity.Property(e => e.StateNumber)
+                    .HasMaxLength(20);
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.HasIndex(e => e.Code);
+            });
+        }
+
+        private void ConfigureWarehouse(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Warehouse>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+                entity.Property(e => e.Code)
+                    .HasMaxLength(50);
+                entity.Property(e => e.LastUpdated)
+                    .HasColumnType("timestamp with time zone");
+                entity.HasIndex(e => e.Name);
+            });
+        }
+
+        private void ConfigureNomenclature(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Nomenclature>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+                entity.Property(e => e.Article)
+                    .HasMaxLength(100);
+                entity.Property(e => e.UnitOfMeasure)
+                    .IsRequired()
+                    .HasMaxLength(20);
+                entity.HasIndex(e => e.Code);
+            });
+        }
+
+        private void ConfigureDefectGroup(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DefectGroup>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+                entity.HasMany(e => e.Defects)
+                    .WithOne(d => d.DefectGroup)
+                    .HasForeignKey(d => d.DefectGroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        private void ConfigureDefect(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Defect>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+                entity.HasIndex(e => e.Name);
+            });
+        }
+
+        private void ConfigureDriver(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Driver>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.FullName)
+                    .IsRequired()
+                    .HasMaxLength(150);
+                entity.Property(e => e.ShortName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(e => e.Position)
+                    .IsRequired()
+                    .HasMaxLength(100);
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.HasIndex(e => e.Code);
+            });
+        }
+
+        private void ConfigureStock(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Stock>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.InitialQuantity)
+                    .HasColumnType("decimal(18,2)");
+                entity.Property(e => e.ReceivedQuantity)
+                    .HasColumnType("decimal(18,2)");
+                entity.Property(e => e.ConsumedQuantity)
+                    .HasColumnType("decimal(18,2)");
+                entity.HasOne(e => e.Warehouse)
+                    .WithMany(w => w.Stocks)
+                    .HasForeignKey(e => e.WarehouseId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.Nomenclature)
-                    .WithMany()
-                    .HasForeignKey(e => e.NomenclatureId);
-                entity.HasOne(e => e.Defect)
-                    .WithMany()
-                    .HasForeignKey(e => e.DefectId);
+                    .WithMany(n => n.Stocks)
+                    .HasForeignKey(e => e.NomenclatureId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => new { e.WarehouseId, e.NomenclatureId });
             });
+        }
+
+        private void ConfigureExpense(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Expense>(entity =>
             {
-                entity.Ignore(e => e.IsSelected);
                 entity.HasKey(e => e.Id);
+                entity.Ignore(e => e.IsSelected);
+                entity.Property(e => e.Code)
+                    .HasMaxLength(50);
                 entity.Property(e => e.Quantity)
                     .HasColumnType("decimal(18,2)");
                 entity.Property(e => e.Date)
@@ -122,83 +204,186 @@ namespace RequestManagement.Server.Data
                     .WithMany()
                     .HasForeignKey(e => e.StockId)
                     .OnDelete(DeleteBehavior.Restrict);
-            });
-            modelBuilder.Entity<Expense>(entity =>
-            {
-                entity.Ignore(e => e.IsSelected);
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Quantity)
-                    .HasColumnType("decimal(18,2)");
-
-                entity.Property(e => e.Date)
-                    .HasColumnType("timestamp with time zone");
-
-                entity.HasOne(e => e.Stock)
-                    .WithMany() // Если нужно, можно добавить коллекцию Expenses в Stock
-                    .HasForeignKey(e => e.StockId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
                 entity.HasOne(e => e.Equipment)
                     .WithMany()
                     .HasForeignKey(e => e.EquipmentId)
                     .OnDelete(DeleteBehavior.Restrict);
-
                 entity.HasOne(e => e.Driver)
                     .WithMany()
                     .HasForeignKey(e => e.DriverId)
                     .OnDelete(DeleteBehavior.Restrict);
-
                 entity.HasOne(e => e.Defect)
                     .WithMany()
                     .HasForeignKey(e => e.DefectId)
                     .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => e.Date);
             });
-            modelBuilder.Entity<Stock>(entity =>
+        }
+
+        private void ConfigureIncoming(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Incoming>(entity =>
             {
-                entity.HasKey(s => s.Id);
-                entity.Property(s => s.InitialQuantity).HasColumnType("decimal(18,2)");
-                entity.Property(s => s.ReceivedQuantity).HasColumnType("decimal(18,2)");
-                entity.Property(s => s.ConsumedQuantity).HasColumnType("decimal(18,2)");
-
-                entity.HasOne(s => s.Warehouse)
-                    .WithMany(w => w.Stocks)
-                    .HasForeignKey(s => s.WarehouseId)
-                    .OnDelete(DeleteBehavior.Restrict); // Запрет удаления склада, если есть запасы
-
-                entity.HasOne(s => s.Nomenclature)
-                    .WithMany(n => n.Stocks)
-                    .HasForeignKey(s => s.NomenclatureId)
-                    .OnDelete(DeleteBehavior.Restrict); // Запрет удаления номенклатуры, если есть запасы
+                entity.HasKey(e => e.Id);
+                entity.Ignore(e => e.IsSelected);
+                entity.Property(e => e.Quantity)
+                    .HasColumnType("decimal(18,2)");
+                entity.Property(e => e.Date)
+                    .HasColumnType("timestamp with time zone");
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.HasOne(e => e.Stock)
+                    .WithMany()
+                    .HasForeignKey(e => e.StockId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Application)
+                    .WithMany()
+                    .HasForeignKey(e => e.ApplicationId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => e.Date);
             });
-            // Отношения для DefectGroup и Defect
-            modelBuilder.Entity<DefectGroup>()
-                .HasMany(dg => dg.Defects)
-                .WithOne(d => d.DefectGroup)
-                .HasForeignKey(d => d.DefectGroupId)
-                .OnDelete(DeleteBehavior.Cascade);
+        }
 
-            modelBuilder.Entity<Expense>().HasData(
-                new Expense
-                {
-                    Id = 1,
-                    StockId = 1,
-                    Quantity = 5,
-                    EquipmentId = 1,
-                    DriverId = 1,
-                    DefectId = 1,
-                    Date = DateTime.SpecifyKind(DateTime.Parse("12.04.2025"), DateTimeKind.Utc)
-                }
-            );
-            modelBuilder.Entity<Incoming>().HasData(
-                new Incoming
-                {
-                    Id = 1,
-                    StockId = 1,
-                    Quantity = 5,
-                    Date = DateTime.SpecifyKind(DateTime.Parse("15.04.2025"), DateTimeKind.Utc)
-                });
-            // Начальные данные для Users
+        private void ConfigureUserLastSelection(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserLastSelection>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.LastUpdated)
+                    .HasColumnType("timestamp with time zone");
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Driver)
+                    .WithMany()
+                    .HasForeignKey(e => e.DriverId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Equipment)
+                    .WithMany()
+                    .HasForeignKey(e => e.EquipmentId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Commissions)
+                    .WithMany()
+                    .HasForeignKey(e => e.CommissionsId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => e.UserId);
+            });
+        }
+
+        private void ConfigureNomenclatureDefectMapping(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<NomenclatureDefectMapping>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.LastUsed)
+                    .HasColumnType("timestamp with time zone");
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Nomenclature)
+                    .WithMany()
+                    .HasForeignKey(e => e.NomenclatureId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Defect)
+                    .WithMany()
+                    .HasForeignKey(e => e.DefectId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => new { e.UserId, e.NomenclatureId });
+            });
+        }
+        private void ConfigureApplication(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Application>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Number)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(e => e.Date)
+                    .HasColumnType("timestamp with time zone");
+                entity.HasOne(e => e.Responsible)
+                    .WithMany()
+                    .HasForeignKey(e => e.ResponsibleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Equipment)
+                    .WithMany()
+                    .HasForeignKey(e => e.EquipmentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => e.Number);
+            });
+        }
+        private void ConfigureCommissions(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Commissions>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+                entity.HasOne(e => e.ApproveForAct)
+                    .WithMany()
+                    .HasForeignKey(e => e.ApproveForActId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.ApproveForDefectAndLimit)
+                    .WithMany()
+                    .HasForeignKey(e => e.ApproveForDefectAndLimitId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Chairman)
+                    .WithMany()
+                    .HasForeignKey(e => e.ChairmanId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Member1)
+                    .WithMany()
+                    .HasForeignKey(e => e.Member1Id)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Member2)
+                    .WithMany()
+                    .HasForeignKey(e => e.Member2Id)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Member3)
+                    .WithMany()
+                    .HasForeignKey(e => e.Member3Id)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Member4)
+                    .WithMany()
+                    .HasForeignKey(e => e.Member4Id)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => e.Name);
+            });
+        }
+
+        private void ConfigureNomenclatureAnalog(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<NomenclatureAnalog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.Original)
+                    .WithMany()
+                    .HasForeignKey(e => e.OriginalId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Analog)
+                    .WithMany()
+                    .HasForeignKey(e => e.AnalogId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => new { e.OriginalId, e.AnalogId });
+            });
+        }
+
+        private void SeedInitialData(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
@@ -209,134 +394,69 @@ namespace RequestManagement.Server.Data
                 }
             );
 
-            // Начальные данные для Warehouses
-            modelBuilder.Entity<Warehouse>().HasData(
-                new Warehouse { Id = 1, Name = "Основной склад" },
-                new Warehouse { Id = 2, Name = "Резервный склад" }
-            );
-
-            // Начальные данные для Nomenclature
             modelBuilder.Entity<Nomenclature>().HasData(
                 new Nomenclature
                 {
                     Id = 1,
-                    Code = "ТКР001",
-                    Name = "Турбокомпрессор ТКР 7С-6 левый КАМАЗ Евро 2",
-                    Article = "7406.1118013",
-                    UnitOfMeasure = "шт",
-                },
-                new Nomenclature
-                {
-                    Id = 2,
-                    Code = "АКБ001",
-                    Name = "Аккумулятор 6СТ-190",
-                    Article = "6СТ-190",
-                    UnitOfMeasure = "шт",
-                },
-                new Nomenclature
-                {
-                    Id = 3,
-                    Code = "АКБ002",
-                    Name = "Аккумулятор 6СТ-200 (аналог 6СТ-190)",
-                    Article = "6СТ-200",
-                    UnitOfMeasure = "шт",
+                    Code = "",
+                    Name = "",
+                    Article = "",
+                    UnitOfMeasure = ""
                 }
             );
-            modelBuilder.Entity<Stock>().HasData(
-                new Stock
-                {
-                    Id = 1,
-                    NomenclatureId = 1,
-                    WarehouseId = 1,
-                    InitialQuantity = 70,
-                    ReceivedQuantity = 0,
-                    ConsumedQuantity = 0
-                },
-                new Stock
-                {
-                    Id = 2,
-                    NomenclatureId = 2,
-                    WarehouseId = 1,
-                    InitialQuantity = 10,
-                    ReceivedQuantity = 0,
-                    ConsumedQuantity = 0
-                },
-            new Stock
-            {
-                Id = 3,
-                NomenclatureId = 1,
-                WarehouseId = 2,
-                InitialQuantity = 40,
-                ReceivedQuantity = 0,
-                ConsumedQuantity = 0
-            },
-            new Stock
-            {
-                Id = 4,
-                NomenclatureId = 2,
-                WarehouseId = 2,
-                InitialQuantity = 20,
-                ReceivedQuantity = 0,
-                ConsumedQuantity = 0
-            }
-            );
-            modelBuilder.Entity<Commissions>().HasData(
-                new Commissions
-                {
-                    Id = 1,
-                    Name = "Магический филиал",
-                    ApproveForActId = 1,
-                    ApproveForDefectAndLimitId = 1,
-                    ChairmanId = 1,
-                    Member1Id = 1,
-                    Member2Id = 1,
-                    Member3Id = 1,
-                    Member4Id = 1
-                }
-            );
+
             modelBuilder.Entity<Driver>().HasData(
                 new Driver
                 {
                     Id = 1,
                     FullName = "",
                     ShortName = "",
-                    Position = ""
-                },
-                new Driver
-                {
-                    Id = 2,
-                    FullName = "Петров Петр Петрович",
-                    ShortName = "Петров П.П.",
-                    Position = "Водитель"
+                    Position = "",
+                    Code = ""
                 }
             );
 
-            // Начальные данные для Equipment
             modelBuilder.Entity<Equipment>().HasData(
                 new Equipment
                 {
                     Id = 1,
-                    Name = "КАМАЗ 53215-15",
-                    StateNumber = "Н 507 СН"
+                    Name = "",
+                    StateNumber = "",
+                    Code = ""
                 }
             );
 
-            // Начальные данные для DefectGroups
             modelBuilder.Entity<DefectGroup>().HasData(
-                new DefectGroup { Id = 1, Name = "Механические повреждения" },
-                new DefectGroup { Id = 2, Name = "Электрические неисправности" }
+                new DefectGroup { Id = 1, Name = "" },
+                new DefectGroup { Id = 2, Name = "Выпускная система" },
+                new DefectGroup { Id = 3, Name = "Гидравлика" },
+                new DefectGroup { Id = 4, Name = "ДВС" },
+                new DefectGroup { Id = 5, Name = "Коробка раздаточная" },
+                new DefectGroup { Id = 6, Name = "Кузов, кабина" },
+                new DefectGroup { Id = 7, Name = "Механизмы управления" },
+                new DefectGroup { Id = 8, Name = "Рабочее оборудование" },
+                new DefectGroup { Id = 9, Name = "Система охлаждения" },
+                new DefectGroup { Id = 10, Name = "Сцепление" },
+                new DefectGroup { Id = 11, Name = "Топливная система" },
+                new DefectGroup { Id = 12, Name = "Трансмиссия" },
+                new DefectGroup { Id = 13, Name = "Ходовая часть" },
+                new DefectGroup { Id = 14, Name = "Электрооборудование" }
             );
 
-            // Начальные данные для Defects
             modelBuilder.Entity<Defect>().HasData(
-                new Defect { Id = 1, Name = "Трещина корпуса", DefectGroupId = 1 },
-                new Defect { Id = 2, Name = "Короткое замыкание", DefectGroupId = 2 }
+                new Defect { Id = 1, Name = "", DefectGroupId = 1 }
             );
 
-            // Индексы
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Login)
-                .IsUnique();
+            modelBuilder.Entity<Application>().HasData(
+                new Application
+                {
+                    Id = 1,
+                    Number = "",
+                    Date = DateTime.SpecifyKind(DateTime.Parse("2025-04-10"), DateTimeKind.Utc),
+                    ResponsibleId = 1,
+                    EquipmentId = 1
+                }
+            );
         }
     }
 }

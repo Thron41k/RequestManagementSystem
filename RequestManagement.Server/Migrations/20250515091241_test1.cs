@@ -20,7 +20,7 @@ namespace RequestManagement.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -33,10 +33,10 @@ namespace RequestManagement.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FullName = table.Column<string>(type: "text", nullable: false),
-                    ShortName = table.Column<string>(type: "text", nullable: false),
-                    Position = table.Column<string>(type: "text", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: false)
+                    FullName = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    ShortName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Position = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -49,9 +49,9 @@ namespace RequestManagement.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    StateNumber = table.Column<string>(type: "text", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    StateNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -59,19 +59,19 @@ namespace RequestManagement.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Nomenclature",
+                name: "Nomenclatures",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Code = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Article = table.Column<string>(type: "text", nullable: true),
-                    UnitOfMeasure = table.Column<string>(type: "text", nullable: false)
+                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Article = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    UnitOfMeasure = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Nomenclature", x => x.Id);
+                    table.PrimaryKey("PK_Nomenclatures", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -80,8 +80,8 @@ namespace RequestManagement.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Login = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
+                    Login = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -95,8 +95,8 @@ namespace RequestManagement.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -110,7 +110,7 @@ namespace RequestManagement.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     DefectGroupId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -130,7 +130,7 @@ namespace RequestManagement.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     ApproveForActId = table.Column<int>(type: "integer", nullable: false),
                     ApproveForDefectAndLimitId = table.Column<int>(type: "integer", nullable: false),
                     ChairmanId = table.Column<int>(type: "integer", nullable: false),
@@ -187,6 +187,60 @@ namespace RequestManagement.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Applications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Number = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ResponsibleId = table.Column<int>(type: "integer", nullable: false),
+                    EquipmentId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Applications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Applications_Drivers_ResponsibleId",
+                        column: x => x.ResponsibleId,
+                        principalTable: "Drivers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Applications_Equipments_EquipmentId",
+                        column: x => x.EquipmentId,
+                        principalTable: "Equipments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "NomenclatureAnalogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OriginalId = table.Column<int>(type: "integer", nullable: false),
+                    AnalogId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NomenclatureAnalogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_NomenclatureAnalogs_Nomenclatures_AnalogId",
+                        column: x => x.AnalogId,
+                        principalTable: "Nomenclatures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_NomenclatureAnalogs_Nomenclatures_OriginalId",
+                        column: x => x.OriginalId,
+                        principalTable: "Nomenclatures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Stocks",
                 columns: table => new
                 {
@@ -202,9 +256,9 @@ namespace RequestManagement.Server.Migrations
                 {
                     table.PrimaryKey("PK_Stocks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Stocks_Nomenclature_NomenclatureId",
+                        name: "FK_Stocks_Nomenclatures_NomenclatureId",
                         column: x => x.NomenclatureId,
-                        principalTable: "Nomenclature",
+                        principalTable: "Nomenclatures",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -234,13 +288,13 @@ namespace RequestManagement.Server.Migrations
                         column: x => x.DefectId,
                         principalTable: "Defects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_NomenclatureDefectMappings_Nomenclature_NomenclatureId",
+                        name: "FK_NomenclatureDefectMappings_Nomenclatures_NomenclatureId",
                         column: x => x.NomenclatureId,
-                        principalTable: "Nomenclature",
+                        principalTable: "Nomenclatures",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_NomenclatureDefectMappings_Users_UserId",
                         column: x => x.UserId,
@@ -268,17 +322,20 @@ namespace RequestManagement.Server.Migrations
                         name: "FK_UserLastSelections_Commissions_CommissionsId",
                         column: x => x.CommissionsId,
                         principalTable: "Commissions",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserLastSelections_Drivers_DriverId",
                         column: x => x.DriverId,
                         principalTable: "Drivers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserLastSelections_Equipments_EquipmentId",
                         column: x => x.EquipmentId,
                         principalTable: "Equipments",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserLastSelections_Users_UserId",
                         column: x => x.UserId,
@@ -293,7 +350,7 @@ namespace RequestManagement.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Code = table.Column<string>(type: "text", nullable: true),
+                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     StockId = table.Column<int>(type: "integer", nullable: false),
                     Quantity = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     EquipmentId = table.Column<int>(type: "integer", nullable: false),
@@ -331,24 +388,33 @@ namespace RequestManagement.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Incoming",
+                name: "Incomings",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StockId = table.Column<int>(type: "integer", nullable: false),
-                    Quantity = table.Column<decimal>(type: "numeric", nullable: false),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Quantity = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DocType = table.Column<string>(type: "text", nullable: false),
+                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    ApplicationId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Incoming", x => x.Id);
+                    table.PrimaryKey("PK_Incomings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Incoming_Stocks_StockId",
+                        name: "FK_Incomings_Applications_ApplicationId",
+                        column: x => x.ApplicationId,
+                        principalTable: "Applications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Incomings_Stocks_StockId",
                         column: x => x.StockId,
                         principalTable: "Stocks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -356,33 +422,36 @@ namespace RequestManagement.Server.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Механические повреждения" },
-                    { 2, "Электрические неисправности" }
+                    { 1, "" },
+                    { 2, "Выпускная система" },
+                    { 3, "Гидравлика" },
+                    { 4, "ДВС" },
+                    { 5, "Коробка раздаточная" },
+                    { 6, "Кузов, кабина" },
+                    { 7, "Механизмы управления" },
+                    { 8, "Рабочее оборудование" },
+                    { 9, "Система охлаждения" },
+                    { 10, "Сцепление" },
+                    { 11, "Топливная система" },
+                    { 12, "Трансмиссия" },
+                    { 13, "Ходовая часть" },
+                    { 14, "Электрооборудование" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Drivers",
                 columns: new[] { "Id", "Code", "FullName", "Position", "ShortName" },
-                values: new object[,]
-                {
-                    { 1, "", "", "", "" },
-                    { 2, "", "Петров Петр Петрович", "Водитель", "Петров П.П." }
-                });
+                values: new object[] { 1, "", "", "", "" });
 
             migrationBuilder.InsertData(
                 table: "Equipments",
                 columns: new[] { "Id", "Code", "Name", "StateNumber" },
-                values: new object[] { 1, "", "КАМАЗ 53215-15", "Н 507 СН" });
+                values: new object[] { 1, "", "", "" });
 
             migrationBuilder.InsertData(
-                table: "Nomenclature",
+                table: "Nomenclatures",
                 columns: new[] { "Id", "Article", "Code", "Name", "UnitOfMeasure" },
-                values: new object[,]
-                {
-                    { 1, "7406.1118013", "ТКР001", "Турбокомпрессор ТКР 7С-6 левый КАМАЗ Евро 2", "шт" },
-                    { 2, "6СТ-190", "АКБ001", "Аккумулятор 6СТ-190", "шт" },
-                    { 3, "6СТ-200", "АКБ002", "Аккумулятор 6СТ-200 (аналог 6СТ-190)", "шт" }
-                });
+                values: new object[] { 1, "", "", "", "" });
 
             migrationBuilder.InsertData(
                 table: "Users",
@@ -390,48 +459,29 @@ namespace RequestManagement.Server.Migrations
                 values: new object[] { 1, "admin", "$2a$11$IeKuyvG/5SoDYP0NFz3kouC3CPUIuUa6ShTfgVVf9oUlfqbXq8LrC", 0 });
 
             migrationBuilder.InsertData(
-                table: "Warehouses",
-                columns: new[] { "Id", "Code", "LastUpdated", "Name" },
-                values: new object[,]
-                {
-                    { 1, "", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Основной склад" },
-                    { 2, "", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Резервный склад" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Commissions",
-                columns: new[] { "Id", "ApproveForActId", "ApproveForDefectAndLimitId", "ChairmanId", "Member1Id", "Member2Id", "Member3Id", "Member4Id", "Name" },
-                values: new object[] { 1, 1, 1, 1, 1, 1, 1, 1, "Магический филиал" });
+                table: "Applications",
+                columns: new[] { "Id", "Date", "EquipmentId", "Number", "ResponsibleId" },
+                values: new object[] { 1, new DateTime(2025, 4, 10, 0, 0, 0, 0, DateTimeKind.Utc), 1, "", 1 });
 
             migrationBuilder.InsertData(
                 table: "Defects",
                 columns: new[] { "Id", "DefectGroupId", "Name" },
-                values: new object[,]
-                {
-                    { 1, 1, "Трещина корпуса" },
-                    { 2, 2, "Короткое замыкание" }
-                });
+                values: new object[] { 1, 1, "" });
 
-            migrationBuilder.InsertData(
-                table: "Stocks",
-                columns: new[] { "Id", "ConsumedQuantity", "InitialQuantity", "NomenclatureId", "ReceivedQuantity", "WarehouseId" },
-                values: new object[,]
-                {
-                    { 1, 0m, 70m, 1, 0m, 1 },
-                    { 2, 0m, 10m, 2, 0m, 1 },
-                    { 3, 0m, 40m, 1, 0m, 2 },
-                    { 4, 0m, 20m, 2, 0m, 2 }
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_Applications_EquipmentId",
+                table: "Applications",
+                column: "EquipmentId");
 
-            migrationBuilder.InsertData(
-                table: "Expenses",
-                columns: new[] { "Id", "Code", "Date", "DefectId", "DriverId", "EquipmentId", "Quantity", "StockId" },
-                values: new object[] { 1, "", new DateTime(2025, 4, 12, 0, 0, 0, 0, DateTimeKind.Utc), 1, 1, 1, 5m, 1 });
+            migrationBuilder.CreateIndex(
+                name: "IX_Applications_Number",
+                table: "Applications",
+                column: "Number");
 
-            migrationBuilder.InsertData(
-                table: "Incoming",
-                columns: new[] { "Id", "Date", "Quantity", "StockId" },
-                values: new object[] { 1, new DateTime(2025, 4, 15, 0, 0, 0, 0, DateTimeKind.Utc), 5m, 1 });
+            migrationBuilder.CreateIndex(
+                name: "IX_Applications_ResponsibleId",
+                table: "Applications",
+                column: "ResponsibleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Commissions_ApproveForActId",
@@ -469,9 +519,34 @@ namespace RequestManagement.Server.Migrations
                 column: "Member4Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Commissions_Name",
+                table: "Commissions",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Defects_DefectGroupId",
                 table: "Defects",
                 column: "DefectGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Defects_Name",
+                table: "Defects",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Drivers_Code",
+                table: "Drivers",
+                column: "Code");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Equipments_Code",
+                table: "Equipments",
+                column: "Code");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Expenses_Date",
+                table: "Expenses",
+                column: "Date");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_DefectId",
@@ -494,9 +569,29 @@ namespace RequestManagement.Server.Migrations
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Incoming_StockId",
-                table: "Incoming",
+                name: "IX_Incomings_ApplicationId",
+                table: "Incomings",
+                column: "ApplicationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Incomings_Date",
+                table: "Incomings",
+                column: "Date");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Incomings_StockId",
+                table: "Incomings",
                 column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NomenclatureAnalogs_AnalogId",
+                table: "NomenclatureAnalogs",
+                column: "AnalogId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NomenclatureAnalogs_OriginalId_AnalogId",
+                table: "NomenclatureAnalogs",
+                columns: new[] { "OriginalId", "AnalogId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_NomenclatureDefectMappings_DefectId",
@@ -509,9 +604,14 @@ namespace RequestManagement.Server.Migrations
                 column: "NomenclatureId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NomenclatureDefectMappings_UserId",
+                name: "IX_NomenclatureDefectMappings_UserId_NomenclatureId",
                 table: "NomenclatureDefectMappings",
-                column: "UserId");
+                columns: new[] { "UserId", "NomenclatureId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Nomenclatures_Code",
+                table: "Nomenclatures",
+                column: "Code");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stocks_NomenclatureId",
@@ -519,9 +619,9 @@ namespace RequestManagement.Server.Migrations
                 column: "NomenclatureId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Stocks_WarehouseId",
+                name: "IX_Stocks_WarehouseId_NomenclatureId",
                 table: "Stocks",
-                column: "WarehouseId");
+                columns: new[] { "WarehouseId", "NomenclatureId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLastSelections_CommissionsId",
@@ -548,6 +648,11 @@ namespace RequestManagement.Server.Migrations
                 table: "Users",
                 column: "Login",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Warehouses_Name",
+                table: "Warehouses",
+                column: "Name");
         }
 
         /// <inheritdoc />
@@ -557,13 +662,19 @@ namespace RequestManagement.Server.Migrations
                 name: "Expenses");
 
             migrationBuilder.DropTable(
-                name: "Incoming");
+                name: "Incomings");
+
+            migrationBuilder.DropTable(
+                name: "NomenclatureAnalogs");
 
             migrationBuilder.DropTable(
                 name: "NomenclatureDefectMappings");
 
             migrationBuilder.DropTable(
                 name: "UserLastSelections");
+
+            migrationBuilder.DropTable(
+                name: "Applications");
 
             migrationBuilder.DropTable(
                 name: "Stocks");
@@ -575,13 +686,13 @@ namespace RequestManagement.Server.Migrations
                 name: "Commissions");
 
             migrationBuilder.DropTable(
-                name: "Equipments");
-
-            migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Nomenclature");
+                name: "Equipments");
+
+            migrationBuilder.DropTable(
+                name: "Nomenclatures");
 
             migrationBuilder.DropTable(
                 name: "Warehouses");

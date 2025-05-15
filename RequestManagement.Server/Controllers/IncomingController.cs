@@ -1,5 +1,7 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Models;
+using WpfClient.Models;
 
 namespace RequestManagement.Server.Controllers
 {
@@ -8,9 +10,42 @@ namespace RequestManagement.Server.Controllers
         private readonly IIncomingService _incomingService = incomingService ?? throw new ArgumentNullException(nameof(incomingService));
         private readonly ILogger<RequestController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-       
+        public override async Task<UploadMaterialIncomingResponse> UploadMaterialIncoming(UploadMaterialIncomingRequest request, ServerCallContext context)
+        {
+            var user = context.GetHttpContext().User;
+            if (user.Identity is { IsAuthenticated: false })
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+            }
 
-      
+            _logger.LogInformation("Upload incomings");
+            var result = await _incomingService.UploadIncomingsAsync(new MaterialIncoming
+            {
+                WarehouseName = request.WarehouseName,
+                Items = request.Items.Select(x=>new MaterialIncomingItem
+                {
+                    RegistratorNumber = x.RegistratorNumber,
+                    RegistratorType = x.RegistratorType,
+                    RegistratorDate = x.RegistratorDate,
+                    ReceiptOrderNumber = x.ReceiptOrderNumber,
+                    ReceiptOrderDate = x.ReceiptOrderDate,
+                    ApplicationNumber = x.ApplicationNumber,
+                    ApplicationDate = x.ApplicationDate,
+                    ApplicationResponsibleName = x.ApplicationResponsibleName,
+                    ApplicationEquipmentName = x.ApplicationEquipmentName,
+                    ApplicationEquipmentCode = x.ApplicationEquipmentCode,
+                    Items = x.Items.Select(c=>new MaterialStock
+                    {
+                        ItemName = c.Name,
+                        Code = c.Code,
+                        Article = c.Article,
+                        Unit = c.Unit,
+                        FinalBalance = c.FinalBalance
+                    }).ToList()
+                }).ToList()
+            });
+            return new UploadMaterialIncomingResponse { Success = result };
+        } 
 
         public override async Task<GetAllIncomingsResponse> GetAllIncomings(GetAllIncomingsRequest request, ServerCallContext context)
         {
@@ -23,34 +58,7 @@ namespace RequestManagement.Server.Controllers
             _logger.LogInformation("Getting all incomings");
 
             var incomingList = await _incomingService.GetAllIncomingsAsync(request.Filter,request.WarehouseId,request.FromDate,request.ToDate);
-            var response = new GetAllIncomingsResponse();
-            response.Incoming.AddRange(incomingList.Select(e => new Incoming
-            {
-                Id = e.Id,
-                Stock = new IncomingStock
-                {
-                    Id = e.StockId,
-                    Warehouse = new IncomingWarehouse
-                    {
-                        Id = e.Stock.Warehouse.Id,
-                        Name = e.Stock.Warehouse.Name
-                    },
-                    Nomenclature = new IncomingNomenclature
-                    {
-                        Id = e.Stock.Nomenclature.Id,
-                        Name = e.Stock.Nomenclature.Name,
-                        Code = e.Stock.Nomenclature.Code,
-                        UnitOfMeasure = e.Stock.Nomenclature.UnitOfMeasure,
-                        Article = e.Stock.Nomenclature.Article
-                    },
-                    InitialQuantity = (double)e.Stock.InitialQuantity,
-                    ReceivedQuantity = (double)e.Stock.ReceivedQuantity,
-                    ConsumedQuantity = (double)e.Stock.ConsumedQuantity
-                },
-                Quantity = (double)e.Quantity,
-                Date = e.Date.ToString("o") // ISO 8601 format
-            }));
-
+            var response = Converters.IncomingConverter.ToGrpc(incomingList);
             return response;
         }
 

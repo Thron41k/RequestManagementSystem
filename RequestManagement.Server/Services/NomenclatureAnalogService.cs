@@ -13,7 +13,7 @@ namespace RequestManagement.Server.Services
             try
             {
                 var allAnalogIds = await GetTransitiveAnalogIdsAsync(filter);
-                return await _dbContext.Nomenclature
+                return await _dbContext.Nomenclatures
                     .Where(n => allAnalogIds.Contains(n.Id) && n.Id != filter)
                     .Distinct()
                     .ToListAsync();
@@ -35,7 +35,7 @@ namespace RequestManagement.Server.Services
                 var currentId = queue.Dequeue();
 
                 // Находим все связанные ID (как оригиналы, так и аналоги)
-                var relatedIds = await _dbContext.NomenclatureAnalog
+                var relatedIds = await _dbContext.NomenclatureAnalogs
                     .Where(x => x.AnalogId == currentId || x.OriginalId == currentId)
                     .Select(x => x.OriginalId == currentId ? x.AnalogId : x.OriginalId)
                     .Distinct()
@@ -54,9 +54,9 @@ namespace RequestManagement.Server.Services
         {
             try
             {
-                var result = await _dbContext.NomenclatureAnalog.Where(x => (x.AnalogId == nomenclatureAnalog.AnalogId && x.OriginalId == nomenclatureAnalog.OriginalId) || (x.AnalogId == nomenclatureAnalog.OriginalId && x.OriginalId == nomenclatureAnalog.AnalogId)).FirstOrDefaultAsync();
+                var result = await _dbContext.NomenclatureAnalogs.Where(x => (x.AnalogId == nomenclatureAnalog.AnalogId && x.OriginalId == nomenclatureAnalog.OriginalId) || (x.AnalogId == nomenclatureAnalog.OriginalId && x.OriginalId == nomenclatureAnalog.AnalogId)).FirstOrDefaultAsync();
                 if (result != null) return result.Id;
-                _dbContext.NomenclatureAnalog.Add(nomenclatureAnalog);
+                _dbContext.NomenclatureAnalogs.Add(nomenclatureAnalog);
                 await _dbContext.SaveChangesAsync();
                 return nomenclatureAnalog.Id;
             }
@@ -71,9 +71,9 @@ namespace RequestManagement.Server.Services
         {
             try
             {
-                var result = await _dbContext.NomenclatureAnalog.Where(x => (x.AnalogId == analogId && x.OriginalId == originalId) || (x.AnalogId == originalId && x.OriginalId == analogId)).FirstOrDefaultAsync();
+                var result = await _dbContext.NomenclatureAnalogs.Where(x => (x.AnalogId == analogId && x.OriginalId == originalId) || (x.AnalogId == originalId && x.OriginalId == analogId)).FirstOrDefaultAsync();
                 if (result == null) return true;
-                _dbContext.NomenclatureAnalog.Remove(result);
+                _dbContext.NomenclatureAnalogs.Remove(result);
                 await _dbContext.SaveChangesAsync();
                 return true;
             }

@@ -20,6 +20,7 @@ namespace RequestManagement.Server.Services
 
         public async Task<bool> UpdateEquipmentAsync(Equipment equipment)
         {
+            if (equipment.Id == 1) return true;
             var existingEquipment = await _dbContext.Equipments
                 .FirstOrDefaultAsync(e => e.Id == equipment.Id);
 
@@ -37,6 +38,7 @@ namespace RequestManagement.Server.Services
         {
             try
             {
+                if (id == 1) return true;
                 var equipment = await _dbContext.Equipments
                 .FirstOrDefaultAsync(e => e.Id == id);
 
@@ -62,6 +64,7 @@ namespace RequestManagement.Server.Services
                 query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase) || e.StateNumber!.ToLower().Contains(phrase)));
             }
             return await query
+                .Where(x => x.Id != 1)
                 .Select(e => new Equipment
                 {
                     Id = e.Id,
@@ -145,6 +148,7 @@ namespace RequestManagement.Server.Services
                 query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase)));
             }
             return await query
+                .Where(x => x.Id != 1)
                 .Select(e => new DefectGroup
                 {
                     Id = e.Id,
@@ -160,6 +164,7 @@ namespace RequestManagement.Server.Services
         }
         public async Task<bool> UpdateDefectGroupAsync(DefectGroup defectGroup)
         {
+            if (defectGroup.Id == 1) return true;
             var existDefectGroup = await _dbContext.DefectGroups
                 .FirstOrDefaultAsync(e => e.Id == defectGroup.Id);
 
@@ -174,6 +179,7 @@ namespace RequestManagement.Server.Services
         {
             try
             {
+                if (id == 1) return true;
                 var defectGroup = await _dbContext.DefectGroups
                     .FirstOrDefaultAsync(e => e.Id == id);
 
@@ -199,6 +205,7 @@ namespace RequestManagement.Server.Services
                 query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase) || e.DefectGroup.Name.ToLower().Contains(phrase)));
             }
             return await query
+                .Where(x => x.Id != 1)
                 .Select(e => new Defect
                 {
                     Id = e.Id,
@@ -216,6 +223,7 @@ namespace RequestManagement.Server.Services
         }
         public async Task<bool> UpdateDefectAsync(Defect defect)
         {
+            if (defect.Id == 1) return true;
             var existDefect = await _dbContext.Defects
                 .FirstOrDefaultAsync(e => e.Id == defect.Id);
 
@@ -232,6 +240,7 @@ namespace RequestManagement.Server.Services
         {
             try
             {
+                if (id == 1) return true;
                 var defect = await _dbContext.Defects
                     .FirstOrDefaultAsync(e => e.Id == id);
 
@@ -250,13 +259,14 @@ namespace RequestManagement.Server.Services
 
         public async Task<List<Nomenclature>> GetAllNomenclaturesAsync(string filter = "")
         {
-            var query = _dbContext.Nomenclature.AsQueryable();
+            var query = _dbContext.Nomenclatures.AsQueryable();
             if (!string.IsNullOrWhiteSpace(filter))
             {
                 var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase) || e.Article.ToLower().Contains(phrase) || e.Code.ToLower().Contains(phrase) || e.UnitOfMeasure.ToLower().Contains(phrase)));
             }
             return await query
+                .Where(x=>x.Id!=1)
                 .Select(e => new Nomenclature
                 {
                     Id = e.Id,
@@ -270,14 +280,15 @@ namespace RequestManagement.Server.Services
 
         public async Task<int> CreateNomenclatureAsync(Nomenclature nomenclature)
         {
-            _dbContext.Nomenclature.Add(nomenclature);
+            _dbContext.Nomenclatures.Add(nomenclature);
             await _dbContext.SaveChangesAsync();
             return nomenclature.Id;
         }
 
         public async Task<bool> UpdateNomenclatureAsync(Nomenclature nomenclature)
         {
-            var existNomenclature = await _dbContext.Nomenclature
+            if(nomenclature.Id == 1) return true;
+            var existNomenclature = await _dbContext.Nomenclatures
                 .FirstOrDefaultAsync(e => e.Id == nomenclature.Id);
 
             if (existNomenclature == null)
@@ -295,13 +306,14 @@ namespace RequestManagement.Server.Services
         {
             try
             {
-                var nomenclature = await _dbContext.Nomenclature
+                if (id == 1) return true;
+                var nomenclature = await _dbContext.Nomenclatures
                     .FirstOrDefaultAsync(e => e.Id == id);
 
                 if (nomenclature == null)
                     return false;
 
-                _dbContext.Nomenclature.Remove(nomenclature);
+                _dbContext.Nomenclatures.Remove(nomenclature);
                 await _dbContext.SaveChangesAsync();
                 return true;
             }

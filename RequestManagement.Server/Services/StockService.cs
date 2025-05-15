@@ -98,7 +98,7 @@ namespace RequestManagement.Server.Services
             try
             {
                 // Получаем существующие номенклатуры и склады
-                var existingNomenclatures = await _dbContext.Nomenclature
+                var existingNomenclatures = await _dbContext.Nomenclatures
                     .Where(n => materials.Select(m => m.Code).Contains(n.Code) &&
                                 materials.Select(m => m.Article).Contains(n.Article) &&
                                 materials.Select(m => m.ItemName).Contains(n.Name) &&
@@ -135,7 +135,7 @@ namespace RequestManagement.Server.Services
                             Article = material.Article,
                             UnitOfMeasure = material.Unit
                         };
-                        _dbContext.Nomenclature.Add(newNomenclature);
+                        _dbContext.Nomenclatures.Add(newNomenclature);
                         await _dbContext.SaveChangesAsync();
                         nomenclatureId = newNomenclature.Id;
                         existingNomenclatures[nomenclatureKey] = nomenclatureId;
@@ -148,7 +148,7 @@ namespace RequestManagement.Server.Services
                         existingStock.InitialQuantity = (decimal)material.FinalBalance;
 
                         // Пересчитываем ReceivedQuantity и ConsumedQuantity
-                        var receivedQuantity = await _dbContext.Incoming
+                        var receivedQuantity = await _dbContext.Incomings
                             .Where(i => i.StockId == existingStock.Id && i.Date >= date)
                             .SumAsync(i => i.Quantity);
 

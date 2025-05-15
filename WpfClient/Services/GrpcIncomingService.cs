@@ -1,10 +1,11 @@
 ﻿using System.Globalization;
 using RequestManagement.Common.Interfaces;
 using Grpc.Core;
+using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
 using WpfClient.Services.Interfaces;
 using Incoming = RequestManagement.Common.Models.Incoming;
-using Stock = RequestManagement.Common.Models.Stock;
+using WpfClient.Converters;
 
 namespace WpfClient.Services;
 
@@ -26,35 +27,52 @@ internal class GrpcIncomingService(IGrpcClientFactory clientFactory, AuthTokenSt
                 FromDate = requestFromDate,
                 ToDate = requestToDate
             }, headers);
-        return response.Incoming.Select(incoming => new Incoming
+        return IncomingConverter.FromGrpc(response).ToList();
+    }
+
+    public async Task<bool> UploadIncomingsAsync(MaterialIncoming incoming)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
         {
-            Id = incoming.Id,
-            StockId = incoming.Stock.Id,
-            Stock = new Stock
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateIncomingClient();
+        var newList = new List<IncomingMaterialItem>();
+        foreach (var item in incoming.Items)
+        {
+            var newItem = new IncomingMaterialItem
             {
-                Id = incoming.Stock.Id,
-                WarehouseId = incoming.Stock.Warehouse.Id,
-                Warehouse = new RequestManagement.Common.Models.Warehouse
+                RegistratorNumber = item.RegistratorNumber,
+                RegistratorType = item.RegistratorType,
+                RegistratorDate = item.RegistratorDate,
+                ReceiptOrderNumber = item.ReceiptOrderNumber ?? "",
+                ReceiptOrderDate = item.ReceiptOrderDate ?? "",
+                ApplicationNumber = item.ApplicationNumber ?? "",
+                ApplicationDate = item.ApplicationDate ?? "",
+                ApplicationResponsibleName = item.ApplicationResponsibleName ?? "",
+                ApplicationEquipmentName = item.ApplicationEquipmentName ?? "",
+                ApplicationEquipmentCode = item.ApplicationEquipmentCode ?? "",
+            };
+            foreach (var i in item.Items)
+            {
+                newItem.Items.Add(new IncomingMaterialStockMessage
                 {
-                    Id = incoming.Stock.Warehouse.Id,
-                    Name = incoming.Stock.Warehouse.Name
-                },
-                NomenclatureId = incoming.Stock.Nomenclature.Id,
-                Nomenclature = new RequestManagement.Common.Models.Nomenclature
-                {
-                    Id = incoming.Stock.Nomenclature.Id,
-                    Name = incoming.Stock.Nomenclature.Name,
-                    Code = incoming.Stock.Nomenclature.Code,
-                    Article = incoming.Stock.Nomenclature.Article,
-                    UnitOfMeasure = incoming.Stock.Nomenclature.UnitOfMeasure
-                },
-                InitialQuantity = (decimal)incoming.Stock.InitialQuantity,
-                ReceivedQuantity = (decimal)incoming.Stock.ReceivedQuantity,
-                ConsumedQuantity = (decimal)incoming.Stock.ConsumedQuantity
-            },
-            Date = Convert.ToDateTime(incoming.Date),
-            Quantity = (decimal)incoming.Quantity
-        }).ToList();
+                    Name = i.ItemName,
+                    Code = i.Code,
+                    Article = i.Article ?? "",
+                    Unit = i.Unit,
+                    FinalBalance = i.FinalBalance
+                });
+            }
+            newList.Add(newItem);
+        }
+        var result = await client.UploadMaterialIncomingAsync(new UploadMaterialIncomingRequest
+        {
+            WarehouseName = incoming.WarehouseName,
+            Items = { newList }
+        }, headers);
+        return result.Success;
     }
 
     public async Task<Incoming> CreateIncomingAsync(Incoming incoming)

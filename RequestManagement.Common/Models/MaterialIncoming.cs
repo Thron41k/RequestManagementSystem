@@ -23,7 +23,6 @@ namespace RequestManagement.Common.Models
         public string ApplicationNumber { get; set; }
         public string ApplicationDate { get; set; } 
         public string ApplicationResponsibleName { get; set; }
-        public string ApplicationResponsibleCode { get; set; }
         public string ApplicationEquipmentName { get; set; }
         public string ApplicationEquipmentCode { get; set; }
         public List<MaterialStock> Items { get; set; }

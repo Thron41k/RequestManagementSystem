@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
+using RequestManagement.Common.Utilities;
 using RequestManagement.Server.Data;
+using System.Diagnostics;
 
 namespace RequestManagement.Server.Services
 {
@@ -9,18 +12,25 @@ namespace RequestManagement.Server.Services
     {
         public async Task<List<Incoming>> GetAllIncomingsAsync(string filter, int requestWarehouseId,  string requestFromDate, string requestToDate)
         {
-            var query = dbContext.Incoming
+            var query = dbContext.Incomings
                 .Include(e => e.Stock)
                 .ThenInclude(s => s.Nomenclature)
                 .Include(e => e.Stock)
                 .ThenInclude(s => s.Warehouse)
+                .Include(e => e.Application)
+                .ThenInclude(s => s!.Responsible)
+                .Include(e => e.Application)
+                .ThenInclude(s => s!.Equipment)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                query = query.Where(e => EF.Functions.Like(e.Stock.Nomenclature.Name, $"%{filter}%") ||
-                                         EF.Functions.Like(e.Stock.Nomenclature.Article, $"%{filter}%") ||
-                                         EF.Functions.Like(e.Stock.Nomenclature.Code, $"%{filter}%"));
+
+                query = query.Where(e =>EF.Functions.ILike(e.Code, $"%{filter}%") || 
+                                             EF.Functions.ILike(e.Application!.Number, $"%{filter}%") ||
+                                             EF.Functions.ILike(e.Stock.Nomenclature.Name, $"%{filter}%") ||
+                                             EF.Functions.ILike(e.Stock.Nomenclature.Article!, $"%{filter}%") ||
+                                             EF.Functions.ILike(e.Stock.Nomenclature.Code, $"%{filter}%"));
             }
             if (requestWarehouseId != 0)
             {
@@ -45,6 +55,363 @@ namespace RequestManagement.Server.Services
             }
             return await query.ToListAsync();
         }
+
+        public async Task<bool> UploadIncomingsAsync(MaterialIncoming incoming)
+        {
+            if (incoming == null || incoming.Items == null || !incoming.Items.Any())
+            {
+                //logger.LogWarning("Некорректный ввод: incoming равен null или не содержит элементов.");
+                return false;
+            }
+
+            var stopwatch = Stopwatch.StartNew();
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var warehouse = await dbContext.Warehouses
+                    .FirstOrDefaultAsync(w => w.Name == incoming.WarehouseName);
+
+                if (warehouse == null)
+                {
+                    warehouse = new Warehouse
+                    {
+                        Name = incoming.WarehouseName,
+                        Code = string.Empty,
+                        LastUpdated = DateTime.UtcNow
+                    };
+                    dbContext.Warehouses.Add(warehouse);
+                    await dbContext.SaveChangesAsync();
+                    //logger.LogInformation("Создан новый склад: {WarehouseName}", warehouse.Name);
+                }
+
+                var driverNames = incoming.Items
+                    .Select(i => i.ApplicationResponsibleName)
+                    .Where(name => !string.IsNullOrEmpty(name))
+                    .Distinct()
+                    .ToHashSet();
+
+                var equipmentCodes = incoming.Items
+                    .Select(i => i.ApplicationEquipmentCode)
+                    .Where(code => !string.IsNullOrEmpty(code))
+                    .Distinct()
+                    .ToHashSet();
+
+                var nomenclatureKeys = incoming.Items
+                    .SelectMany(i => i.Items)
+                    .Select(m => (m.Code, m.Article, m.ItemName, m.Unit))
+                    .Distinct()
+                    .ToList();
+
+                var codes = nomenclatureKeys.Select(k => k.Code).ToHashSet();
+                var articles = nomenclatureKeys.Select(k => k.Article).ToHashSet();
+                var names = nomenclatureKeys.Select(k => k.ItemName).ToHashSet();
+                var units = nomenclatureKeys.Select(k => k.Unit).ToHashSet();
+
+               //logger.LogInformation("Подготовлены списки: Drivers={DriverCount}, Equipments={EquipmentCount}, Nomenclatures={NomenclatureCount}",
+                 //   driverNames.Count, equipmentCodes.Count, nomenclatureKeys.Count);
+
+                var existingDrivers = driverNames.Any()
+                    ? await dbContext.Drivers
+                        .Where(d => driverNames.Contains(d.FullName))
+                        .ToDictionaryAsync(d => d.FullName)
+                    : new Dictionary<string, Driver>();
+
+                var existingEquipments = equipmentCodes.Any()
+                    ? await dbContext.Equipments
+                        .Where(e => equipmentCodes.Contains(e.Code))
+                        .ToDictionaryAsync(e => e.Code)
+                    : new Dictionary<string, Equipment>();
+
+                Dictionary<(string, string, string, string), Nomenclature> existingNomenclatures;
+                if (!codes.Any() || !names.Any() || !units.Any())
+                {
+                    //logger.LogWarning("Один из списков (codes, names, units) пуст. Пропускаем загрузку Nomenclatures.");
+                    existingNomenclatures = new Dictionary<(string, string, string, string), Nomenclature>();
+                }
+                else
+                {
+                    const int batchSize = 1000;
+                    var existingNomenclaturesList = new List<Nomenclature>();
+                    for (int i = 0; i < codes.Count; i += batchSize)
+                    {
+                        var batchCodes = codes.Skip(i).Take(batchSize).ToList();
+                        var batchArticles = articles.Skip(i).Take(batchSize).ToList();
+                        var batchNames = names.Skip(i).Take(batchSize).ToList();
+                        var batchUnits = units.Skip(i).Take(batchSize).ToList();
+
+                        var batchNomenclatures = await dbContext.Nomenclatures
+                            .Where(n => batchCodes.Contains(n.Code) &&
+                                        (n.Article == null ? batchArticles.Contains(null) : batchArticles.Contains(n.Article)) &&
+                                        batchNames.Contains(n.Name) &&
+                                        batchUnits.Contains(n.UnitOfMeasure))
+                            .ToListAsync();
+
+                        existingNomenclaturesList.AddRange(batchNomenclatures);
+                    }
+                    existingNomenclatures = existingNomenclaturesList
+                        .ToDictionary(n => (n.Code, n.Article ?? string.Empty, n.Name, n.UnitOfMeasure), n => n);
+                }
+
+                // 3. Создаем новые Drivers и сохраняем их
+                var newDrivers = new List<Driver>();
+                foreach (var name in driverNames)
+                {
+                    if (!existingDrivers.ContainsKey(name))
+                    {
+                        var driver = new Driver
+                        {
+                            Code = string.Empty,
+                            FullName = name,
+                            ShortName = NameFormatter.FormatToShortName(name),
+                            Position = string.Empty
+                        };
+                        newDrivers.Add(driver);
+                        existingDrivers[name] = driver;
+                    }
+                }
+                if (newDrivers.Any())
+                {
+                    await dbContext.Drivers.AddRangeAsync(newDrivers);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                // 4. Создаем новые Equipments и сохраняем их
+                var newEquipments = new List<Equipment>();
+                foreach (var code in equipmentCodes)
+                {
+                    if (!existingEquipments.ContainsKey(code))
+                    {
+                        var equipment = new Equipment
+                        {
+                            Code = code,
+                            Name = incoming.Items.FirstOrDefault(i => i.ApplicationEquipmentCode == code)?.ApplicationEquipmentName ?? string.Empty,
+                            StateNumber = string.Empty
+                        };
+                        newEquipments.Add(equipment);
+                        existingEquipments[code] = equipment;
+                    }
+                }
+                if (newEquipments.Any())
+                {
+                    await dbContext.Equipments.AddRangeAsync(newEquipments);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                // 5. Создаем новые Nomenclatures и сохраняем их
+                var newNomenclatures = new List<Nomenclature>();
+                foreach (var key in nomenclatureKeys)
+                {
+                    if (!existingNomenclatures.ContainsKey(key))
+                    {
+                        var nomenclature = new Nomenclature
+                        {
+                            Code = key.Code,
+                            Name = key.ItemName,
+                            Article = key.Article,
+                            UnitOfMeasure = key.Unit
+                        };
+                        newNomenclatures.Add(nomenclature);
+                        existingNomenclatures[key] = nomenclature;
+                    }
+                }
+                if (newNomenclatures.Any())
+                {
+                    await dbContext.Nomenclatures.AddRangeAsync(newNomenclatures);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                // 6. Подготавливаем Applications
+                var applicationKeys = incoming.Items
+                    .Where(i => !string.IsNullOrEmpty(i.ApplicationNumber) && !string.IsNullOrEmpty(i.ApplicationDate))
+                    .Select(i => (Number: i.ApplicationNumber, Date: DateTime.TryParse(i.ApplicationDate, out var date) ? date : (DateTime?)null))
+                    .Where(a => a.Date.HasValue)
+                    .Distinct()
+                    .ToList();
+
+                var existingApplications = applicationKeys.Any()
+                    ? await dbContext.Applications
+                        .Where(a => applicationKeys.Select(k => k.Number).Contains(a.Number) &&
+                                    applicationKeys.Select(k => k.Date!.Value).Contains(a.Date))
+                        .ToDictionaryAsync(a => (a.Number, a.Date))
+                    : new Dictionary<(string, DateTime), Application>();
+
+                var newApplications = new List<Application>();
+                foreach (var item in incoming.Items)
+                {
+                    if (string.IsNullOrEmpty(item.ApplicationNumber) || string.IsNullOrEmpty(item.ApplicationDate) ||
+                        !DateTime.TryParse(item.ApplicationDate, out var applicationDate))
+                    {
+                        continue;
+                    }
+
+                    var appKey = (item.ApplicationNumber, applicationDate);
+                    if (!existingApplications.ContainsKey(appKey))
+                    {
+                        int responsibleId = 1;
+                        if (!string.IsNullOrEmpty(item.ApplicationResponsibleName) &&
+                            existingDrivers.TryGetValue(item.ApplicationResponsibleName, out var responsible))
+                        {
+                            responsibleId = responsible.Id;
+                        }
+
+                        int equipmentId = 1;
+                        if (!string.IsNullOrEmpty(item.ApplicationEquipmentCode) &&
+                            existingEquipments.TryGetValue(item.ApplicationEquipmentCode, out var equipment))
+                        {
+                            equipmentId = equipment.Id;
+                        }
+
+                        var application = new Application
+                        {
+                            Number = item.ApplicationNumber,
+                            Date = applicationDate,
+                            ResponsibleId = responsibleId,
+                            EquipmentId = equipmentId
+                        };
+                        newApplications.Add(application);
+                        existingApplications[appKey] = application;
+                    }
+                }
+                if (newApplications.Any())
+                {
+                    await dbContext.Applications.AddRangeAsync(newApplications);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                // 7. Создаем Stocks и сохраняем их
+                var existingStocks = await dbContext.Stocks
+                    .Where(s => s.WarehouseId == warehouse.Id)
+                    .ToDictionaryAsync(s => (s.NomenclatureId, s.WarehouseId), s => s);
+
+                var newStocks = new List<Stock>();
+                var stockMappings = new Dictionary<(int NomenclatureId, int WarehouseId), Stock>();
+
+                foreach (var item in incoming.Items)
+                {
+                    foreach (var material in item.Items)
+                    {
+                        var nomenclatureKey = (material.Code, material.Article, material.ItemName, material.Unit);
+                        if (!existingNomenclatures.TryGetValue(nomenclatureKey, out var nomenclature))
+                        {
+                            //logger.LogWarning("Номенклатура с ключом {NomenclatureKey} не найдена после сохранения.", nomenclatureKey);
+                            continue;
+                        }
+
+                        var stockKey = (nomenclature.Id, warehouse.Id);
+                        if (!existingStocks.TryGetValue(stockKey, out var stock) && !stockMappings.TryGetValue(stockKey, out stock))
+                        {
+                            stock = new Stock
+                            {
+                                WarehouseId = warehouse.Id,
+                                NomenclatureId = nomenclature.Id,
+                                InitialQuantity = 0,
+                                ReceivedQuantity = 0,
+                                ConsumedQuantity = 0
+                            };
+                            newStocks.Add(stock);
+                            stockMappings[stockKey] = stock;
+                        }
+                    }
+                }
+
+                if (newStocks.Any())
+                {
+                    await dbContext.Stocks.AddRangeAsync(newStocks);
+                    await dbContext.SaveChangesAsync();
+                    // Обновляем existingStocks после сохранения
+                    foreach (var stock in newStocks)
+                    {
+                        var stockKey = (stock.NomenclatureId, stock.WarehouseId);
+                        existingStocks[stockKey] = stock;
+                    }
+                }
+
+                // 8. Создаем Incomings
+                var newIncomings = new List<Incoming>();
+                foreach (var item in incoming.Items)
+                {
+                    Application? application = null;
+                    if (!string.IsNullOrEmpty(item.ApplicationNumber) && !string.IsNullOrEmpty(item.ApplicationDate) &&
+                        DateTime.TryParse(item.ApplicationDate, out var applicationDate))
+                    {
+                        var appKey = (item.ApplicationNumber, applicationDate);
+                        existingApplications.TryGetValue(appKey, out application);
+                    }
+
+                    foreach (var material in item.Items)
+                    {
+                        var nomenclatureKey = (material.Code, material.Article, material.ItemName, material.Unit);
+                        if (!existingNomenclatures.TryGetValue(nomenclatureKey, out var nomenclature))
+                        {
+                            //logger.LogWarning("Номенклатура с ключом {NomenclatureKey} не найдена.", nomenclatureKey);
+                            continue;
+                        }
+
+                        var stockKey = (nomenclature.Id, warehouse.Id);
+                        if (!existingStocks.TryGetValue(stockKey, out var stock))
+                        {
+                            //logger.LogWarning("Запас с ключом {StockKey} не найден для номенклатуры {NomenclatureId}.", stockKey, nomenclature.Id);
+                            continue;
+                        }
+
+                        string incomingCode;
+                        DateTime incomingDate;
+                        string incomingType;
+                        if (!string.IsNullOrEmpty(item.ReceiptOrderNumber) &&
+                            !string.IsNullOrEmpty(item.ReceiptOrderDate) &&
+                            DateTime.TryParse(item.ReceiptOrderDate, out var receiptOrderDate))
+                        {
+                            incomingCode = item.ReceiptOrderNumber;
+                            incomingDate = receiptOrderDate;
+                            incomingType = "Приходный ордер";
+                        }
+                        else
+                        {
+                            incomingCode = item.RegistratorNumber ?? $"AUTO_{Guid.NewGuid().ToString("N")[..8]}";
+                            incomingDate = DateTime.TryParse(item.RegistratorDate, out var registratorDate)
+                                ? registratorDate
+                                : DateTime.UtcNow;
+                            incomingType = item.RegistratorType;
+                        }
+
+                        var incomingEntry = new Incoming
+                        {
+                            StockId = stock.Id,
+                            Quantity = (decimal)material.FinalBalance,
+                            Date = incomingDate,
+                            Code = incomingCode,
+                            DocType = incomingType,
+                            ApplicationId = application?.Id ?? 1
+                        };
+                        stock.ReceivedQuantity += incomingEntry.Quantity;
+                        newIncomings.Add(incomingEntry);
+                    }
+                }
+
+                // Сохраняем Incomings
+                if (newIncomings.Any())
+                {
+                    await dbContext.Incomings.AddRangeAsync(newIncomings);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                // Коммитим транзакцию
+                await transaction.CommitAsync();
+
+                stopwatch.Stop();
+                //logger.LogInformation("Успешно загружены поступления для склада {WarehouseName}. Время: {ElapsedMs} мс, Incomings: {IncomingCount}",
+                //    warehouse.Name, stopwatch.ElapsedMilliseconds, newIncomings.Count);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                //logger.LogError(ex, "Ошибка в UploadIncomingsAsync для склада {WarehouseName}", incoming?.WarehouseName);
+                return false;
+            }
+        }
+
         public async Task<Incoming> CreateIncomingAsync(Incoming incoming)
         {
             try
@@ -63,7 +430,7 @@ namespace RequestManagement.Server.Services
                 // Обновление ReceivedQuantity
                 stock.ReceivedQuantity += incoming.Quantity;
 
-                dbContext.Incoming.Add(incoming);
+                dbContext.Incomings.Add(incoming);
                 await dbContext.SaveChangesAsync();
 
                 return incoming;
@@ -78,7 +445,7 @@ namespace RequestManagement.Server.Services
         {
             if (incoming == null) throw new ArgumentNullException(nameof(incoming));
 
-            var existingIncoming = await dbContext.Incoming
+            var existingIncoming = await dbContext.Incomings
                 .FirstOrDefaultAsync(e => e.Id == incoming.Id);
 
             if (existingIncoming == null)
@@ -96,10 +463,8 @@ namespace RequestManagement.Server.Services
             {
                 throw new InvalidOperationException("Stock with the given ID does not exist.");
             }
-
-            // Корректировка ReceivedQuantity
-            oldStock.ReceivedQuantity -= existingIncoming.Quantity; // Убираем старое значение
-            newStock.ReceivedQuantity += incoming.Quantity; // Добавляем новое значение
+            oldStock.ReceivedQuantity -= existingIncoming.Quantity;
+            newStock.ReceivedQuantity += incoming.Quantity;
 
             existingIncoming.StockId = incoming.StockId;
             existingIncoming.Quantity = incoming.Quantity;
@@ -110,7 +475,7 @@ namespace RequestManagement.Server.Services
         }
         public async Task<bool> DeleteIncomingAsync(int id)
         {
-            var incoming = await dbContext.Incoming
+            var incoming = await dbContext.Incomings
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (incoming == null)
@@ -130,7 +495,7 @@ namespace RequestManagement.Server.Services
             // Уменьшение ReceivedQuantity
             stock.ReceivedQuantity -= incoming.Quantity;
 
-            dbContext.Incoming.Remove(incoming);
+            dbContext.Incomings.Remove(incoming);
             await dbContext.SaveChangesAsync();
             return true;
         }
@@ -139,7 +504,7 @@ namespace RequestManagement.Server.Services
 
         public async Task<bool> DeleteIncomingsAsync(List<int> requestIds)
         {
-            var incomings = await dbContext.Incoming
+            var incomings = await dbContext.Incomings
                 .Where(e => requestIds.Contains(e.Id))
                 .Include(e => e.Stock)
                 .ToListAsync();
@@ -152,7 +517,7 @@ namespace RequestManagement.Server.Services
             {
                 incoming.Stock.ReceivedQuantity -= incoming.Quantity;
             }
-            dbContext.Incoming.RemoveRange(incomings);
+            dbContext.Incomings.RemoveRange(incomings);
             var deletedCount = await dbContext.SaveChangesAsync();
             return deletedCount > 0;
         }

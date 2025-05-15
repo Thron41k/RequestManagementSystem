@@ -18,14 +18,19 @@ public partial class IncomingListViewModel : ObservableObject
     private readonly IMessageBus _messageBus;
     private readonly IIncomingService _incomingService;
     private readonly System.Timers.Timer _filterTimer;
-    [ObservableProperty] private CollectionViewSource _incomingsViewSource;
-    [ObservableProperty] private Incoming? _selectedIncoming = new();
+    private List<Incoming> _incomings = [];
+    [ObservableProperty] private CollectionViewSource _incomingsDocsViewSource;
+    [ObservableProperty] private ObservableCollection<Incoming> _incomingsDocs = [];
+    [ObservableProperty] private CollectionViewSource _incomingsItemsViewSource;
+    [ObservableProperty] private ObservableCollection<Incoming> _incomingsItems = [];
+    [ObservableProperty] private Incoming? _selectedIncomingDoc = new();
+    [ObservableProperty] private Incoming? _selectedIncomingItem = new();
     [ObservableProperty] private Warehouse _selectedWarehouse = new();
-    [ObservableProperty] private ObservableCollection<Incoming> _incomings = [];
     [ObservableProperty] private string _menuDeleteItemText = "Удалить отмеченные";
     [ObservableProperty] private string _searchText = "";
     [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.04.2025");
     [ObservableProperty] private DateTime _toDate = DateTime.Parse("30.04.2025");
+    [ObservableProperty] private int _notificationCount = 0;
     public IncomingListViewModel() { }
 
     public IncomingListViewModel(IMessageBus messageBus, IIncomingService incomingService)
@@ -33,7 +38,8 @@ public partial class IncomingListViewModel : ObservableObject
         _messageBus = messageBus;
         _incomingService = incomingService;
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
-        _incomingsViewSource = new CollectionViewSource { Source = Incomings };
+        _incomingsDocsViewSource = new CollectionViewSource { Source = _incomingsDocs };
+        IncomingsItemsViewSource = new CollectionViewSource { Source = _incomingsItems };
         var dispatcher = Dispatcher.CurrentDispatcher;
         _filterTimer = new System.Timers.Timer(1000) { AutoReset = false };
         _filterTimer.Elapsed += async (_, _) =>
@@ -59,81 +65,87 @@ public partial class IncomingListViewModel : ObservableObject
     [RelayCommand]
     private async Task IncomingDeleteAsync()
     {
-        if (SelectedIncoming != null)
-        {
-            var result = await _incomingService.DeleteIncomingAsync(SelectedIncoming.Id);
-            if (result)
-            {
-                await LoadIncomingsAsync();
-            }
-        }
+        //if (SelectedIncoming != null)
+        //{
+        //    var result = await _incomingService.DeleteIncomingAsync(SelectedIncoming.Id);
+        //    if (result)
+        //    {
+        //        await LoadIncomingsAsync();
+        //    }
+        //}
+    }
+
+    partial void OnNotificationCountChanged(int value)
+    {
+        Console.WriteLine(value);
     }
     [RelayCommand]
     private async Task IncomingDeleteRangeAsync()
     {
-        var list = Incomings.Where(x => x.IsSelected).Select(x => x.Id).ToList();
-        if (list.Count > 0)
-        {
-            var result = await _incomingService.DeleteIncomingsAsync(list);
-            if (result)
-            {
-                await LoadIncomingsAsync();
-            }
-        }
+        //var list = Incomings.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        //if (list.Count > 0)
+        //{
+        //    var result = await _incomingService.DeleteIncomingsAsync(list);
+        //    if (result)
+        //    {
+        //        await LoadIncomingsAsync();
+        //    }
+        //}
     }
     [RelayCommand]
     private void SelectAll()
     {
-        foreach (var incoming in Incomings)
-        {
-            incoming.IsSelected = true;
-        }
+        //foreach (var incoming in Incomings)
+        //{
+        //    incoming.IsSelected = true;
+        //}
 
-        IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
-        IncomingListCheckedUpdate();
+        //IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
+        //IncomingListCheckedUpdate();
+        NotificationCount++;
     }
     [RelayCommand]
     private void DeselectAll()
     {
-        foreach (var incoming in Incomings)
-        {
-            incoming.IsSelected = false;
-        }
-        IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
-        IncomingListCheckedUpdate();
+        //foreach (var incoming in Incomings)
+        //{
+        //    incoming.IsSelected = false;
+        //}
+        //IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
+        //IncomingListCheckedUpdate();
     }
     [RelayCommand]
     private void InvertSelected()
     {
-        foreach (var incoming in Incomings)
-        {
-            incoming.IsSelected = !incoming.IsSelected;
-        }
-        IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
-        IncomingListCheckedUpdate();
+        //foreach (var incoming in Incomings)
+        //{
+        //    incoming.IsSelected = !incoming.IsSelected;
+        //}
+        //IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
+        //IncomingListCheckedUpdate();
     }
     [RelayCommand]
     private async Task DoubleClick()
     {
-        if (SelectedIncoming != null)
-        {
-            //await _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(ExpenseListViewModel), true, SelectedExpense.Id, SelectedExpense.Date, SelectedExpense.Quantity, SelectedExpense.Stock, SelectedExpense.Equipment, SelectedExpense.Driver, SelectedExpense.Defect));
-        }
+        //if (SelectedIncoming != null)
+        //{
+        //    //await _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(ExpenseListViewModel), true, SelectedExpense.Id, SelectedExpense.Date, SelectedExpense.Quantity, SelectedExpense.Stock, SelectedExpense.Equipment, SelectedExpense.Driver, SelectedExpense.Defect));
+        //}
     }
     [RelayCommand]
     private async Task LoadIncomingsAsync()
     {
         if (!ValidateDates()) return;
         if (SelectedWarehouse.Id == 0) return;
-        var currentSortDescriptions = IncomingsViewSource.View?.SortDescriptions.ToList() ?? [];
-        var incomingList = await _incomingService.GetAllIncomingsAsync(SearchText, SelectedWarehouse.Id, FromDate.ToString(CultureInfo.CurrentCulture), ToDate.ToString(CultureInfo.CurrentCulture));
-        Incomings = new ObservableCollection<Incoming>(incomingList);
-        IncomingsViewSource.Source = Incomings;
+        var currentSortDescriptions = IncomingsDocsViewSource.View?.SortDescriptions.ToList() ?? [];
+        _incomings = await _incomingService.GetAllIncomingsAsync(SearchText, SelectedWarehouse.Id, FromDate.ToString(CultureInfo.CurrentCulture), ToDate.ToString(CultureInfo.CurrentCulture));
+        IncomingsDocs = new ObservableCollection<Incoming>(_incomings.DistinctBy(x=>x.Code));
+        IncomingsDocsViewSource.Source = IncomingsDocs;
         if (currentSortDescriptions.Any())
         {
             foreach (var sortDescription in currentSortDescriptions)
             {
-                IncomingsViewSource.View?.SortDescriptions.Add(sortDescription);
+                IncomingsDocsViewSource.View?.SortDescriptions.Add(sortDescription);
             }
         }
         IncomingListCheckedUpdate();
@@ -141,7 +153,7 @@ public partial class IncomingListViewModel : ObservableObject
     [RelayCommand]
     private void IncomingListCheckedUpdate()
     {
-        MenuDeleteItemText = $"Удалить отмеченные({Incomings.Count(x => x.IsSelected)})";
+       // MenuDeleteItemText = $"Удалить отмеченные({Incomings.Count(x => x.IsSelected)})";
     }
     [RelayCommand]
     private async Task SelectWarehouse()
@@ -164,6 +176,12 @@ public partial class IncomingListViewModel : ObservableObject
     {
         _filterTimer.Stop();
         _filterTimer.Start();
+    }
+
+    partial void OnSelectedIncomingDocChanged(Incoming? value)
+    {
+        _incomingsItems = new ObservableCollection<Incoming>(_incomings.Where(x=>x.Code == value?.Code));
+        IncomingsItemsViewSource.Source = _incomingsItems;
     }
     private bool ValidateDates()
     {

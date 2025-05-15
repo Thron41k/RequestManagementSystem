@@ -13,6 +13,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/TextBoxClearButton.xaml" />
+                <ResourceDictionary Source="Styles/BadgedButtonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -22,7 +23,7 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
@@ -67,44 +68,60 @@
                         <behaviors:MouseClickCommandBehavior/>
                     </b:Interaction.Behaviors>
                 </TextBox>
+                <Button Command="{Binding SelectAllCommand}"  Content="Печать этикеток" Margin="30,0,0,0" Style="{StaticResource BadgedButtonStyle}" DataContext="{Binding}">
+
+                </Button>
             </StackPanel>
         </Grid>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding IncomingsViewSource.View}" SelectedItem="{Binding SelectedIncoming}"
-                  AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow" Name="IncomingListDataGrid">
-            <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
-            </DataGrid.Resources>
-            <DataGrid.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Редактировать" Command="{Binding DoubleClickCommand}"/>
-                    <MenuItem Header="Отметить все" Command="{Binding SelectAllCommand}"/>
-                    <MenuItem Header="Снять отметки со всех" Command="{Binding DeselectAllCommand}"/>
-                    <MenuItem Header="Инвертировать отметки" Command="{Binding InvertSelectedCommand}"/>
-                    <MenuItem Header="Удалить выбранный" Command="{Binding IncomingDeleteCommand}"/>
-                    <MenuItem Header="{Binding MenuDeleteItemText}" Command="{Binding IncomingDeleteRangeCommand}"/>
-                </ContextMenu>
-            </DataGrid.ContextMenu>
-            <DataGrid.InputBindings>
-                <MouseBinding
-                    MouseAction="LeftDoubleClick"
-                    Command="{Binding DoubleClickCommand}"
-                    CommandParameter="{Binding Incomings/}"/>
-            </DataGrid.InputBindings>
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="" SortMemberPath="IsSelected" CanUserSort="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Command="{Binding DataContext.IncomingListCheckedUpdateCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="80" />
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Ед.изм." Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="50" />
-                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="70" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <DataGrid Grid.Row="0" ItemsSource="{Binding IncomingsDocsViewSource.View}" SelectedItem="{Binding SelectedIncomingDoc}"
+                          AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Тип документа" Binding="{Binding DocType}" IsReadOnly="True" Width="Auto" />
+                    <DataGridTextColumn Header="Номер документа" Binding="{Binding Code}" IsReadOnly="True" Width="Auto" />
+                    <DataGridTextColumn Header="Дата документа" Binding="{Binding Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="Auto" />
+                    <DataGridTextColumn Header="Номер заявки" Binding="{Binding Application.Number}" IsReadOnly="True" Width="Auto" />
+                    <DataGridTextColumn Header="Дата заявки" Binding="{Binding Application.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="Auto" />
+                    <DataGridTextColumn Header="Ответственный" Binding="{Binding Application.Responsible.ShortName}" IsReadOnly="True" Width="Auto" />
+                    <DataGridTextColumn Header="Техника" Binding="{Binding Application.Equipment.FullName}" IsReadOnly="True" Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+            <GridSplitter Grid.Row="1" ShowsPreview="False" Height="6"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+            <DataGrid Grid.Row="2" ItemsSource="{Binding IncomingsItemsViewSource.View}" SelectedItem="{Binding SelectedIncomingItem}"
+              AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,0,0,0" SelectionMode="Single" SelectionUnit="FullRow" Name="IncomingListDataGrid">
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
+                </DataGrid.Resources>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Редактировать" Command="{Binding DoubleClickCommand}"/>
+                        <MenuItem Header="Отметить все" Command="{Binding SelectAllCommand}"/>
+                        <MenuItem Header="Снять отметки со всех" Command="{Binding DeselectAllCommand}"/>
+                        <MenuItem Header="Инвертировать отметки" Command="{Binding InvertSelectedCommand}"/>
+                        <MenuItem Header="Удалить выбранный" Command="{Binding IncomingDeleteCommand}"/>
+                        <MenuItem Header="{Binding MenuDeleteItemText}" Command="{Binding IncomingDeleteRangeCommand}"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+                <DataGrid.InputBindings>
+                    <MouseBinding
+                        MouseAction="LeftDoubleClick"
+                        Command="{Binding DoubleClickCommand}"
+                        CommandParameter="{Binding Incomings/}"/>
+                </DataGrid.InputBindings>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="80" />
+                    <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*" />
+                    <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="*" />
+                    <DataGridTextColumn Header="Ед.изм." Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="50" />
+                    <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="70" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </UserControl>

@@ -1,4 +1,5 @@
 ﻿using RequestManagement.Common.Models.Interfaces;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RequestManagement.Common.Models;
 
@@ -21,5 +22,24 @@ public class Equipment : IEntity
     /// Государственный номер (может отсутствовать)
     /// </summary>
     public string? StateNumber { get; set; } = string.Empty;
+
+    [NotMapped]
+    public string FullName
+    {
+        get
+        {
+            if (Name != "" && !string.IsNullOrEmpty(StateNumber))
+            {
+                return $"{Name}({StateNumber})";
+            }
+
+            if (Name != "" && string.IsNullOrEmpty(StateNumber))
+            {
+                return Name;
+            }
+
+            return "";
+        }
+    }
     public string Code { get; set; } = string.Empty;
 }
