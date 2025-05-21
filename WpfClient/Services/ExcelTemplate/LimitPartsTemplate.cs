@@ -28,7 +28,7 @@ namespace WpfClient.Services.ExcelTemplate
             templateSheet.Cells[12, 3].Value = $"за период c {data.StartDate:dd.MM.yyyy} по {data.EndDate:dd.MM.yyyy}";
             templateSheet.Cells[20, 8].Value = data.Frp?.ShortName;
             var grouped = data.Expenses
-                .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 10 && e.Defect.Id != 11)
+                .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 2 && e.Defect.Id != 3 && e.Defect.DefectGroupId != 15 && e.Defect.DefectGroupId != 16)
                 .GroupBy(e => e.Code!)
                 .ToList();
             foreach (var group in grouped)
@@ -47,7 +47,7 @@ namespace WpfClient.Services.ExcelTemplate
                     {
                         newSheet.DeleteRow(startRow);
                     }
-                    ;
+                    
                     newSheet.Cells[startRow, 1].Value = startRow - startDataRow + 1;
                     newSheet.Cells[startRow, 2].Value = item.Stock.Nomenclature.Name;
                     var nameHeight = ExcelHelpers.GetRowHeight(newSheet.Column(2).Width, newSheet.Cells[startRow, 2].Style.Font.Name, newSheet.Cells[startRow, 2].Style.Font.Size, item.Stock.Nomenclature.Name);

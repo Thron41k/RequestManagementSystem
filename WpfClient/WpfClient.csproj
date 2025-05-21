@@ -10,8 +10,11 @@
 
   <ItemGroup>
     <None Remove="Resources\ActPartsTemplate.xlsx" />
+    <None Remove="Resources\ConsumablesTemplate.xlsx" />
     <None Remove="Resources\DefectPartsTemplate.xlsx" />
     <None Remove="Resources\LimitPartsTemplate.xlsx" />
+    <None Remove="Resources\Mb7PartsTemplate.xlsx" />
+    <None Remove="Resources\OperationsTemplate.xlsx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,8 +31,11 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\ActPartsTemplate.xlsx" />
+    <EmbeddedResource Include="Resources\ConsumablesTemplate.xlsx" />
     <EmbeddedResource Include="Resources\DefectPartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\LimitPartsTemplate.xlsx" />
+    <EmbeddedResource Include="Resources\Mb7PartsTemplate.xlsx" />
+    <EmbeddedResource Include="Resources\OperationsTemplate.xlsx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +50,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
     <PackageReference Include="System.Management" Version="9.0.5" />
   </ItemGroup>

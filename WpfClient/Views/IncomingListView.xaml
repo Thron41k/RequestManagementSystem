@@ -68,7 +68,7 @@
                         <behaviors:MouseClickCommandBehavior/>
                     </b:Interaction.Behaviors>
                 </TextBox>
-                <Button Command="{Binding SelectAllCommand}"  Content="Печать этикеток" Margin="30,0,0,0" Style="{StaticResource BadgedButtonStyle}" DataContext="{Binding}">
+                <Button Command="{Binding ShowLabelPrintDialogCommand}"  Content="Печать этикеток" Margin="30,0,0,0" Style="{StaticResource BadgedButtonStyle}" DataContext="{Binding}">
 
                 </Button>
             </StackPanel>
@@ -81,6 +81,11 @@
             </Grid.RowDefinitions>
             <DataGrid Grid.Row="0" ItemsSource="{Binding IncomingsDocsViewSource.View}" SelectedItem="{Binding SelectedIncomingDoc}"
                           AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow">
+                <DataGrid.InputBindings>
+                    <MouseBinding
+                        MouseAction="LeftDoubleClick"
+                        Command="{Binding DoubleClickDocCommand}"/>
+                </DataGrid.InputBindings>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Тип документа" Binding="{Binding DocType}" IsReadOnly="True" Width="Auto" />
                     <DataGridTextColumn Header="Номер документа" Binding="{Binding Code}" IsReadOnly="True" Width="Auto" />
@@ -100,7 +105,7 @@
                 </DataGrid.Resources>
                 <DataGrid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Редактировать" Command="{Binding DoubleClickCommand}"/>
+                        <!--<MenuItem Header="Редактировать" Command="{Binding DoubleClickCommand}"/>-->
                         <MenuItem Header="Отметить все" Command="{Binding SelectAllCommand}"/>
                         <MenuItem Header="Снять отметки со всех" Command="{Binding DeselectAllCommand}"/>
                         <MenuItem Header="Инвертировать отметки" Command="{Binding InvertSelectedCommand}"/>
@@ -111,8 +116,7 @@
                 <DataGrid.InputBindings>
                     <MouseBinding
                         MouseAction="LeftDoubleClick"
-                        Command="{Binding DoubleClickCommand}"
-                        CommandParameter="{Binding Incomings/}"/>
+                        Command="{Binding DoubleClickItemCommand}"/>
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="80" />

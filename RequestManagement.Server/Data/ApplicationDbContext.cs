@@ -15,7 +15,7 @@ namespace RequestManagement.Server.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
-        public DbSet<Nomenclature> Nomenclatures{ get; set; }
+        public DbSet<Nomenclature> Nomenclatures { get; set; }
         public DbSet<DefectGroup> DefectGroups { get; set; }
         public DbSet<Defect> Defects { get; set; }
         public DbSet<Driver> Drivers { get; set; }
@@ -393,7 +393,18 @@ namespace RequestManagement.Server.Data
                     Role = UserRole.Administrator
                 }
             );
-
+            modelBuilder.Entity<Commissions>().HasData(new Commissions
+            {
+                Id = 1,
+                Name = "Могочинский филиал АО \"Труд\"",
+                ApproveForActId = 1,
+                ApproveForDefectAndLimitId = 1,
+                ChairmanId = 1,
+                Member1Id = 1,
+                Member2Id = 1,
+                Member3Id = 1,
+                Member4Id = 1
+            });
             modelBuilder.Entity<Nomenclature>().HasData(
                 new Nomenclature
                 {
@@ -440,11 +451,16 @@ namespace RequestManagement.Server.Data
                 new DefectGroup { Id = 11, Name = "Топливная система" },
                 new DefectGroup { Id = 12, Name = "Трансмиссия" },
                 new DefectGroup { Id = 13, Name = "Ходовая часть" },
-                new DefectGroup { Id = 14, Name = "Электрооборудование" }
+                new DefectGroup { Id = 14, Name = "Электрооборудование" },
+                new DefectGroup { Id = 15, Name = "Расходные материалы" },
+                new DefectGroup { Id = 16, Name = "Передача в эксплуатацию" }
             );
 
             modelBuilder.Entity<Defect>().HasData(
-                new Defect { Id = 1, Name = "", DefectGroupId = 1 }
+                new Defect { Id = 1, Name = "", DefectGroupId = 1 },
+                new Defect { Id = 2, Name = "Замена АКБ", DefectGroupId = 14 },
+                new Defect { Id = 3, Name = "Замена автошин", DefectGroupId = 13 },
+                new Defect { Id = 4, Name = "Передача в эксплуатацию", DefectGroupId = 16 }
             );
 
             modelBuilder.Entity<Application>().HasData(

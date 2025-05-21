@@ -22,7 +22,7 @@ namespace WpfClient.Services.ExcelTemplate
             templateSheet.Cells[6, 6].Value = data.Commissions?.ApproveForAct?.Position;
             templateSheet.Cells[8, 6].Value = data.Commissions?.ApproveForAct?.ShortName;
             var grouped = data.Expenses
-                .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 10 && e.Defect.Id != 11)
+                .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 2 && e.Defect.Id != 3 && e.Defect.DefectGroupId != 15 && e.Defect.DefectGroupId != 16)
                 .GroupBy(e => e.Code!)
                 .ToList();
             foreach (var group in grouped)
@@ -66,7 +66,7 @@ namespace WpfClient.Services.ExcelTemplate
                     newSheet.Row(startRow).Height = hA > hN ? hA : hN;
                     newSheet.Cells[startRow, 5].Value = expense.Stock.Nomenclature.UnitOfMeasure;
                     newSheet.Cells[startRow, 6].Value = expense.Quantity;
-                    newSheet.Cells[startRow, 7].Value = expense.Defect.Id == 5 ? "ТО" : "Текущий ремонт";
+                    newSheet.Cells[startRow, 7].Value = expense.Defect.Id == 7 ? "ТО" : "Текущий ремонт";
                     newSheet.Cells[startRow, 7, startRow, 9].Merge = true;
                     startRow++;
                     var cc = group.Count();

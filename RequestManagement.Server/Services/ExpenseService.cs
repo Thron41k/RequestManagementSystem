@@ -70,32 +70,40 @@ namespace RequestManagement.Server.Services
 
         public async Task<bool> UploadMaterialsExpenseAsync(List<RequestManagement.Common.Models.MaterialExpense>? materials, int warehouseId)
         {
-
             if (materials == null || materials.Count == 0)
                 return true;
 
             try
             {
-                var driverCodes = materials.Select(m => m.DriverCode).Distinct().ToList();
+                // Подготовка данных для запросов
+                var driverFullNames = materials.Select(m => m.DriverFullName).Distinct().ToList();
                 var equipmentCodes = materials.Select(m => m.EquipmentCode).Distinct().ToList();
                 var nomenclatureKeys = materials
                     .Select(m => new NomenclatureKey(m.NomenclatureName, m.NomenclatureCode, m.NomenclatureArticle, m.NomenlatureUnitOfMeasure))
                     .Distinct()
                     .ToList();
+                var expenseCodes = materials.Select(m => m.Number).Distinct().ToList();
 
-                // Загружаем данные из базы одним запросом
+                // Загрузка существующих данных одним запросом
                 var existingDrivers = await dbContext.Drivers
-                    .Where(d => driverCodes.Contains(d.Code))
-                    .ToDictionaryAsync(d => d.Code);
+                    .Where(d => driverFullNames.Contains(d.FullName))
+                    .Distinct()
+                    .ToDictionaryAsync(d => d.FullName);
 
                 var existingEquipments = await dbContext.Equipments
                     .Where(e => equipmentCodes.Contains(e.Code))
+                    .Distinct()
                     .ToDictionaryAsync(e => e.Code);
 
                 var existingStocks = await dbContext.Stocks
                     .Include(s => s.Nomenclature)
                     .Where(s => s.WarehouseId == warehouseId)
-                    .ToListAsync();
+                    .Distinct().ToListAsync();
+
+                var existingExpenses = await dbContext.Expenses
+                    .Where(ex => expenseCodes.Contains(ex.Code) &&
+                                 existingStocks.Select(s => s.Id).Contains(ex.StockId)).ToDictionaryAsync(x=>(x.Code,x.StockId));
+
 
                 var stockMap = existingStocks
                     .Select(s => new
@@ -106,21 +114,21 @@ namespace RequestManagement.Server.Services
                     .Where(x => nomenclatureKeys.Contains(x.Key))
                     .ToDictionary(x => x.Key, x => x.Stock);
 
-
                 var nomenclatureIds = stockMap.Values.Select(s => s.NomenclatureId).Distinct().ToList();
                 var defectMappings = await dbContext.NomenclatureDefectMappings
                     .Where(m => nomenclatureIds.Contains(m.NomenclatureId))
                     .ToDictionaryAsync(m => m.NomenclatureId, m => m.DefectId);
 
-                // Подготовка к вставке
+                // Подготовка к вставке/обновлению
                 var newDrivers = new List<RequestManagement.Common.Models.Driver>();
                 var newEquipments = new List<RequestManagement.Common.Models.Equipment>();
                 var newExpenses = new List<RequestManagement.Common.Models.Expense>();
+                var expensesToUpdate = new List<RequestManagement.Common.Models.Expense>();
 
                 foreach (var material in materials)
                 {
                     // Драйвер
-                    if (!existingDrivers.TryGetValue(material.DriverCode, out var driver))
+                    if (!existingDrivers.TryGetValue(material.DriverFullName, out var driver))
                     {
                         driver = new RequestManagement.Common.Models.Driver
                         {
@@ -130,7 +138,7 @@ namespace RequestManagement.Server.Services
                             ShortName = NameFormatter.FormatToShortName(material.DriverFullName)
                         };
                         newDrivers.Add(driver);
-                        existingDrivers[driver.Code] = driver; // Добавляем в словарь, чтобы переиспользовать
+                        existingDrivers[driver.FullName] = driver;
                     }
 
                     // Оборудование
@@ -155,6 +163,23 @@ namespace RequestManagement.Server.Services
                     if (!stockMap.TryGetValue(key, out var stock))
                         continue;
 
+                    // Проверка существующего Expense
+                    if (existingExpenses.TryGetValue((material.Number, stock.Id), out var existingExpense))
+                    {
+                        if (existingExpense.Quantity != material.Quantity)
+                        {
+                            existingExpense.Stock.ConsumedQuantity -= existingExpense.Quantity;
+                            existingExpense.Stock.ConsumedQuantity += material.Quantity;
+                            existingExpense.Quantity = material.Quantity;
+                            existingExpense.Date = material.Date;
+                            existingExpense.Driver = driver;
+                            existingExpense.Equipment = equipment;
+                            expensesToUpdate.Add(existingExpense);
+                        }
+                        continue; // Пропускаем создание новой записи
+                    }
+
+                    // Создаем новый Expense
                     var defectId = defectMappings.TryGetValue(stock.NomenclatureId, out var id) ? id : 1;
 
                     var expense = new RequestManagement.Common.Models.Expense
@@ -171,15 +196,20 @@ namespace RequestManagement.Server.Services
                     newExpenses.Add(expense);
                 }
 
-                // Добавляем новые сущности
+                // Сохранение изменений
                 await dbContext.Drivers.AddRangeAsync(newDrivers);
                 await dbContext.Equipments.AddRangeAsync(newEquipments);
                 await dbContext.Expenses.AddRangeAsync(newExpenses);
 
+                if (expensesToUpdate.Count > 0)
+                {
+                    dbContext.Expenses.UpdateRange(expensesToUpdate);
+                }
+
                 await dbContext.SaveChangesAsync();
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return false;
@@ -304,16 +334,16 @@ namespace RequestManagement.Server.Services
                 existing = new UserLastSelection
                 {
                     UserId = userId,
-                    DriverId = driverId,
-                    EquipmentId = equipmentId,
+                    DriverId = driverId == 0 ? 1 : driverId,
+                    EquipmentId = equipmentId == 0 ? 1 : equipmentId,
                     LastUpdated = DateTime.UtcNow
                 };
                 dbContext.UserLastSelections.Add(existing);
             }
             else
             {
-                existing.DriverId = driverId;
-                existing.EquipmentId = equipmentId;
+                existing.DriverId = driverId == 0 ? 1 : driverId;
+                existing.EquipmentId = equipmentId == 0 ? 1 : equipmentId;
                 existing.LastUpdated = DateTime.UtcNow;
             }
 
@@ -322,27 +352,39 @@ namespace RequestManagement.Server.Services
 
         public async Task SaveNomenclatureDefectMappingAsync(int userId, int stockId, int defectId)
         {
-            var stock = await dbContext.Stocks.FirstOrDefaultAsync(x => x.Id == stockId);
-            if(stock == null)return;
-            var existing = await dbContext.NomenclatureDefectMappings
-                .FirstOrDefaultAsync(m => m.UserId == userId && m.NomenclatureId == stock.NomenclatureId);
+            var stockWithMapping = await dbContext.Stocks
+                .Where(s => s.Id == stockId)
+                .Select(s => new
+                {
+                    Stock = s,
+                    ExistingMapping = dbContext.NomenclatureDefectMappings
+                        .FirstOrDefault(m => m.UserId == userId && m.NomenclatureId == s.NomenclatureId)
+                })
+                .FirstOrDefaultAsync();
+
+            if (stockWithMapping?.Stock == null) return;
+
+            var existing = stockWithMapping.ExistingMapping;
 
             if (existing == null)
             {
-                existing = new NomenclatureDefectMapping
+                dbContext.NomenclatureDefectMappings.Add(new NomenclatureDefectMapping
                 {
                     UserId = userId,
-                    NomenclatureId = stock.NomenclatureId,
+                    NomenclatureId = stockWithMapping.Stock.NomenclatureId,
                     DefectId = defectId,
                     LastUsed = DateTime.UtcNow
-                };
-                dbContext.NomenclatureDefectMappings.Add(existing);
+                });
             }
             else
             {
                 existing.DefectId = defectId;
                 existing.LastUsed = DateTime.UtcNow;
             }
+            await dbContext.Expenses
+                .Where(e => e.StockId == stockId && e.DefectId == 1)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(e => e.DefectId, defectId));
 
             await dbContext.SaveChangesAsync();
         }

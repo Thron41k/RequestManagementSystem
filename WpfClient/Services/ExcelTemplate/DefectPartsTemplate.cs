@@ -27,7 +27,7 @@ namespace WpfClient.Services.ExcelTemplate
             templateSheet.Cells[11, 3].Value = data.EndDate.ToString("d MMMM yyyyг.", new CultureInfo("ru-RU"));
             templateSheet.Cells[22, 3].Value = data.Frp?.ShortName;
             var grouped = data.Expenses
-                .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 10 && e.Defect.Id != 11)
+                .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 2 && e.Defect.Id != 3 && e.Defect.DefectGroupId != 15 && e.Defect.DefectGroupId != 16)
                 .GroupBy(e => e.Code!)
                 .ToList();
             foreach (var group in grouped)

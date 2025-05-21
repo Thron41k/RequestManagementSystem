@@ -105,9 +105,9 @@ public class DriverViewModel : INotifyPropertyChanged
     }
     private async Task AddDriverAsync()
     {
-        if (!string.IsNullOrWhiteSpace(NewDriverFullName.Trim()) && !string.IsNullOrWhiteSpace(NewDriverShortName.Trim()) && !string.IsNullOrWhiteSpace(NewDriverPosition.Trim()))
+        if (!string.IsNullOrWhiteSpace(NewDriverFullName) && !string.IsNullOrWhiteSpace(NewDriverShortName))
         {
-            await _requestService.CreateDriverAsync(new RequestManagement.Common.Models.Driver { FullName = NewDriverFullName, ShortName = NewDriverShortName, Position = NewDriverPosition });
+            await _requestService.CreateDriverAsync(new RequestManagement.Common.Models.Driver { FullName = NewDriverFullName.Trim(), ShortName = NewDriverShortName.Trim(), Position = !string.IsNullOrEmpty(NewDriverPosition) ? NewDriverPosition.Trim() : "" });
             await LoadDriverAsync();
             NewDriverFullName = string.Empty;
             NewDriverShortName = string.Empty;

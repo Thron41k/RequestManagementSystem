@@ -117,6 +117,39 @@ namespace WpfClient.ViewModels
                     };
                     _excelWriterService.ExportAndSave(ExcelTemplateType.DefectParts, defectParts, "Дефектные ведомости");
                     break;
+                case 3:
+                    var mb7 = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.Mb7Parts, mb7, "Ведомость учета выдачи автошин и АКБ");
+                    break;
+                case 4:
+                    var consumables = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.Consumables, consumables, "Расходные материалы");
+                    break;
+                case 5:
+                    var operations = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.Operations, operations, "Передача в эксплуатацию");
+                    break;
             }
 
         }

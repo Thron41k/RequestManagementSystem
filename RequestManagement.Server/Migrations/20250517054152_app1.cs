@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RequestManagement.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class test1 : Migration
+    public partial class app1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -435,7 +435,9 @@ namespace RequestManagement.Server.Migrations
                     { 11, "Топливная система" },
                     { 12, "Трансмиссия" },
                     { 13, "Ходовая часть" },
-                    { 14, "Электрооборудование" }
+                    { 14, "Электрооборудование" },
+                    { 15, "Расходные материалы" },
+                    { 16, "Передача в эксплуатацию" }
                 });
 
             migrationBuilder.InsertData(
@@ -464,9 +466,20 @@ namespace RequestManagement.Server.Migrations
                 values: new object[] { 1, new DateTime(2025, 4, 10, 0, 0, 0, 0, DateTimeKind.Utc), 1, "", 1 });
 
             migrationBuilder.InsertData(
+                table: "Commissions",
+                columns: new[] { "Id", "ApproveForActId", "ApproveForDefectAndLimitId", "ChairmanId", "Member1Id", "Member2Id", "Member3Id", "Member4Id", "Name" },
+                values: new object[] { 1, 1, 1, 1, 1, 1, 1, 1, "Могочинский филиал АО \"Труд\"" });
+
+            migrationBuilder.InsertData(
                 table: "Defects",
                 columns: new[] { "Id", "DefectGroupId", "Name" },
-                values: new object[] { 1, 1, "" });
+                values: new object[,]
+                {
+                    { 1, 1, "" },
+                    { 2, 14, "Замена АКБ" },
+                    { 3, 13, "Замена автошин" },
+                    { 4, 16, "Передача в эксплуатацию" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Applications_EquipmentId",

@@ -110,11 +110,7 @@ public partial class ExpenseViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveExpenseToDatabase(UserControl window)
     {
-        if (SelectedEquipment != null &&
-            !string.IsNullOrEmpty(SelectedEquipmentText.Trim()) &&
-            !string.IsNullOrEmpty(SelectedDriver?.FullName.Trim()) &&
-            !string.IsNullOrEmpty(SelectedDefect?.Name.Trim()) &&
-            !string.IsNullOrEmpty(QuantityForExpense.Trim()))
+        if (SelectedEquipment != null && SelectedDriver != null && SelectedDefect != null && !string.IsNullOrEmpty(QuantityForExpense.Trim()))
         {
             var convertResul = decimal.TryParse(QuantityForExpense.Replace(".", ","), out var quantityForExpense);
             if (convertResul)

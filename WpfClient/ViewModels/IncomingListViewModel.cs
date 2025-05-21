@@ -10,6 +10,9 @@ using CommunityToolkit.Mvvm.Input;
 using System.Globalization;
 using Warehouse = RequestManagement.Common.Models.Warehouse;
 using System.Windows;
+using Google.Protobuf.WellKnownTypes;
+using RequestManagement.Common.Models.Extensions;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace WpfClient.ViewModels;
 
@@ -19,10 +22,12 @@ public partial class IncomingListViewModel : ObservableObject
     private readonly IIncomingService _incomingService;
     private readonly System.Timers.Timer _filterTimer;
     private List<Incoming> _incomings = [];
+    [ObservableProperty] private ObservableCollection<Incoming> _labelList = [];
     [ObservableProperty] private CollectionViewSource _incomingsDocsViewSource;
     [ObservableProperty] private ObservableCollection<Incoming> _incomingsDocs = [];
     [ObservableProperty] private CollectionViewSource _incomingsItemsViewSource;
     [ObservableProperty] private ObservableCollection<Incoming> _incomingsItems = [];
+    [ObservableProperty] private ObservableCollection<Incoming> _incomingsLabels = [];
     [ObservableProperty] private Incoming? _selectedIncomingDoc = new();
     [ObservableProperty] private Incoming? _selectedIncomingItem = new();
     [ObservableProperty] private Warehouse _selectedWarehouse = new();
@@ -31,6 +36,7 @@ public partial class IncomingListViewModel : ObservableObject
     [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.04.2025");
     [ObservableProperty] private DateTime _toDate = DateTime.Parse("30.04.2025");
     [ObservableProperty] private int _notificationCount = 0;
+
     public IncomingListViewModel() { }
 
     public IncomingListViewModel(IMessageBus messageBus, IIncomingService incomingService)
@@ -38,6 +44,7 @@ public partial class IncomingListViewModel : ObservableObject
         _messageBus = messageBus;
         _incomingService = incomingService;
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
+        _messageBus.Subscribe<ShowResultMessage>(OnShow);
         _incomingsDocsViewSource = new CollectionViewSource { Source = _incomingsDocs };
         IncomingsItemsViewSource = new CollectionViewSource { Source = _incomingsItems };
         var dispatcher = Dispatcher.CurrentDispatcher;
@@ -47,6 +54,23 @@ public partial class IncomingListViewModel : ObservableObject
             await dispatcher.InvokeAsync(async () => { await LoadIncomingsAsync(); });
         };
     }
+
+    private async Task OnShow(ShowResultMessage arg)
+    {
+        if (arg.Caller == typeof(IncomingListViewModel) && arg.Items.Count != 0)
+            switch (arg.Message)
+            {
+                case MessagesEnum.ResultLabelCountSelector:
+                    foreach (var incoming in arg.Items)
+                    {
+                        LabelList.Add(incoming);
+                    }
+
+                    NotificationCount = LabelList.Select(x=>(int)x.Quantity).Sum();
+                    break;
+            }
+    }
+
     public async Task Load()
     {
         await LoadIncomingsAsync();
@@ -62,6 +86,12 @@ public partial class IncomingListViewModel : ObservableObject
                 break;
         }
     }
+
+    [RelayCommand]
+    private async Task ShowLabelPrintDialog()
+    {
+        await _messageBus.Publish(new ShowResultMessage(MessagesEnum.ShowLabelPrintListViewDialog, typeof(IncomingListViewModel), LabelList.ToList()));
+    }
     [RelayCommand]
     private async Task IncomingDeleteAsync()
     {
@@ -73,11 +103,6 @@ public partial class IncomingListViewModel : ObservableObject
         //        await LoadIncomingsAsync();
         //    }
         //}
-    }
-
-    partial void OnNotificationCountChanged(int value)
-    {
-        Console.WriteLine(value);
     }
     [RelayCommand]
     private async Task IncomingDeleteRangeAsync()
@@ -102,7 +127,6 @@ public partial class IncomingListViewModel : ObservableObject
 
         //IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
         //IncomingListCheckedUpdate();
-        NotificationCount++;
     }
     [RelayCommand]
     private void DeselectAll()
@@ -124,13 +148,25 @@ public partial class IncomingListViewModel : ObservableObject
         //IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
         //IncomingListCheckedUpdate();
     }
+
     [RelayCommand]
-    private async Task DoubleClick()
+    private async Task DoubleClickDoc()
     {
-        //if (SelectedIncoming != null)
-        //{
-        //    //await _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(ExpenseListViewModel), true, SelectedExpense.Id, SelectedExpense.Date, SelectedExpense.Quantity, SelectedExpense.Stock, SelectedExpense.Equipment, SelectedExpense.Driver, SelectedExpense.Defect));
-        //}
+        if (SelectedIncomingDoc != null)
+        {
+            var newList = _incomings.Where(x => x.Code == SelectedIncomingDoc.Code)
+                .Select(x => x.Clone())
+                .ToList();
+            await _messageBus.Publish(new ShowResultMessage(MessagesEnum.ShowLabelCountSelector,
+                typeof(IncomingListViewModel), newList));
+        }
+    }
+
+    [RelayCommand]
+    private async Task DoubleClickItem()
+    {
+        if(SelectedIncomingItem != null)
+            await _messageBus.Publish(new ShowResultMessage(MessagesEnum.ShowLabelCountSelector, typeof(IncomingListViewModel), [SelectedIncomingItem.Clone()]));
     }
     [RelayCommand]
     private async Task LoadIncomingsAsync()

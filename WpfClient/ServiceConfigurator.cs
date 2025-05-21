@@ -36,6 +36,9 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<IExcelTemplateWriter, ActPartsTemplate>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, LimitPartsTemplate>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, DefectPartsTemplate>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, Mb7PartsTemplate>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, ConsumablesTemplate>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, OperationsTemplate>();
         serviceCollection.AddSingleton<IFileSaveDialogService, FileSaveDialogService>();
         serviceCollection.AddSingleton<IExcelPrintService, ExcelPrintService>();
 
@@ -58,6 +61,8 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<PrintReportViewModel>();
         serviceCollection.AddScoped<SparePartsAnalogsViewModel>();
         serviceCollection.AddScoped<IncomingDataLoadViewModel>();
+        serviceCollection.AddScoped<LabelCountSelectorViewModel>();
+        serviceCollection.AddScoped<LabelPrintListViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -89,6 +94,8 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<PrintReportView>();
         serviceCollection.AddTransient<SparePartsAnalogsView>();
         serviceCollection.AddTransient<IncomingDataLoadView>();
+        serviceCollection.AddTransient<LabelCountSelectorView>();
+        serviceCollection.AddTransient<LabelPrintListView>();
 
         return serviceCollection.BuildServiceProvider();
     }

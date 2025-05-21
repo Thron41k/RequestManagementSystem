@@ -5,12 +5,13 @@ using RequestManagement.Common.Models;
 using RequestManagement.Common.Utilities;
 using RequestManagement.Server.Data;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace RequestManagement.Server.Services
 {
     public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
     {
-        public async Task<List<Incoming>> GetAllIncomingsAsync(string filter, int requestWarehouseId,  string requestFromDate, string requestToDate)
+        public async Task<List<Incoming>> GetAllIncomingsAsync(string filter, int requestWarehouseId, string requestFromDate, string requestToDate)
         {
             var query = dbContext.Incomings
                 .Include(e => e.Stock)
@@ -26,7 +27,7 @@ namespace RequestManagement.Server.Services
             if (!string.IsNullOrWhiteSpace(filter))
             {
 
-                query = query.Where(e =>EF.Functions.ILike(e.Code, $"%{filter}%") || 
+                query = query.Where(e => EF.Functions.ILike(e.Code, $"%{filter}%") ||
                                              EF.Functions.ILike(e.Application!.Number, $"%{filter}%") ||
                                              EF.Functions.ILike(e.Stock.Nomenclature.Name, $"%{filter}%") ||
                                              EF.Functions.ILike(e.Stock.Nomenclature.Article!, $"%{filter}%") ||
@@ -70,20 +71,24 @@ namespace RequestManagement.Server.Services
             try
             {
                 var warehouse = await dbContext.Warehouses
-                    .FirstOrDefaultAsync(w => w.Name == incoming.WarehouseName);
-
-                if (warehouse == null)
-                {
-                    warehouse = new Warehouse
+                    .FirstOrDefaultAsync(w => w.Name == incoming.WarehouseName) ?? new Warehouse
                     {
                         Name = incoming.WarehouseName,
                         Code = string.Empty,
                         LastUpdated = DateTime.UtcNow
                     };
+
+                if (warehouse.Id == 0)
+                {
                     dbContext.Warehouses.Add(warehouse);
                     await dbContext.SaveChangesAsync();
-                    //logger.LogInformation("Создан новый склад: {WarehouseName}", warehouse.Name);
                 }
+
+                var incomingCodes = incoming.Items
+                    .Select(i => i.ReceiptOrderNumber == "" ? i.RegistratorNumber : i.ReceiptOrderNumber)
+                    .Where(code => !string.IsNullOrEmpty(code))
+                    .Distinct()
+                    .ToList();
 
                 var driverNames = incoming.Items
                     .Select(i => i.ApplicationResponsibleName)
@@ -108,8 +113,12 @@ namespace RequestManagement.Server.Services
                 var names = nomenclatureKeys.Select(k => k.ItemName).ToHashSet();
                 var units = nomenclatureKeys.Select(k => k.Unit).ToHashSet();
 
-               //logger.LogInformation("Подготовлены списки: Drivers={DriverCount}, Equipments={EquipmentCount}, Nomenclatures={NomenclatureCount}",
-                 //   driverNames.Count, equipmentCodes.Count, nomenclatureKeys.Count);
+                //logger.LogInformation("Подготовлены списки: Drivers={DriverCount}, Equipments={EquipmentCount}, Nomenclatures={NomenclatureCount}",
+                //   driverNames.Count, equipmentCodes.Count, nomenclatureKeys.Count);
+
+                var existingIncomings = await dbContext.Incomings
+                    .Where(i => incomingCodes.Contains(i.Code))
+                    .ToDictionaryAsync(i => (i.StockId, i.ApplicationId, i.Code));
 
                 var existingDrivers = driverNames.Any()
                     ? await dbContext.Drivers
@@ -224,17 +233,22 @@ namespace RequestManagement.Server.Services
                 // 6. Подготавливаем Applications
                 var applicationKeys = incoming.Items
                     .Where(i => !string.IsNullOrEmpty(i.ApplicationNumber) && !string.IsNullOrEmpty(i.ApplicationDate))
-                    .Select(i => (Number: i.ApplicationNumber, Date: DateTime.TryParse(i.ApplicationDate, out var date) ? date : (DateTime?)null))
+                    .Select(i => {
+                        if (DateTime.TryParse(i.ApplicationDate, out var date))
+                        {
+                            // Берем только дату (без времени)
+                            return (Number: i.ApplicationNumber, Date: date.Date);
+                        }
+                        return (Number: i.ApplicationNumber, Date: (DateTime?)null);
+                    })
                     .Where(a => a.Date.HasValue)
                     .Distinct()
                     .ToList();
-
-                var existingApplications = applicationKeys.Any()
-                    ? await dbContext.Applications
-                        .Where(a => applicationKeys.Select(k => k.Number).Contains(a.Number) &&
-                                    applicationKeys.Select(k => k.Date!.Value).Contains(a.Date))
-                        .ToDictionaryAsync(a => (a.Number, a.Date))
-                    : new Dictionary<(string, DateTime), Application>();
+                var existing = applicationKeys.Any() ? dbContext.Applications
+                    .Where(a => applicationKeys.Select(k => k.Number).Contains(a.Number)).ToList() : [];
+                existing = applicationKeys.Any() && existing.Any() ? existing
+                    .Where(a => applicationKeys.Select(k => k.Date.Value).Contains(a.Date.Date)).ToList() : [];
+                var existingApplications = existing.DistinctBy(x => x.Number).DistinctBy(x => x.Date.Date).ToDictionary(a => (a.Number, a.Date.Date));
 
                 var newApplications = new List<Application>();
                 foreach (var item in incoming.Items)
@@ -329,6 +343,7 @@ namespace RequestManagement.Server.Services
 
                 // 8. Создаем Incomings
                 var newIncomings = new List<Incoming>();
+                var incomingsToUpdate = new List<Incoming>();
                 foreach (var item in incoming.Items)
                 {
                     Application? application = null;
@@ -375,6 +390,23 @@ namespace RequestManagement.Server.Services
                             incomingType = item.RegistratorType;
                         }
 
+                        if (incomingCode == "БПТР0006356") 
+                            Console.WriteLine("БПТР0006356");
+                        var incomingKey = (stock.Id, application?.Id ?? 1, incomingCode);
+                        if (existingIncomings.TryGetValue(incomingKey, out var existingIncoming))
+                        {
+                            // Обновляем существующую запись, если количество изменилось
+                            if (existingIncoming.Quantity != (decimal)material.FinalBalance)
+                            {
+                                var quantityDifference = (decimal)material.FinalBalance - existingIncoming.Quantity;
+                                existingIncoming.Quantity = (decimal)material.FinalBalance;
+                                existingIncoming.Date = incomingDate;
+                                existingIncoming.DocType = incomingType;
+                                stock.ReceivedQuantity += quantityDifference;
+                                incomingsToUpdate.Add(existingIncoming);
+                            }
+                            continue;
+                        }
                         var incomingEntry = new Incoming
                         {
                             StockId = stock.Id,
@@ -386,27 +418,30 @@ namespace RequestManagement.Server.Services
                         };
                         stock.ReceivedQuantity += incomingEntry.Quantity;
                         newIncomings.Add(incomingEntry);
+                        existingIncomings[incomingKey] = incomingEntry;
                     }
                 }
 
-                // Сохраняем Incomings
                 if (newIncomings.Any())
                 {
                     await dbContext.Incomings.AddRangeAsync(newIncomings);
-                    await dbContext.SaveChangesAsync();
                 }
 
-                // Коммитим транзакцию
+                if (incomingsToUpdate.Any())
+                {
+                    dbContext.Incomings.UpdateRange(incomingsToUpdate);
+                }
+
+                await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 stopwatch.Stop();
-                //logger.LogInformation("Успешно загружены поступления для склада {WarehouseName}. Время: {ElapsedMs} мс, Incomings: {IncomingCount}",
-                //    warehouse.Name, stopwatch.ElapsedMilliseconds, newIncomings.Count);
                 return true;
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
+                Console.WriteLine(ex.Message);
                 //logger.LogError(ex, "Ошибка в UploadIncomingsAsync для склада {WarehouseName}", incoming?.WarehouseName);
                 return false;
             }
@@ -500,7 +535,7 @@ namespace RequestManagement.Server.Services
             return true;
         }
 
-     
+
 
         public async Task<bool> DeleteIncomingsAsync(List<int> requestIds)
         {

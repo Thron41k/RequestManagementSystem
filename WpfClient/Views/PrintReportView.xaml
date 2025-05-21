@@ -66,6 +66,8 @@
                 <system:String>Лимитные карты</system:String>
                 <system:String>Дефектные ведомости</system:String>
                 <system:String>Ведомости выдачи АКБ и Автошин</system:String>
+                <system:String>Расходные материалы</system:String>
+                <system:String>Эксплуатация</system:String>
             </ComboBox>
         </StackPanel>
         <StackPanel Grid.Row="4"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">

@@ -118,6 +118,20 @@ namespace RequestManagement.Server.Migrations
                     b.HasIndex("Name");
 
                     b.ToTable("Commissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ApproveForActId = 1,
+                            ApproveForDefectAndLimitId = 1,
+                            ChairmanId = 1,
+                            Member1Id = 1,
+                            Member2Id = 1,
+                            Member3Id = 1,
+                            Member4Id = 1,
+                            Name = "Могочинский филиал АО \"Труд\""
+                        });
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Defect", b =>
@@ -150,6 +164,24 @@ namespace RequestManagement.Server.Migrations
                             Id = 1,
                             DefectGroupId = 1,
                             Name = ""
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DefectGroupId = 14,
+                            Name = "Замена АКБ"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DefectGroupId = 13,
+                            Name = "Замена автошин"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DefectGroupId = 16,
+                            Name = "Передача в эксплуатацию"
                         });
                 });
 
@@ -240,6 +272,16 @@ namespace RequestManagement.Server.Migrations
                         {
                             Id = 14,
                             Name = "Электрооборудование"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Расходные материалы"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Name = "Передача в эксплуатацию"
                         });
                 });
 

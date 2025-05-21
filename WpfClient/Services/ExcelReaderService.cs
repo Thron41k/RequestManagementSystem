@@ -25,7 +25,7 @@ namespace WpfClient.Services
                 using var package = new ExcelPackage(new FileInfo(filePath));
                 var worksheet = package.Workbook.Worksheets[0];
                 var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
-                const int startRow = 12;
+                const int startRow = 13;
                 warehouse = worksheet.Cells[startRow - 1, 1].Value.ToString()?.Trim();
                 var expenseNumber = "";
                 var expenseDate = DateTime.Now;
@@ -36,37 +36,27 @@ namespace WpfClient.Services
                 for (var row = startRow; row < rowCount; row++)
                 {
                     var name = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty;
-                    var code = worksheet.Cells[row, 6].Value?.ToString()?.Trim() ?? string.Empty;
-                    var article = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
-                    var unit = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
-                    var quantity = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
-                    if (code == string.Empty && article == string.Empty && unit == string.Empty &&
-                        quantity == string.Empty)
+                    var code = worksheet.Cells[row, 10].Value?.ToString()?.Trim() ?? string.Empty;
+                    var article = worksheet.Cells[row, 11].Value?.ToString()?.Trim() ?? string.Empty;
+                    var unit = worksheet.Cells[row, 12].Value?.ToString()?.Trim() ?? string.Empty;
+                    var quantity = worksheet.Cells[row, 13].Value?.ToString()?.Trim() ?? string.Empty;
+                    if (name == "Штуцер топливной трубки угловой d-12мм")
                     {
-                        var splited = name.Split(',');
-                        if (splited.Length == 0) continue;
-                        if (splited[1] == string.Empty && splited[2] == string.Empty && splited[3] == string.Empty &&
-                            splited[4] == string.Empty)
-                        {
-                            expenseNumber = "";
-                            driverName = "";
-                            driverCode = "";
-                            equipmentName = "";
-                            equipmentCode = "";
-                            continue;
-                        }
-                        var numberAndDate = splited[0].Split(' ');
-                        expenseNumber = numberAndDate[2].Trim();
+                        Console.WriteLine(name);
+                    }
+                    if (code == string.Empty && article == string.Empty && unit == string.Empty)
+                    {
+                        var numberAndDate = name.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                        expenseNumber = numberAndDate[2];
                         expenseDate = DateTime.Parse(numberAndDate[4]);
-                        driverName = splited[1].Trim();
-                        driverCode = splited[2].Trim();
-                        equipmentName = splited[3].Trim();
-                        equipmentCode = splited[4].Trim();
+                        driverName = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
+                        driverCode = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
+                        equipmentName = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
+                        equipmentCode = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
                     }
                     else
                     {
-                        if (expenseNumber == string.Empty && driverName == string.Empty && driverCode == string.Empty ||
-                            equipmentName == string.Empty && equipmentCode == string.Empty)
+                        if (expenseNumber == string.Empty)
                             continue;
                         materialExpenses.Add(new MaterialExpense
                         {
@@ -142,60 +132,61 @@ namespace WpfClient.Services
                 using var package = new ExcelPackage(new FileInfo(filePath));
                 var worksheet = package.Workbook.Worksheets[0];
                 var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
-                materialIncoming.WarehouseName = worksheet.Cells[11, 1].Value.ToString()?.Trim();
-                const int startRow = 12;
+                const int startRow = 13;
+                materialIncoming.WarehouseName = worksheet.Cells[startRow - 1, 1].Value.ToString()?.Trim();
                 MaterialIncomingItem? newMaterialIncoming = null;
                 for (var row = startRow; row < rowCount; row++)
                 {
                     var name = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty;
-                    var code = worksheet.Cells[row, 6].Value?.ToString()?.Trim() ?? string.Empty;
-                    var article = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
-                    var unit = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
-                    var quantity = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
-                    if (string.IsNullOrEmpty(code) && string.IsNullOrEmpty(article) && string.IsNullOrEmpty(unit) &&
-                        string.IsNullOrEmpty(quantity))
+                    var code = worksheet.Cells[row, 11].Value?.ToString()?.Trim() ?? string.Empty;
+                    var article = worksheet.Cells[row, 12].Value?.ToString()?.Trim() ?? string.Empty;
+                    var unit = worksheet.Cells[row, 13].Value?.ToString()?.Trim() ?? string.Empty;
+                    var quantity = worksheet.Cells[row, 14].Value?.ToString()?.Trim() ?? string.Empty;
+                    if (string.IsNullOrEmpty(code) && string.IsNullOrEmpty(article) && string.IsNullOrEmpty(unit))
                     {
                         if (newMaterialIncoming != null)
                         {
                             materialIncoming.Items.Add(newMaterialIncoming);
                         }
-                        var splited = name.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                        if (splited.Length == 0)
+                        if (string.IsNullOrEmpty(name))
                         {
                             newMaterialIncoming = null;
                             continue;
                         }
                         newMaterialIncoming = new MaterialIncomingItem();
-                        var registrator = splited[0].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        var registrator = name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         newMaterialIncoming.RegistratorType = registrator[0];
                         var index = newMaterialIncoming.RegistratorType == "Перемещение" ? 4 : 2;
                         newMaterialIncoming.RegistratorNumber = registrator[index];
                         newMaterialIncoming.RegistratorDate = registrator[index + 2];
-                        if (splited.Length > 1 && !string.IsNullOrEmpty(splited[1]))
+                        var receiptOrderCleared = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
+                        if (!string.IsNullOrEmpty(receiptOrderCleared))
                         {
-                            var receiptOrderCleared = splited[1];
                             var receiptOrder = receiptOrderCleared.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                             newMaterialIncoming.ReceiptOrderNumber = receiptOrder[2];
                             newMaterialIncoming.ReceiptOrderDate = receiptOrder[4];
                         }
-                        if (splited.Length > 2 && !string.IsNullOrEmpty(splited[2]))
+                        var applicationCleared = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
+                        if (!string.IsNullOrEmpty(applicationCleared))
                         {
-                            var applicationCleared = splited[2];
                             var application = applicationCleared.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                             newMaterialIncoming.ApplicationNumber = application[3];
                             newMaterialIncoming.ApplicationDate = application[5];
                         }
-                        if (splited.Length > 3 && !string.IsNullOrEmpty(splited[3]))
+                        var applicationResponsibleName = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
+                        if (!string.IsNullOrEmpty(applicationResponsibleName))
                         {
-                            newMaterialIncoming.ApplicationResponsibleName = splited[3];
+                            newMaterialIncoming.ApplicationResponsibleName = applicationResponsibleName;
                         }
-                        if (splited.Length > 4 && !string.IsNullOrEmpty(splited[4]))
+                        var applicationEquipmentName = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
+                        if (!string.IsNullOrEmpty(applicationEquipmentName))
                         {
-                            newMaterialIncoming.ApplicationEquipmentName = splited[4];
+                            newMaterialIncoming.ApplicationEquipmentName = applicationEquipmentName;
                         }
-                        if (splited.Length > 5 && !string.IsNullOrEmpty(splited[5]))
+                        var applicationEquipmentCode = worksheet.Cells[row, 10].Value?.ToString()?.Trim() ?? string.Empty;
+                        if (!string.IsNullOrEmpty(applicationEquipmentCode))
                         {
-                            newMaterialIncoming.ApplicationEquipmentCode = splited[5];
+                            newMaterialIncoming.ApplicationEquipmentCode = applicationEquipmentCode;
                         }
                     }
                     else

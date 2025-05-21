@@ -38,8 +38,9 @@ public class SelectResultMessage(MessagesEnum message, Type caller, IEntity? ite
     public Type Caller { get; } = caller;
     public IEntity? Item { get; } = item;
 }
-public class ShowResultMessage(MessagesEnum message, Type caller)
+public class ShowResultMessage(MessagesEnum message, Type caller,List<Incoming> items)
 {
     public MessagesEnum Message { get; } = message;
     public Type Caller { get; } = caller;
+    public List<Incoming> Items { get; } = items;
 }

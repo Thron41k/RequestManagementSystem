@@ -4,6 +4,9 @@
     {
         ActParts,
         LimitParts,
-        DefectParts
+        DefectParts,
+        Mb7Parts,
+        Consumables,
+        Operations
     }
 }

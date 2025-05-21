@@ -17,5 +17,8 @@ public enum MessagesEnum
     SelectDefect,
     SelectDefectGroup,
     SelectCommissions,
-    ShowPrintReportDialog
+    ShowPrintReportDialog,
+    ResultLabelCountSelector,
+    ShowLabelCountSelector,
+    ShowLabelPrintListViewDialog
 }

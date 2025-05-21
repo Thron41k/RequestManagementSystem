@@ -146,14 +146,13 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="80" />
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Ед.изм." Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="50" />
-                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="70" />
+                <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="250" />
+                <DataGridTextColumn Header="Ед.изм." Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="60" />
+                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="50" />
                 <DataGridTextColumn Header="Техника" Binding="{Binding Equipment.Name}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="г.н." Binding="{Binding Equipment.StateNumber}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Водитель" Binding="{Binding Driver.ShortName}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Дефект" Binding="{Binding Defect.Name}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Склад" Binding="{Binding Stock.Warehouse.Name}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="г.н." Binding="{Binding Equipment.StateNumber}" IsReadOnly="True" Width="100" />
+                <DataGridTextColumn Header="Водитель" Binding="{Binding Driver.ShortName}" IsReadOnly="True" Width="150" />
+                <DataGridTextColumn Header="Дефект" Binding="{Binding Defect.Name}" IsReadOnly="True" Width="180" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

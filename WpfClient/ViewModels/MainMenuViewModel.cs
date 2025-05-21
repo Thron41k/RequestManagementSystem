@@ -28,6 +28,8 @@ public class MainMenuViewModel
     private readonly PrintReportViewModel _printReportViewModel;
     private readonly SparePartsAnalogsViewModel _sparePartsAnalogsViewModel;
     private readonly IncomingDataLoadViewModel _incomingDataLoadViewModel;
+    private readonly LabelCountSelectorViewModel _labelCountSelectorViewModel;
+    private readonly LabelPrintListViewModel _labelPrintListViewModel;
     private readonly IMessageBus _messageBus;
     public UserControl StockControlProperty { get; }
     public ICommand ShowEquipmentCommand { get; }
@@ -45,7 +47,7 @@ public class MainMenuViewModel
     public ICommand ShowNomenclatureAnalogCommand { get; }
     public ICommand ShowIncomingDataLoadingCommand { get; }
 
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel)
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel, LabelCountSelectorViewModel labelCountSelectorViewModel, LabelPrintListViewModel labelPrintListViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -64,10 +66,13 @@ public class MainMenuViewModel
         _expenseDataLoadViewModel = expenseDataLoadViewModel;
         _sparePartsAnalogsViewModel = sparePartsAnalogsViewModel;
         _incomingDataLoadViewModel = incomingDataLoadViewModel;
+        _labelCountSelectorViewModel = labelCountSelectorViewModel;
+        _labelPrintListViewModel = labelPrintListViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
         _messageBus.Subscribe<ShowTaskPrintDialogMessage>(OnShowPrintDialog);
+        _messageBus.Subscribe<ShowResultMessage>(OnShowResultMessageDialog);
         ShowEquipmentCommand = new RelayCommand(ShowEquipment);
         ShowDriverCommand = new RelayCommand(ShowDriver);
         ShowDefectGroupCommand = new RelayCommand(ShowDefectGroup);
@@ -84,6 +89,33 @@ public class MainMenuViewModel
         ShowIncomingDataLoadingCommand = new RelayCommand(ShowIncomingDataLoading);
     }
 
+    private Task OnShowResultMessageDialog(ShowResultMessage arg)
+    {
+        if (arg.Message == MessagesEnum.ShowLabelCountSelector && arg.Caller == typeof(IncomingListViewModel))
+        {
+            ShowLabelCountAccept(arg.Items,arg.Caller);
+        }
+
+        if (arg.Message == MessagesEnum.ShowLabelPrintListViewDialog && arg.Caller == typeof(IncomingListViewModel))
+        {
+            ShowLabelPrintListViewDialog(arg.Items, arg.Caller);
+        }
+        return Task.CompletedTask;
+    }
+
+    private void ShowLabelPrintListViewDialog(List<Incoming> labelList, Type argCaller)
+    {
+        var labelPrintListView = new LabelPrintListView(_labelPrintListViewModel);
+        var window = new Window
+        {
+            Content = labelPrintListView,
+            Title = "Печать этикеток",
+            Width = 520,
+            Height = 1240
+        };
+        _labelPrintListViewModel.Init(labelList);
+        window.ShowDialog();
+    }
     private void ShowIncomingDataLoading()
     {
         var incomingDataLoadView = new IncomingDataLoadView(_incomingDataLoadViewModel);
@@ -131,6 +163,26 @@ public class MainMenuViewModel
         window.ShowDialog();
     }
 
+    private void ShowLabelCountAccept(List<Incoming> labelList, Type argCaller)
+    {
+        var labelCountSelectorView = new LabelCountSelectorView(_labelCountSelectorViewModel);
+        var window = new Window
+        {
+            Content = labelCountSelectorView,
+            Title = "Выбор количества этикеток для печати",
+            Width = 600,
+            Height = 400,
+            ResizeMode = ResizeMode.NoResize
+        };
+        _labelCountSelectorViewModel.Init(labelList);
+        window.ShowDialog();
+        if (_labelCountSelectorViewModel.DialogResult)
+        {
+            _messageBus.Publish(
+                new ShowResultMessage(
+                    MessagesEnum.ResultLabelCountSelector, argCaller, _labelCountSelectorViewModel.LabelList.ToList()));
+        }
+    }
     private void ShowCommissions(bool editMode, Type? argCaller = null)
     {
         var commissionsView = new CommissionsView(_commissionsViewModel);
