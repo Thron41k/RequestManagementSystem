@@ -12,7 +12,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/StyledButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <helpers:AspectRatioConverter x:Key="AspectRatioConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.DataContext>
@@ -21,30 +20,37 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="734" />
         </Grid.ColumnDefinitions>
+
+        <!-- Левая панель с кнопкой -->
         <Grid Grid.Column="0" Width="1000">
             <Button Width="100" Height="25" Content="test" Command="{Binding PrintCommand}"/>
         </Grid>
+
+        <!-- Правая панель с содержимым и скроллом -->
         <Grid Grid.Column="1">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
+                          VerticalScrollBarVisibility="Auto"
+                          VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch" Margin="0,20,0,20">
                 <Border Background="White" BorderBrush="Black" BorderThickness="1"
-                        Width="714" Height="1010">
+                        Width="714">
                     <!-- A4 при 96 DPI -->
-                    <Grid>
-                        <ItemsControl ItemsSource="{Binding Images}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Columns="{Binding Columns}" Rows="{Binding Rows}" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Image Source="{Binding Image}" Stretch="Fill"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Grid>
+                    <ItemsControl ItemsSource="{Binding Images}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="{Binding Columns}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="357" Height="238">
+                                    <Image Source="{Binding Image}" Stretch="Uniform"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Border>
             </ScrollViewer>
         </Grid>
