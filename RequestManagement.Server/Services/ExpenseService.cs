@@ -127,7 +127,6 @@ namespace RequestManagement.Server.Services
 
                 foreach (var material in materials)
                 {
-                    // Драйвер
                     if (!existingDrivers.TryGetValue(material.DriverFullName, out var driver))
                     {
                         driver = new RequestManagement.Common.Models.Driver

@@ -5,8 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:WpfClient.ViewModels"
              xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" MinHeight="780" MinWidth="1500">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,23 +19,99 @@
     <UserControl.DataContext>
         <viewModels:LabelPrintListViewModel />
     </UserControl.DataContext>
-    <Grid>
+    <Grid Margin="0,0,20,0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="734" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="741" />
         </Grid.ColumnDefinitions>
 
         <!-- Левая панель с кнопкой -->
-        <Grid Grid.Column="0" Width="1000">
-            <Button Width="100" Height="25" Content="test" Command="{Binding PrintCommand}"/>
+        <Grid Grid.Column="0" Margin="10,15,0,20" HorizontalAlignment="Right" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="85" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="13,0,0,0">
+                    <Label FontSize="16" Margin="0,9,1,0" Content="Масштаб при печати:"/>
+                    <materialDesign:NumericUpDown
+                    Value="{Binding PrintScale, UpdateSourceTrigger=PropertyChanged}"
+                    Minimum="0"
+                    Maximum="100"
+                    ValueStep="1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    BorderBrush="Black"
+                    FontSize="16"
+                    materialDesign:TextFieldAssist.SuffixText="%"
+                    HorizontalContentAlignment="Right"
+                    Style="{StaticResource MaterialDesignFloatingHintNumericUpDown}"
+                    Foreground="Black"/>
+                    <Button Content="Печать" Margin="15,7,0,0" Command="{Binding PrintCommand}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Margin="10,24,0,0">
+                <TextBox
+                    Text ="{Binding FastSearchText, UpdateSourceTrigger=PropertyChanged}"
+                    Height="56"
+                    VerticalAlignment="Top"
+                    materialDesign:HintAssist.Hint="Быстрый поиск"
+                    FontSize="16"
+                    AcceptsReturn="True"
+                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                    TextWrapping="Wrap"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    VerticalScrollBarVisibility="Auto" />
+            </StackPanel>
+                    <DataGrid Grid.Row="2" ItemsSource="{Binding IncomingsViewSource.View}"
+                      AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow">
+                <b:Interaction.Behaviors>
+                    <helpers:QuantityUpdateBehavior/>
+                </b:Interaction.Behaviors>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button 
+                                    VerticalAlignment="Top"
+                                    Content="Удалить"
+                                    Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                    CommandParameter="{Binding}">
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="250">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
 
         <!-- Правая панель с содержимым и скроллом -->
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Margin="10,0,0,0">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
                           VerticalScrollBarVisibility="Auto"
-                          VerticalAlignment="Stretch"
-                          HorizontalAlignment="Stretch" Margin="0,20,0,20">
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Left" Margin="0,20,0,20">
                 <Border Background="White" BorderBrush="Black" BorderThickness="1"
                         Width="714">
                     <!-- A4 при 96 DPI -->
@@ -45,8 +123,8 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Width="357" Height="238">
-                                    <Image Source="{Binding Image}" Stretch="Uniform"/>
+                                <Border Width="356" Height="203">
+                                    <Image Source="{Binding Image}" Stretch="Fill"/>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

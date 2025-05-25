@@ -1,18 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RequestManagement.Common.Interfaces;
 using WpfClient.Services.Interfaces;
-using WpfClient.Models;
 using RequestManagement.Common.Models;
 using WpfClient.Messages;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System.Windows;
-using WpfClient.Views;
 
 namespace WpfClient.ViewModels
 {
@@ -23,9 +16,12 @@ namespace WpfClient.ViewModels
         private readonly IExcelReaderService _excelReaderService;
         private readonly IWarehouseService _requestService;
         [ObservableProperty] private bool _isBusy;
+        [ObservableProperty] private bool _isShowResultDialog;
+        [ObservableProperty] private string _resultDialogText = "";
         [ObservableProperty] private string _documentPath = "";
+        [ObservableProperty] private string _selectedWarehouseName = "";
         [ObservableProperty] private MaterialIncoming? _materialIncoming = new();
-        [ObservableProperty] private Warehouse _selectedWarehouse = new();
+        [ObservableProperty] private Warehouse? _selectedWarehouse = new();
         [ObservableProperty] private int _materialIncomingCount;
         public IncomingDataLoadViewModel()
         {
@@ -45,6 +41,7 @@ namespace WpfClient.ViewModels
             {
                 case MessagesEnum.SelectWarehouse:
                     SelectedWarehouse = (Warehouse)arg.Item;
+                    SelectedWarehouseName = SelectedWarehouse.Name;
                     break;
             }
 
@@ -53,31 +50,29 @@ namespace WpfClient.ViewModels
         public void Init()
         {
             DocumentPath = "";
-            MaterialIncoming = new();
-            SelectedWarehouse = new ();
+            MaterialIncoming = new MaterialIncoming();
+            SelectedWarehouse = new Warehouse();
+            SelectedWarehouseName = "";
         }
         [RelayCommand]
         private async Task UploadMaterials()
         {
             try
             {
-                if(MaterialIncoming == null) return;
+                if(string.IsNullOrEmpty(DocumentPath)) return;
+                if(MaterialIncoming == null || MaterialIncoming.Items.Count == 0)return;
+                if(string.IsNullOrEmpty(SelectedWarehouseName)) return;
                 IsBusy = true;
                 var result =
                     await _incomingService.UploadIncomingsAsync(MaterialIncoming);
-                if (result)
-                {
-                    MessageBox.Show("Data uploaded successfully", "Success", MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Error uploading data", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                ResultDialogText = result ? "Data uploaded successfully" : "Error uploading data";
+                IsShowResultDialog = true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading data: {ex.Message}");
+                ResultDialogText = "Error loading data";
+                IsShowResultDialog = true;
+
             }
             finally
             {
@@ -105,29 +100,48 @@ namespace WpfClient.ViewModels
                         if (result.WarehouseName != null)
                         {
                             SelectedWarehouse = await _requestService.GetOrCreateWarehousesAsync(result.WarehouseName);
+                            SelectedWarehouseName = SelectedWarehouse.Name;
                         }
+                    }
+                    else
+                    {
+                        MaterialIncomingCount = 0;
+                        SelectedWarehouse = new Warehouse();
+                        SelectedWarehouseName = "";
+                        DocumentPath = "";
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading Excel file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ResultDialogText = "Error loading Excel file";
+                IsShowResultDialog = true;
             }
-        }
-        [RelayCommand]
-        private void ClearDocumentPath()
-        {
-            DocumentPath = "";
         }
         [RelayCommand]
         private async Task SelectWarehouse()
         {
             await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectWarehouse, typeof(IncomingDataLoadViewModel)));
         }
+
         [RelayCommand]
-        private void ClearSelectedWarehouse()
+        private void HideResultDialog()
         {
-            SelectedWarehouse = new Warehouse();
+            IsShowResultDialog = false;
+        }
+
+        [RelayCommand]
+        private void ClearDocumentPath()
+        {
+            DocumentPath = "";
+            MaterialIncomingCount = 0;
+        }
+
+        [RelayCommand]
+        private void ClearWarehouseName()
+        {
+            SelectedWarehouseName = "";
+            SelectedWarehouse = null;
         }
     }
 }

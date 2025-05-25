@@ -17,10 +17,14 @@ namespace WpfClient.ViewModels
         private readonly IWarehouseService _requestService;
         private readonly IStockService _stockService;
         [ObservableProperty] private bool _isBusy;
+        [ObservableProperty] private bool _isShowResultDialog;
+        [ObservableProperty] private string _resultDialogText = "";
         [ObservableProperty] private string _documentPath = "";
         [ObservableProperty] private List<MaterialStock> _materialStocks = [];
-        [ObservableProperty] private Warehouse _selectedWarehouse = new();
+        [ObservableProperty] private Warehouse? _selectedWarehouse = new();
+        [ObservableProperty] private string _selectedWarehouseName = "";
         [ObservableProperty] private DateTime _toDate = DateTime.Now;
+        [ObservableProperty] private int _materialIncomingCount;
         public StartDataLoadViewModel()
         {
            
@@ -50,16 +54,22 @@ namespace WpfClient.ViewModels
             {
                 case MessagesEnum.SelectWarehouse:
                     SelectedWarehouse = (Warehouse)arg.Item;
+                    SelectedWarehouseName = SelectedWarehouse.Name;
                     break;
             }
 
             return Task.CompletedTask;
         }
-
+        [RelayCommand]
+        private void HideResultDialog()
+        {
+            IsShowResultDialog = false;
+        }
         [RelayCommand]
         private void ClearDocumentPath()
         {
             DocumentPath = "";
+            MaterialIncomingCount = 0;
         }
 
         [RelayCommand]
@@ -67,22 +77,19 @@ namespace WpfClient.ViewModels
         {
             try
             {
+                if (string.IsNullOrEmpty(DocumentPath)) return;
+                if (MaterialStocks.Count == 0) return;
+                if (string.IsNullOrEmpty(SelectedWarehouseName)) return;
                 IsBusy = true;
                 var result =
                     await _stockService.UploadMaterialsStockAsync(MaterialStocks, SelectedWarehouse.Id, ToDate);
-                if (result)
-                {
-                    MessageBox.Show("Data uploaded successfully", "Success", MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Error uploading data", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                ResultDialogText = result ? "Data uploaded successfully" : "Error uploading data";
+                IsShowResultDialog = true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading data: {ex.Message}");
+                ResultDialogText = "Error loading data";
+                IsShowResultDialog = true;
             }
             finally
             {
@@ -107,17 +114,27 @@ namespace WpfClient.ViewModels
                     if (result.materialStocks is { Count: > 0 })
                     {
                         MaterialStocks = result.materialStocks;
+                        MaterialIncomingCount = result.materialStocks.Count;
                         if (result.date != null) ToDate = DateTime.Parse(result.date);
                         if (result.warehouse != null)
                         {
                             SelectedWarehouse = await _requestService.GetOrCreateWarehousesAsync(result.warehouse);
+                            SelectedWarehouseName = SelectedWarehouse.Name;
                         }
+                    }
+                    else
+                    {
+                        MaterialIncomingCount = 0;
+                        SelectedWarehouse = new Warehouse();
+                        SelectedWarehouseName = "";
+                        DocumentPath = "";
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading Excel file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ResultDialogText = "Error loading Excel file";
+                IsShowResultDialog = true;
             }
         }
         [RelayCommand]
@@ -128,7 +145,8 @@ namespace WpfClient.ViewModels
         [RelayCommand]
         private void ClearSelectedWarehouse()
         {
-            SelectedWarehouse = new Warehouse();
+            SelectedWarehouseName = "";
+            SelectedWarehouse = null;
         }
     }
 }

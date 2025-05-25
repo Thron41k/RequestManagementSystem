@@ -1,11 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
-using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using QRCoder;
 using RequestManagement.Common.Models;
@@ -14,7 +9,6 @@ using System.Collections.ObjectModel;
 using System.Windows.Media.Imaging;
 using System.IO;
 using WpfClient.Models;
-using Microsoft.Office.Interop.Excel;
 using Font = System.Drawing.Font;
 using Rectangle = System.Drawing.Rectangle;
 using System.Windows.Controls.Primitives;
@@ -25,18 +19,24 @@ using System.Windows.Media;
 using CommunityToolkit.Mvvm.Input;
 using Brushes = System.Drawing.Brushes;
 using Color = System.Drawing.Color;
+using Pen = System.Drawing.Pen;
 using Size = System.Windows.Size;
+using System.Windows.Data;
 
 namespace WpfClient.ViewModels
 {
     public partial class LabelPrintListViewModel : ObservableObject
     {
-        private const int LabelPerPage = 8;
+        private const int LabelPerPage = 10;
+        [ObservableProperty] private CollectionViewSource _incomingsViewSource;
         [ObservableProperty] private ObservableCollection<Incoming> _labelList = [];
+        [ObservableProperty] private ObservableCollection<Incoming> _labelListForShow = [];
         [ObservableProperty] private ObservableCollection<ImageItem> _images = [];
+        [ObservableProperty] private Incoming? _selectedIncoming;
         [ObservableProperty] private int _columns = 2;
-        [ObservableProperty] private int _rows = 4;
-        [ObservableProperty] private int _pageIndex = 0;
+        [ObservableProperty] private int _rows = 5;
+        [ObservableProperty] private int _printScale = 100;
+        [ObservableProperty] private string _fastSearchText = "";
         public event EventHandler CloseWindowRequested;
 
         public LabelPrintListViewModel()
@@ -44,17 +44,18 @@ namespace WpfClient.ViewModels
 
         }
 
+
         private Bitmap CreateLabel(Incoming i)
         {
-            const int pos1 = 20;
-            var bmp = new Bitmap(600, 400);
-            var rectF = new RectangleF(10, 10, 580, 166);
+            var bmp = new Bitmap(600, 340);
+            var rectF = new RectangleF(10, 10, 580, 106);
             var g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-            g.FillRectangle(Brushes.White, 2, 2, 594, 394);
+            var pen = new Pen(Brushes.Black, 2);
+            g.Clear(Color.White);
             var q = GetQr(i.Id.ToString());
+            g.DrawImage(q, 410, 147);
             //g.FillRectangle(Brushes.Aqua, rectF);
-            g.DrawImage(q, 400, 200);
+            g.DrawLine(pen, 15, 116, 575, 116);
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
@@ -62,69 +63,88 @@ namespace WpfClient.ViewModels
             stringFormat.Alignment = StringAlignment.Center;
             stringFormat.LineAlignment = StringAlignment.Center;
             g.DrawString(i.Stock.Nomenclature.Name, new Font("Arial", 18, System.Drawing.FontStyle.Bold), Brushes.Black, rectF, stringFormat);
-            rectF = new RectangleF(10, 178, 580, 40);
+            rectF = new RectangleF(10, 117, 580, 40);
+            g.DrawLine(pen, 15, 156, 575, 156);
             stringFormat.LineAlignment = StringAlignment.Center;
-            //g.FillRectangle(Brushes.Chartreuse, rectF);
-            g.DrawString(i.Stock.Nomenclature.Article != "" ? $"{i.Stock.Nomenclature.Article}" : "", new Font("Arial", 16), Brushes.Black, rectF, stringFormat);
-            rectF = new RectangleF(10, 220, 410, 135);
+            // g.FillRectangle(Brushes.Chartreuse, rectF);
+            g.DrawString(i.Stock.Nomenclature.Article != "" ? $"{i.Stock.Nomenclature.Article}" : "", new Font("Arial", 18), Brushes.Black, rectF, stringFormat);
+            rectF = new RectangleF(10, 158, 410, 135);
             //g.FillRectangle(Brushes.Yellow, rectF);
+            g.DrawLine(pen, 15, 292, 405, 292);
             g.DrawString(i.Application?.Equipment?.FullName, new Font("Arial", 16, System.Drawing.FontStyle.Regular), Brushes.Black, rectF, stringFormat);
-            rectF = new RectangleF(10, 352, 410, 40);
+            rectF = new RectangleF(10, 293, 410, 40);
             //g.FillRectangle(Brushes.Crimson, rectF);
-            g.DrawString($"Дата поступления: {i.Date.ToShortDateString()}", new Font("Arial", 16, System.Drawing.FontStyle.Italic), Brushes.Black, rectF, stringFormat);
+            g.DrawString($"Дата поступления: {i.Date.ToShortDateString()}", new Font("Arial", 18, System.Drawing.FontStyle.Italic), Brushes.Black, rectF, stringFormat);
+            g.DrawLine(pen, 0, 1, 600, 1);
+            g.DrawLine(pen, 0, 339, 600, 339);
+            g.DrawLine(pen, 1, 0, 1, 340);
+            g.DrawLine(pen, 599, 0, 599, 340);
             g.Flush();
             return bmp;
         }
-
         [RelayCommand]
         public void Print()
         {
             var printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
             {
+                var pageWidth = 794;// * PrintScale/100.0; // A4 @ 96 DPI
+                var pageHeight = 1123;// * PrintScale / 100.0;
+                const double margin = 20;
+                var labelWidth = (pageWidth - 2 * margin) / Columns;
+                var labelHeight = (pageHeight - 2 * margin) / Rows;
+                var labelWidthScaled = labelWidth * PrintScale / 100.0;
+                var labelHeightScaled = labelHeight * PrintScale / 100.0;
+                var rowOverride = (int)Math.Round(pageHeight / labelHeightScaled, MidpointRounding.ToZero);
+                var columnOverride = (int)Math.Round(pageWidth / labelWidthScaled, MidpointRounding.ToZero);
+                var labelsPerPage = rowOverride * columnOverride;
                 var doc = new FixedDocument
                 {
-                    DocumentPaginator =
-                    {
-                        PageSize = new Size(794, 1123) // A4 @ 96 DPI
-                    }
+                    DocumentPaginator = { PageSize = new Size(pageWidth, pageHeight) }
                 };
 
-                var pageContent = new PageContent();
-                var fixedPage = new FixedPage
+                // Разбиваем изображения на группы по 8 этикеток
+                for (var i = 0; i < Images.Count; i += labelsPerPage)
                 {
-                    Width = 794,
-                    Height = 1123
-                };
+                    var pageImages = Images.Skip(i).Take(labelsPerPage).ToList();
 
-                var grid = new UniformGrid
-                {
-                    Columns = Columns,
-                    Rows = Rows,
-                    Margin = new Thickness(20),
-                    VerticalAlignment = VerticalAlignment.Top
-                };
-                //var tmpImages = Images.
-                foreach (var item in Images)
-                {
-                    var sourceImage = ResizeImage(item.Image, (794 - 40) / Columns, (1123 - 40) / Rows);
-                    var img = new System.Windows.Controls.Image
+                    var pageContent = new PageContent();
+                    var fixedPage = new FixedPage
                     {
-                        Source = sourceImage,
-                        Width = sourceImage.Width,
-                        Height = sourceImage.Height,
-                        Margin = new Thickness(0),
-                        Stretch = Stretch.None,
+                        Width = pageWidth,
+                        Height = pageHeight
+                    };
+
+                    var grid = new UniformGrid
+                    {
+                        Columns = columnOverride,
+                        Rows = rowOverride,
+                        Margin = new Thickness(margin),
                         VerticalAlignment = VerticalAlignment.Top
                     };
-                    grid.Children.Add(img);
-                }
 
-                FixedPage.SetLeft(grid, 0);
-                FixedPage.SetTop(grid, 0);
-                fixedPage.Children.Add(grid);
-                ((IAddChild)pageContent).AddChild(fixedPage);
-                doc.Pages.Add(pageContent);
+                    foreach (var item in pageImages)
+                    {
+                        var sourceImage = ResizeImage(item.Image, labelWidthScaled, labelHeightScaled); // Высота этикетки
+
+                        var img = new System.Windows.Controls.Image
+                        {
+                            Source = sourceImage,
+                            Width = sourceImage.Width,
+                            Height = sourceImage.Height,
+                            Margin = new Thickness(0),
+                            Stretch = Stretch.Uniform,
+                            VerticalAlignment = VerticalAlignment.Top
+                        };
+                        grid.Children.Add(img);
+                    }
+
+                    FixedPage.SetLeft(grid, 0);
+                    FixedPage.SetTop(grid, 0);
+                    fixedPage.Children.Add(grid);
+                    ((IAddChild)pageContent).AddChild(fixedPage);
+                    doc.Pages.Add(pageContent);
+                }
 
                 printDialog.PrintDocument(doc.DocumentPaginator, "Печать этикеток");
             }
@@ -153,36 +173,21 @@ namespace WpfClient.ViewModels
             graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
             return destImage;
         }
-
-        public static BitmapSource ResizeImage(BitmapSource source, int maxWidth, int maxHeight)
+        private static BitmapSource ResizeImage(BitmapSource source, double maxWidth, double maxHeight)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
-
-            // Рассчитываем коэффициент масштабирования с сохранением пропорций
-            double scaleX = (double)maxWidth / source.PixelWidth;
-            double scaleY = (double)maxHeight / source.PixelHeight;
-            double scale = Math.Min(scaleX, scaleY);
-
-            // Если изображение уже меньше целевого размера, возвращаем оригинал
+            var scaleX = maxWidth / source.PixelWidth;
+            var scaleY = maxHeight / source.PixelHeight;
+            var scale = Math.Min(scaleX, scaleY);
             if (scale >= 1.0)
                 return source;
-
-            // Рассчитываем новые размеры
-            int scaledWidth = (int)(source.PixelWidth * scale);
-            int scaledHeight = (int)(source.PixelHeight * scale);
-
-            // Создаем TransformedBitmap для масштабирования
             var transform = new ScaleTransform(scale, scale);
             var scaledBitmap = new TransformedBitmap(source, transform);
-
-            // Конвертируем в WriteableBitmap для возможных дальнейших операций
             var resized = new WriteableBitmap(scaledBitmap);
-            resized.Freeze(); // Для безопасного использования в разных потоках
-
             return resized;
         }
-        private BitmapImage BitmapToBitmapImage(Bitmap bitmap)
+        private static BitmapImage BitmapToBitmapImage(Bitmap bitmap)
         {
             var memory = new MemoryStream();
             bitmap.Save(memory, ImageFormat.Png);
@@ -196,28 +201,56 @@ namespace WpfClient.ViewModels
             return bitmapImage;
         }
 
-        public void Init(List<Incoming> labelList)
+        public async Task Init(List<Incoming> labelList)
         {
             LabelList = new ObservableCollection<Incoming>(labelList);
-            UpdateLabelList();
+            await UpdateLabelList();
         }
 
-        private void UpdateLabelList()
+        partial void OnFastSearchTextChanged(string value)
+        {
+            _ = UpdateLabelList();
+        }
+        public async Task UpdateLabelList()
         {
             Images.Clear();
-            foreach (var label in LabelList)
+            if (!string.IsNullOrEmpty(FastSearchText))
+            {
+                LabelListForShow = new ObservableCollection<Incoming>(LabelList.Where(x => x.Stock.Nomenclature.Name.ToLower().Contains(FastSearchText.ToLower())
+                    || x.Stock.Nomenclature.Article!.ToLower().Contains(FastSearchText.ToLower())));
+            }
+            else
+            {
+                LabelListForShow = new ObservableCollection<Incoming>(LabelList);
+            }
+            await ProcessImagesAsync();
+            IncomingsViewSource = new CollectionViewSource
+            {
+                Source = LabelListForShow
+            };
+        }
+        private async Task ProcessImagesAsync()
+        {
+            foreach (var label in LabelListForShow)
             {
                 for (var i = 0; i < label.Quantity; i++)
                 {
-                    var image = BitmapToBitmapImage(CreateLabel(label));
+                    var image = await Task.Run(() =>
+                    {
+                        var bitmap = CreateLabel(label);
+                        return BitmapToBitmapImage(bitmap);
+                    });
                     Images.Add(new ImageItem { Image = image });
                     image.Freeze();
                 }
             }
         }
-        partial void OnImagesChanged(ObservableCollection<ImageItem> value)
+
+        [RelayCommand]
+        private async Task DeleteItem(Incoming item)
         {
-            Console.WriteLine(value.Count);
+            LabelList.Remove(item);
+            await UpdateLabelList();
         }
     }
 }

@@ -110,8 +110,8 @@ public class MainMenuViewModel
         {
             Content = labelPrintListView,
             Title = "Печать этикеток",
-            Width = 520,
-            Height = 1240
+            Width = 1500,
+            Height = 820
         };
         _labelPrintListViewModel.Init(labelList);
         window.ShowDialog();
@@ -122,9 +122,9 @@ public class MainMenuViewModel
         var window = new Window
         {
             Content = incomingDataLoadView,
-            Title = "Загрузка начальных остатков",
+            Title = "Загрузка приходов",
             Width = 520,
-            Height = 240,
+            Height = 310,
             ResizeMode = ResizeMode.NoResize
         };
         _incomingDataLoadViewModel.Init();
@@ -139,7 +139,7 @@ public class MainMenuViewModel
             Content = sparePartsAnalogsView,
             Title = "Аналоги номенклатуры",
             Width = 850,
-            Height = 490,
+            Height = 510,
             ResizeMode = ResizeMode.NoResize
         };
         window.ShowDialog();
@@ -209,8 +209,8 @@ public class MainMenuViewModel
         {
             Content = startDataLoadView,
             Title = "Загрузка начальных остатков",
-            Width = 520,
-            Height = 240,
+            Width = 570,
+            Height = 310,
             ResizeMode = ResizeMode.NoResize
         };
         _startDataLoadViewModel.Init();
@@ -225,7 +225,7 @@ public class MainMenuViewModel
             Content = expenseDataLoadView,
             Title = "Загрузка расходов",
             Width = 520,
-            Height = 240,
+            Height = 310,
             ResizeMode = ResizeMode.NoResize
         };
         _expenseDataLoadViewModel.Init();

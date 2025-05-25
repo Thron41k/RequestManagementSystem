@@ -26,6 +26,7 @@ namespace WpfClient.Services
                 var worksheet = package.Workbook.Worksheets[0];
                 var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
                 const int startRow = 13;
+                if(worksheet.Cells[startRow - 1, 1].Value == null) return (materialExpenses, warehouse);
                 warehouse = worksheet.Cells[startRow - 1, 1].Value.ToString()?.Trim();
                 var expenseNumber = "";
                 var expenseDate = DateTime.Now;
@@ -86,37 +87,48 @@ namespace WpfClient.Services
         }
         public (List<MaterialStock> materialStocks, string? date, string? warehouse) ReadMaterialStock(string filePath)
         {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException("Excel file not found.", filePath);
-            var materialStocks = new List<MaterialStock>();
-            using var package = new ExcelPackage(new FileInfo(filePath));
-            var worksheet = package.Workbook.Worksheets[0];
-            var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
-            const int startRow = 11;
-            var date = worksheet.Cells[4, 3].Value.ToString()?.Split('-')[1].Trim();
-            var warehouse = worksheet.Cells[10, 1].Value.ToString()?.Trim();
-            for (var row = startRow; row < rowCount; row++)
+            try
             {
-                if (worksheet.Cells[row, 1].Value == null && worksheet.Cells[row, 2].Value == null)
-                    continue;
-                try
+                if (!File.Exists(filePath))
+                    throw new FileNotFoundException("Excel file not found.", filePath);
+                var materialStocks = new List<MaterialStock>();
+                using var package = new ExcelPackage(new FileInfo(filePath));
+                var worksheet = package.Workbook.Worksheets[0];
+                var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
+                const int startRow = 11;
+                var date = worksheet.Cells[4, 3].Value.ToString()?.Split('-')[1].Trim();
+                var warehouse = worksheet.Cells[10, 1].Value.ToString()?.Trim();
+                for (var row = startRow; row < rowCount; row++)
                 {
-                    var material = new MaterialStock
+                    if (worksheet.Cells[row, 1].Value == null && worksheet.Cells[row, 2].Value == null)
+                        continue;
+                    try
                     {
-                        ItemName = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
-                        Code = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty,
-                        Article = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty,
-                        Unit = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty,
-                        FinalBalance = double.TryParse(worksheet.Cells[row, 9].Value?.ToString()?.Trim(), out var balance) ? balance : 0
-                    };
-                    materialStocks.Add(material);
+                        var material = new MaterialStock
+                        {
+                            ItemName = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
+                            Code = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty,
+                            Article = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty,
+                            Unit = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty,
+                            FinalBalance =
+                                double.TryParse(worksheet.Cells[row, 9].Value?.ToString()?.Trim(), out var balance)
+                                    ? balance
+                                    : 0
+                        };
+                        materialStocks.Add(material);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error processing row {row}: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error processing row {row}: {ex.Message}");
-                }
+
+                return (materialStocks, date, warehouse);
             }
-            return (materialStocks, date, warehouse);
+            catch (Exception ex)
+            {
+                return ([], null, null);
+            }
         }
 
         public MaterialIncoming ReadMaterialIncoming(string filePath)
@@ -133,6 +145,7 @@ namespace WpfClient.Services
                 var worksheet = package.Workbook.Worksheets[0];
                 var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
                 const int startRow = 13;
+                if(worksheet.Cells[startRow - 1, 1].Value == null)return new MaterialIncoming();
                 materialIncoming.WarehouseName = worksheet.Cells[startRow - 1, 1].Value.ToString()?.Trim();
                 MaterialIncomingItem? newMaterialIncoming = null;
                 for (var row = startRow; row < rowCount; row++)
@@ -203,7 +216,10 @@ namespace WpfClient.Services
                         });
                     }
                 }
-
+                if (newMaterialIncoming != null)
+                {
+                    materialIncoming.Items.Add(newMaterialIncoming);
+                }
                 return materialIncoming;
             }
             catch (Exception ex)

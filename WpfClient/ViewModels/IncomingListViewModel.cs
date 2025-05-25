@@ -10,9 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Globalization;
 using Warehouse = RequestManagement.Common.Models.Warehouse;
 using System.Windows;
-using Google.Protobuf.WellKnownTypes;
 using RequestManagement.Common.Models.Extensions;
-using static OfficeOpenXml.ExcelErrorValue;
 
 namespace WpfClient.ViewModels;
 

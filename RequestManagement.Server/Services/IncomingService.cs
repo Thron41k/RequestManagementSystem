@@ -346,6 +346,8 @@ namespace RequestManagement.Server.Services
                 var incomingsToUpdate = new List<Incoming>();
                 foreach (var item in incoming.Items)
                 {
+                    if(item.ReceiptOrderNumber == "БПТР0005663")
+                        Console.WriteLine(item.ReceiptOrderNumber);
                     Application? application = null;
                     if (!string.IsNullOrEmpty(item.ApplicationNumber) && !string.IsNullOrEmpty(item.ApplicationDate) &&
                         DateTime.TryParse(item.ApplicationDate, out var applicationDate))

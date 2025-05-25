@@ -3,19 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfClient.Views"
              xmlns:vm="clr-namespace:WpfClient.ViewModels"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:WpfClient.ViewModels.Behaviors"
-             xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:validationRules="clr-namespace:WpfClient.ViewModels.ValidationRules"
              mc:Ignorable="d" 
              d:DesignHeight="220" d:DesignWidth="500" MinHeight="220" MinWidth="500">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/TextBoxClearButton.xaml" />
-                <ResourceDictionary Source="Styles/StyledButton.xaml" />
-            </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -23,7 +19,18 @@
         <vm:IncomingDataLoadViewModel />
     </UserControl.DataContext>
     <Grid>
-        <Grid Margin="10" x:Name="MainContent" >
+        <materialDesign:Snackbar
+            Height="70"
+            ActionButtonPlacement="Inline"
+            Panel.ZIndex="1"
+            ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionMidButton}"
+            IsActive="{Binding IsShowResultDialog}">
+            <materialDesign:SnackbarMessage
+                ActionContent="OK"
+                ActionCommand="{Binding HideResultDialogCommand}"
+                Content="{Binding ResultDialogText}" />
+        </materialDesign:Snackbar>
+        <Grid Margin="10,10,0,0">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="IsEnabled" Value="True" />
@@ -40,30 +47,65 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="10,5,0,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Документ Excel" 
-                         Tag="{Binding ClearDocumentPathCommand}" 
-                         Text="{Binding DocumentPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                         IsReadOnly="True" Width="455" Style="{StaticResource ClearableTextBoxStyle}">
+            <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="9,5,0,5">
+                <TextBox
+                    Tag="{Binding ClearDocumentPathCommand}"
+                    Height="56"
+                    VerticalAlignment="Top"
+                    materialDesign:HintAssist.Hint="Документ Excel"
+                    FontSize="16"
+                    AcceptsReturn="True"
+                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                    TextWrapping="Wrap"
+                    Width="465"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    VerticalScrollBarVisibility="Auto" >
+                    <TextBox.Text>
+                        <Binding
+                            Path="DocumentPath"
+                            Mode="TwoWay"
+                            UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <validationRules:NotEmptyValidationRule
+                                    ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
                     <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
                         <behaviors:MouseClickCommandBehavior Command="{Binding SelectDocumentPathCommand}" />
                     </b:Interaction.Behaviors>
                 </TextBox>
             </StackPanel>
-            <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,25,0,5">
-                <Label Content="Всего позиций: "/>
-                <Label Margin="-10,0,0,0" Content="{Binding MaterialIncomingCount}"/>
+            <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,15,0,5">
+                <Label Content="Всего позиций:   " FontSize="16"/>
+                <Label Margin="-10,0,0,0" Content="{Binding MaterialIncomingCount}"  FontSize="16"/>
             </StackPanel>
-            <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,0,0,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Склад" 
-                         Tag="{Binding ClearSelectedWarehouseCommand}" 
-                         Text="{Binding SelectedWarehouse.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                         IsReadOnly="True" Width="455" Style="{StaticResource ClearableTextBoxStyle}">
+            <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="9,10,0,5">
+                <TextBox
+                    Tag="{Binding ClearWarehouseNameCommand}"
+                    Height="56"
+                    VerticalAlignment="Top"
+                    materialDesign:HintAssist.Hint="Склад"
+                    FontSize="16"
+                    AcceptsReturn="True"
+                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                    TextWrapping="Wrap"
+                    Width="465"
+                    IsReadOnly="True"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    VerticalScrollBarVisibility="Auto" >
+                    <TextBox.Text>
+                        <Binding
+                            Path="SelectedWarehouseName"
+                            Mode="TwoWay"
+                            UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <validationRules:NotEmptyValidationRule
+                                    ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
                     <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
                         <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
                     </b:Interaction.Behaviors>
                 </TextBox>
