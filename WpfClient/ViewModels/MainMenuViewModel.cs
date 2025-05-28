@@ -340,8 +340,8 @@ public class MainMenuViewModel
         {
             Content = expenseView,
             Title = editMode ? "Редактирование расхода" : "Добавить расход",
-            Width = 620,
-            Height = 330,
+            Width = 650,
+            Height = 380,
             ResizeMode = ResizeMode.NoResize
         };
         _expenseViewModel.SetExpenseId(id);
@@ -413,8 +413,8 @@ public class MainMenuViewModel
         {
             Content = driverView,
             Title = "Сотрудники",
-            Width = 800,
-            Height = 600
+            Width = 850,
+            Height = 700
         };
         _ = _driverViewModel.Load();
         _driverViewModel.EditMode = editMode;

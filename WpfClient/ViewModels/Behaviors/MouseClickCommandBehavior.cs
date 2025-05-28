@@ -34,7 +34,16 @@ public class MouseClickCommandBehavior : Behavior<TextBox>
     }
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        FindChild<Button>(AssociatedObject, "PART_ClearButton").Command = AssociatedObject.Tag as ICommand;
+        try
+        {
+            if (AssociatedObject.Tag != null)
+            {
+                var button = FindChild<Button>(AssociatedObject, "PART_ClearButton");
+                if(button != null)
+                    FindChild<Button>(AssociatedObject, "PART_ClearButton").Command = AssociatedObject.Tag as ICommand;
+            }
+        }
+        catch { }
     }
     private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {

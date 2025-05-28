@@ -115,7 +115,8 @@ public class DefectViewModel : INotifyPropertyChanged
         {
             DefectList.Clear();
             foreach (var item in _defectList)
-            {
+            { 
+                //Тут бывает ошибка когда фильтруется группа
                 DefectList.Add(new DefectViewItem(item, _defectGroupList.First(x => x.Id == item.DefectGroupId).Name));
             }
             return Task.CompletedTask;
