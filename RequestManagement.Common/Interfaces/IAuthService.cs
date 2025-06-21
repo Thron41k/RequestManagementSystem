@@ -23,4 +23,5 @@ public interface IAuthService
     /// <param name="requiredRole">Требуемая роль для действия</param>
     /// <returns>Признак наличия прав</returns>
     Task<bool> AuthorizeAsync(int userId, UserRole requiredRole);
+    Task<User> RefreshTokenAsync(string token, string ipAddress);
 }

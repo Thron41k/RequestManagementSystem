@@ -143,7 +143,7 @@ public partial class StockViewModel : ObservableObject
     [RelayCommand]
     private void DoubleClick()
     {
-        _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(IStockService), false,-1,null,0, SelectedStock, _lastSelectedEquipment, _lastSelectedDriver, null));
+        _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(IStockService), false,-1,null,0,0, SelectedStock, _lastSelectedEquipment, _lastSelectedDriver, null));
     }
 
     [RelayCommand]

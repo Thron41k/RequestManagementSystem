@@ -90,7 +90,8 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 }
             },
             Date = Convert.ToDateTime(expense.Date),
-            Quantity = (decimal)expense.Quantity
+            Quantity = (decimal)expense.Quantity,
+            Term = expense.Term
         }).ToList();
     }
 
@@ -144,7 +145,8 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 DriverId = expense.DriverId,
                 DefectId = expense.DefectId,
                 Date = expense.Date.ToString(CultureInfo.CurrentCulture),
-                Quantity = (double)expense.Quantity
+                Quantity = (double)expense.Quantity,
+                Term = expense.Term ?? 0
             }, headers);
         expense.Id = result.Id;
         return expense;
@@ -167,7 +169,8 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 DriverId = expense.DriverId,
                 DefectId = expense.DefectId,
                 Date = expense.Date.ToString(CultureInfo.CurrentCulture),
-                Quantity = (double)expense.Quantity
+                Quantity = (double)expense.Quantity,
+                Term = expense.Term ?? 0
             }, headers);
         return result.Success;
     }
@@ -220,11 +223,12 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         {
             mapping.Defect = new RequestManagement.Common.Models.Defect
                 { Id = result.Defect.Id, Name = result.Defect.Name };
+            mapping.Term = result.Term;
         }
         return mapping;
     }
 
-    public Task SaveNomenclatureDefectMappingAsync(int userId, int stockId, int defectId)
+    public Task SaveNomenclatureDefectMappingAsync(int userId, int stockId, int defectId, int term)
     {
         throw new NotImplementedException();
     }

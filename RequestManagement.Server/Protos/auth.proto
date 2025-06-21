@@ -8,6 +8,7 @@ package auth;
 service AuthService {
     rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse);
     rpc Authorize (AuthorizeRequest) returns (AuthorizeResponse);
+    rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
 }
 
 // Сообщения для запросов и ответов
@@ -24,6 +25,7 @@ message AuthenticateResponse {
     string login = 2;         // Логин пользователя
     int32 role = 3;           // Роль пользователя (enum UserRole)
     string token = 4;         // JWT-токен для дальнейших запросов
+    string refresh_token = 5;
 }
 
 // Запрос на проверку прав доступа
@@ -35,4 +37,17 @@ message AuthorizeRequest {
 // Ответ на проверку прав доступа
 message AuthorizeResponse {
     bool is_authorized = 1;   // Признак наличия прав
+}
+
+message RefreshTokenRequest {
+    string token = 1;
+    string ip_address = 2;
+}
+
+message RefreshTokenResponse {
+    int32 user_id = 1;
+    string login = 2;
+    int32 role = 3;
+    string token = 4;
+    string refresh_token = 5;
 }

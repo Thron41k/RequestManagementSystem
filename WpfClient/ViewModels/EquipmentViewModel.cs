@@ -1,108 +1,59 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
 using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
 using Dispatcher = System.Windows.Threading.Dispatcher;
+using Equipment = RequestManagement.Common.Models.Equipment;
 using Timer = System.Timers.Timer;
 
 
 namespace WpfClient.ViewModels;
 
-public class EquipmentViewModel : INotifyPropertyChanged
+public partial class EquipmentViewModel : ObservableObject
 {
     private readonly IMessageBus _messageBus;
-    public event PropertyChangedEventHandler PropertyChanged;
     private readonly IEquipmentService _requestService;
-    private Equipment? _selectedEquipment;
-    private string _newEquipmentLicensePlate;
-    private string _newEquipmentName;
+    [ObservableProperty] private Equipment? _selectedEquipment;
+    [ObservableProperty] private string _newEquipmentLicensePlate;
+    [ObservableProperty] private string _newEquipmentName;
+    [ObservableProperty] private string _newEquipmentCode;
+    [ObservableProperty] private string _filterText;
+    [ObservableProperty] private ObservableCollection<Equipment> _equipmentList = [];
+    [ObservableProperty] private CollectionViewSource _equipmentViewSource;
     private readonly Timer _filterTimer;
-    private string _filterText;
     private readonly Dispatcher _dispatcher;
+    public bool DialogResult { get; set; }
     public event EventHandler CloseWindowRequested;
-    public ObservableCollection<Equipment> EquipmentList { get; } = [];
-    public ICommand LoadEquipmentCommand { get; }
-    public ICommand AddEquipmentCommand { get; }
-    public ICommand UpdateEquipmentCommand { get; }
-    public ICommand DeleteEquipmentCommand { get; }
-    public ICommand SelectRowCommand { get; }
-
-    public string FilterText
-    {
-        get => _filterText;
-        set
-        {
-            if (_filterText == value) return;
-            _filterText = value;
-            OnPropertyChanged();
-            _filterTimer.Stop(); // Сбрасываем таймер при каждом вводе
-            _filterTimer.Start(); // Запускаем таймер заново
-        }
-    }
-
-    public string NewEquipmentName {
-        get => _newEquipmentName;
-        set
-        {
-            if (_newEquipmentName == value) return;
-            _newEquipmentName = value;
-            OnPropertyChanged(); // Уведомляем UI об изменении
-        }
-    }
-    public string NewEquipmentLicensePlate {
-        get => _newEquipmentLicensePlate;
-        set
-        {
-            if (_newEquipmentLicensePlate == value) return;
-            _newEquipmentLicensePlate = value;
-            OnPropertyChanged(); // Уведомляем UI об изменении
-        }
-    }
-
-    public Equipment? SelectedEquipment
-    {
-        get => _selectedEquipment ?? null;
-        set
-        {
-            _selectedEquipment = value;
-            AddToEdit();
-        }
-    }
 
     public bool EditMode { get; set; }
+
+    partial void OnFilterTextChanged(string value)
+    {
+        _filterTimer.Stop();
+        _filterTimer.Start();
+    }
+
+    partial void OnSelectedEquipmentChanged(Equipment? value)
+    {
+        AddToEdit();
+    }
 
     public EquipmentViewModel(IEquipmentService requestService, IMessageBus messageBus)
     {
         _requestService = requestService;
         _messageBus = messageBus;
-        LoadEquipmentCommand = new RelayCommand(Execute);
-        AddEquipmentCommand = new RelayCommand(Action);
-        UpdateEquipmentCommand = new RelayCommand(Execute1);
-        DeleteEquipmentCommand = new RelayCommand(Action1);
-        SelectRowCommand = new RelayCommand(Action2);
+        EquipmentViewSource = new CollectionViewSource { Source = EquipmentList };
         _dispatcher = Dispatcher.CurrentDispatcher;
-        _filterTimer = new Timer(1000) { AutoReset = false }; // Задержка 1 секунда
+        _filterTimer = new Timer(Vars.SearchDelay) { AutoReset = false };
         _filterTimer.Elapsed += async (s, e) => await LoadEquipmentAsync();
-        return;
-
-        async void Action1() => await DeleteEquipmentAsync();
-        async void Execute1() => await UpdateEquipmentAsync();
-        async void Action() => await AddEquipmentAsync();
-        async void Execute() => await LoadEquipmentAsync();
-        async void Action2() => await SelectAndClose();
-    }
-
-    private async Task SelectAndClose()
-    {
-        if (!EditMode && SelectedEquipment != null)
-        {
-            CloseWindowRequested?.Invoke(this, EventArgs.Empty);
-        }
     }
 
     public async Task Load()
@@ -111,63 +62,94 @@ public class EquipmentViewModel : INotifyPropertyChanged
     }
     private async Task LoadEquipmentAsync()
     {
-        var filter = string.IsNullOrWhiteSpace(_filterText) ? "" : _filterText.Trim();
+        var filter = string.IsNullOrWhiteSpace(FilterText) ? "" : FilterText.Trim();
         var equipmentList = await _requestService.GetAllEquipmentAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
-            EquipmentList.Clear();
-            foreach (var item in equipmentList)
-            {
-                EquipmentList.Add(new Equipment { Id = item.Id, Name = item.Name, LicensePlate = item.StateNumber });
-            }
+            EquipmentList = new ObservableCollection<Equipment>(equipmentList);
+            EquipmentViewSource.Source = EquipmentList;
+            NewEquipmentName = string.Empty;
+            NewEquipmentLicensePlate = string.Empty;
+            NewEquipmentCode = string.Empty;
             return Task.CompletedTask;
         });
     }
 
-    private Task AddToEdit()
+    private void AddToEdit()
     {
-        if (_selectedEquipment != null)
-        {
-            NewEquipmentName = _selectedEquipment.Name;
-            NewEquipmentLicensePlate = _selectedEquipment.LicensePlate;
-        }
-        return Task.CompletedTask;
+        if (SelectedEquipment == null) return;
+        NewEquipmentName = SelectedEquipment.Name;
+        if (SelectedEquipment.StateNumber != null) NewEquipmentLicensePlate = SelectedEquipment.StateNumber;
+        NewEquipmentCode = SelectedEquipment.Code;
     }
-    private async Task AddEquipmentAsync()
+
+    [RelayCommand]
+    private void SelectAndClose()
     {
-        if (!string.IsNullOrWhiteSpace(NewEquipmentName))
+        if (!EditMode && SelectedEquipment != null)
         {
-            await _requestService.CreateEquipmentAsync(new RequestManagement.Common.Models.Equipment { Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate });
-            await LoadEquipmentAsync(); // Обновляем список после добавления
+            DialogResult = true;
+            CloseWindowRequested.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    [RelayCommand]
+    private async Task AddEquipment()
+    {
+        if (!string.IsNullOrWhiteSpace(NewEquipmentName) && !string.IsNullOrWhiteSpace(NewEquipmentCode))
+        {
+            await _requestService.CreateEquipmentAsync(new Equipment { Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate, Code = NewEquipmentCode });
+            await LoadEquipmentAsync();
             NewEquipmentName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
+            NewEquipmentCode = string.Empty;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
     }
 
-    private async Task UpdateEquipmentAsync()
+    [RelayCommand]
+    private async Task UpdateEquipment()
     {
-        if (SelectedEquipment != null && !string.IsNullOrEmpty(NewEquipmentName.Trim()))
+        if (SelectedEquipment != null && !string.IsNullOrEmpty(NewEquipmentName.Trim()) && !string.IsNullOrEmpty(NewEquipmentCode.Trim()))
         {
-            await _requestService.UpdateEquipmentAsync(new RequestManagement.Common.Models.Equipment { Id = SelectedEquipment.Id, Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate });
-            await LoadEquipmentAsync(); // Обновляем список после изменения
+            await _requestService.UpdateEquipmentAsync(new Equipment { Id = SelectedEquipment.Id, Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate, Code = NewEquipmentCode });
+            await LoadEquipmentAsync();
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
     }
 
-    private async Task DeleteEquipmentAsync()
+    [RelayCommand]
+    private async Task DeleteEquipment()
     {
-        if (_selectedEquipment != null)
+        if (SelectedEquipment != null)
         {
-            await _requestService.DeleteEquipmentAsync(_selectedEquipment.Id);
-            await LoadEquipmentAsync(); // Обновляем список после удаления
-            NewEquipmentName = "";
-            NewEquipmentLicensePlate = "";
+            await _requestService.DeleteEquipmentAsync(SelectedEquipment.Id);
+            await LoadEquipmentAsync();
+            NewEquipmentName = string.Empty;
+            NewEquipmentLicensePlate = string.Empty;
+            NewEquipmentCode = string.Empty;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
     }
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+
+    [RelayCommand]
+    private void ClearEquipmentName()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        NewEquipmentName = string.Empty;
+    }
+    [RelayCommand]
+    private void ClearEquipmentLicensePlate()
+    {
+        NewEquipmentLicensePlate = string.Empty;
+    }
+    [RelayCommand]
+    private void ClearEquipmentCode()
+    {
+        NewEquipmentCode = string.Empty;
+    }
+    [RelayCommand]
+    private void ClearFilterText()
+    {
+        FilterText = string.Empty;
     }
 }

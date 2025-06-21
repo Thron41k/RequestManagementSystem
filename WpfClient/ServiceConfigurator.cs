@@ -25,6 +25,8 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<WarehouseService.WarehouseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<CommissionsService.CommissionsServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<NomenclatureAnalogService.NomenclatureAnalogServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<EquipmentService.EquipmentServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<DriverService.DriverServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();

@@ -3,16 +3,6 @@
 option csharp_namespace = "RequestManagement.Server.Controllers";
 
 service RequestService {
-    rpc GetAllEquipment (GetAllEquipmentRequest) returns (GetAllEquipmentResponse);
-    rpc CreateEquipment (CreateEquipmentRequest) returns (CreateEquipmentResponse);
-    rpc UpdateEquipment (UpdateEquipmentRequest) returns (UpdateEquipmentResponse);
-    rpc DeleteEquipment (DeleteEquipmentRequest) returns (DeleteEquipmentResponse);
-
-    rpc GetAllDrivers (GetAllDriversRequest) returns (GetAllDriversResponse);
-    rpc CreateDriver (CreateDriverRequest) returns (CreateDriverResponse);
-    rpc UpdateDriver (UpdateDriverRequest) returns (UpdateDriverResponse);
-    rpc DeleteDriver (DeleteDriverRequest) returns (DeleteDriverResponse);
-
     rpc GetAllDefectGroups (GetAllDefectGroupsRequest) returns (GetAllDefectGroupsResponse);
     rpc CreateDefectGroup (CreateDefectGroupRequest) returns (CreateDefectGroupResponse);
     rpc UpdateDefectGroup (UpdateDefectGroupRequest) returns (UpdateDefectGroupResponse);
@@ -27,87 +17,6 @@ service RequestService {
     rpc CreateNomenclature(CreateNomenclatureRequest) returns (CreateNomenclatureResponse);
     rpc UpdateNomenclature (UpdateNomenclatureRequest) returns (UpdateNomenclatureResponse);
     rpc DeleteNomenclature (DeleteNomenclatureRequest) returns (DeleteNomenclatureResponse);
-}
-
-// Сообщения для оборудования
-message GetAllEquipmentRequest {
-    string filter = 1;
-}
-
-message GetAllEquipmentResponse {
-    repeated Equipment equipment = 1;
-}
-
-message CreateEquipmentRequest {
-    string name = 1;
-    string license_plate = 2;
-}
-
-message CreateEquipmentResponse {
-    int32 id = 1;
-}
-
-message UpdateEquipmentRequest {
-    int32 id = 1;
-    string name = 2;
-    string license_plate = 3;
-}
-
-message UpdateEquipmentResponse {
-    bool success = 1;
-}
-
-message DeleteEquipmentRequest {
-    int32 id = 1;
-}
-
-message DeleteEquipmentResponse {
-    bool success = 1;
-}
-
-message Equipment {
-    int32 id = 1;
-    string name = 2;
-    string license_plate = 3;
-}
-
-message GetAllDriversRequest {
-    string filter = 1; // Фильтр для поиска по имени или должности
-}
-
-message GetAllDriversResponse {
-    repeated Driver drivers = 1;
-}
-
-message CreateDriverRequest {
-    Driver driver = 1;
-}
-
-message CreateDriverResponse {
-    int32 id = 1; // ID созданного водителя
-}
-
-message UpdateDriverRequest {
-    Driver driver = 1;
-}
-
-message UpdateDriverResponse {
-    bool success = 1;
-}
-
-message DeleteDriverRequest {
-    int32 id = 1;
-}
-
-message DeleteDriverResponse {
-    bool success = 1;
-}
-
-message Driver {
-    int32 id = 1;
-    string full_name = 2;   // Полное ФИО
-    string short_name = 3;  // Фамилия с инициалами
-    string position = 4;    // Должность
 }
 
 message GetAllDefectGroupsRequest {

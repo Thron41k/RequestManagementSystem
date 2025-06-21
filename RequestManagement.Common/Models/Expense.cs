@@ -16,6 +16,7 @@ namespace RequestManagement.Common.Models
         public int StockId { get; set; }
         public Stock Stock { get; set; } = null!;
         public decimal Quantity { get; set; }
+        public int? Term { get; set; }
         public int EquipmentId { get; set; }
         public Equipment Equipment { get; set; } = null!;
         public int DriverId { get; set; }

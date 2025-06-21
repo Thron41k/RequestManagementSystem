@@ -15,8 +15,8 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var request = new CreateEquipmentRequest { Name = equipment.Name, LicensePlate = equipment.StateNumber };
-        var client = clientFactory.CreateRequestClient();
+        var request = new CreateEquipmentRequest { Name = equipment.Name, LicensePlate = equipment.StateNumber, Code = equipment.Code };
+        var client = clientFactory.CreateEquipmentClient();
         var result = await client.CreateEquipmentAsync(request, headers);
         return result.Id;
     }
@@ -28,8 +28,8 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var request = new UpdateEquipmentRequest { Id = equipment.Id, Name = equipment.Name, LicensePlate = equipment.StateNumber };
-        var client = clientFactory.CreateRequestClient();
+        var request = new UpdateEquipmentRequest { Id = equipment.Id, Name = equipment.Name, LicensePlate = equipment.StateNumber, Code = equipment.Code };
+        var client = clientFactory.CreateEquipmentClient();
         var result = await client.UpdateEquipmentAsync(request, headers);
         return result.Success;
     }
@@ -42,7 +42,7 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
         var request = new DeleteEquipmentRequest { Id = id};
-        var client = clientFactory.CreateRequestClient();
+        var client = clientFactory.CreateEquipmentClient();
         var result = await client.DeleteEquipmentAsync(request, headers);
         return result.Success;
     }
@@ -54,8 +54,8 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var client = clientFactory.CreateRequestClient();
+        var client = clientFactory.CreateEquipmentClient();
         var response = await client.GetAllEquipmentAsync(new GetAllEquipmentRequest { Filter = filter }, headers);
-        return response.Equipment.Select(equipment => new RequestManagement.Common.Models.Equipment { Id = equipment.Id, Name = equipment.Name, StateNumber = equipment.LicensePlate }).ToList();
+        return response.Equipment.Select(equipment => new RequestManagement.Common.Models.Equipment { Id = equipment.Id, Name = equipment.Name, StateNumber = equipment.LicensePlate, Code = equipment.Code}).ToList();
     }
 }

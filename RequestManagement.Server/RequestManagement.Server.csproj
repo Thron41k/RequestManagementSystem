@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Protobuf Include="Protos\auth.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\driver.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\request.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\stock.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\expense.proto" GrpcServices="Server" />
@@ -41,6 +42,8 @@
     <Protobuf Include="Protos\warehouse.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\commissions.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\nomenclatureanalog.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\equipment.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\driver.proto" GrpcServices="Server" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\" />

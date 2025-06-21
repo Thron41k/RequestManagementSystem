@@ -13,7 +13,7 @@ public class SelectTaskMessage(MessagesEnum message, Type caller)
     public Type Caller { get; } = caller;
 }
 
-public class ShowTaskMessage(MessagesEnum message, Type caller, bool editMode, int id, DateTime? date, decimal quantity, params IEntity?[] items)
+public class ShowTaskMessage(MessagesEnum message, Type caller, bool editMode, int id, DateTime? date, decimal quantity,int? term, params IEntity?[] items)
 {
     public MessagesEnum Message { get; } = message;
     public Type Caller { get; } = caller;
@@ -22,6 +22,7 @@ public class ShowTaskMessage(MessagesEnum message, Type caller, bool editMode, i
     public DateTime? Date { get; } = date;
     public decimal Quantity { get; } = quantity;
     public IEntity?[] Item { get; } = items;
+    public int? Term { get; set; } = term;
 }
 public class ShowTaskPrintDialogMessage(MessagesEnum message, Type caller, bool editMode, List<Expense> items, DateTime fromDate, DateTime toDate)
 {

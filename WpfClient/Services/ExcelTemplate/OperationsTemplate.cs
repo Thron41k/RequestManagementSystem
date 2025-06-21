@@ -71,6 +71,7 @@ namespace WpfClient.Services.ExcelTemplate
                         newSheet.Cells[startRow, 14, startRow, 16].Merge = true;
                         newSheet.Cells[startRow, 17].Value = item.Date.ToString("dd.MM.yyyy");
                         newSheet.Cells[startRow, 17, startRow, 19].Merge = true;
+                        newSheet.Cells[startRow, 20].Value = item.Term is 0 or null ? "" : item.Term.ToString();
                         newSheet.Cells[startRow, 20, startRow, 21].Merge = true;
                     }
 

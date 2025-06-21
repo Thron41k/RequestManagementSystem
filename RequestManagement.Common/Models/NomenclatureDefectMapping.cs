@@ -17,5 +17,6 @@ namespace RequestManagement.Common.Models
         public int DefectId { get; set; }
         public Defect Defect { get; set; } = null!;
         public DateTime LastUsed { get; set; }
+        public int Term { get; set; }
     }
 }

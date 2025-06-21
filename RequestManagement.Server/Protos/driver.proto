@@ -1,0 +1,50 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service DriverService {
+    rpc GetAllDrivers (GetAllDriversRequest) returns (GetAllDriversResponse);
+    rpc CreateDriver (CreateDriverRequest) returns (CreateDriverResponse);
+    rpc UpdateDriver (UpdateDriverRequest) returns (UpdateDriverResponse);
+    rpc DeleteDriver (DeleteDriverRequest) returns (DeleteDriverResponse);
+}
+
+message GetAllDriversRequest {
+    string filter = 1; // Фильтр для поиска по имени или должности
+}
+
+message GetAllDriversResponse {
+    repeated Driver drivers = 1;
+}
+
+message CreateDriverRequest {
+    Driver driver = 1;
+}
+
+message CreateDriverResponse {
+    int32 id = 1; // ID созданного водителя
+}
+
+message UpdateDriverRequest {
+    Driver driver = 1;
+}
+
+message UpdateDriverResponse {
+    bool success = 1;
+}
+
+message DeleteDriverRequest {
+    int32 id = 1;
+}
+
+message DeleteDriverResponse {
+    bool success = 1;
+}
+
+message Driver {
+    int32 id = 1;
+    string full_name = 2;   // Полное ФИО
+    string short_name = 3;  // Фамилия с инициалами
+    string position = 4;    // Должность
+    string code = 5;
+}

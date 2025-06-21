@@ -39,8 +39,19 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     {
         return serviceProvider.GetRequiredService<CommissionsService.CommissionsServiceClient>();
     }
+
     public NomenclatureAnalogService.NomenclatureAnalogServiceClient CreateNomenclatureAnalogClient()
     {
         return serviceProvider.GetRequiredService<NomenclatureAnalogService.NomenclatureAnalogServiceClient>();
+    }
+
+    public EquipmentService.EquipmentServiceClient CreateEquipmentClient()
+    {
+        return serviceProvider.GetRequiredService<EquipmentService.EquipmentServiceClient>();
+    }
+
+    public DriverService.DriverServiceClient CreateDriverClient()
+    {
+        return serviceProvider.GetRequiredService<DriverService.DriverServiceClient>();
     }
 }

@@ -7,6 +7,8 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:WpfClient.ViewModels.Behaviors"
              xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:validationRules="clr-namespace:WpfClient.ViewModels.ValidationRules"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200" MinHeight="800" MinWidth="1200">
     <UserControl.Resources>
@@ -36,68 +38,127 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="5,5,0,5">
-                    <Label Content="Период: с " Margin="0,5"/>
-                    <DatePicker Margin="0,7,0,3" SelectedDate="{Binding FromDate}">
+                <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="5,9,0,5">
+                    <Label FontSize="14" Content="Период: с " Margin="0,0,0,3" VerticalAlignment="Center"/>
+                    <DatePicker Margin="0,0,0,0" 
+                                SelectedDate="{Binding FromDate}" 
+                                FontSize="14"
+                                Style="{StaticResource MaterialDesignOutlinedDatePicker}">
                         <b:Interaction.Behaviors>
                             <behaviors:DatePickerSelectedDateChangedBehavior Command="{Binding LoadExpensesCommand}" />
                         </b:Interaction.Behaviors>
                     </DatePicker>
-                    <Label Content="по" Margin="0,5"/>
-                    <DatePicker Margin="0,7,0,3" SelectedDate="{Binding ToDate}">
+                    <Label FontSize="14" 
+                           Content="по" 
+                           Margin="3,0,5,3" 
+                           VerticalAlignment="Center"/>
+                    <DatePicker Margin="0,0,0,0" 
+                                SelectedDate="{Binding ToDate}" 
+                                FontSize="14"
+                                Style="{StaticResource MaterialDesignOutlinedDatePicker}">
                         <b:Interaction.Behaviors>
                             <behaviors:DatePickerSelectedDateChangedBehavior Command="{Binding LoadExpensesCommand}" />
                         </b:Interaction.Behaviors>
                     </DatePicker>
                 </StackPanel>
-                <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Склад" Tag="{Binding ClearSelectedWarehouseCommand}" Text="{Binding SelectedWarehouse.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,10,0,5">
+                    <TextBox materialDesign:HintAssist.Hint="Склад" 
+                             Tag="{Binding ClearSelectedWarehouseCommand}"
+                             IsReadOnly="True" 
+                             materialDesign:TextFieldAssist.HasClearButton="True"
+                             materialDesign:ValidationAssist.UsePopup="True"
+                             materialDesign:HintAssist.HintPaddingBrush="White"
+                             materialDesign:HintAssist.FloatingScale="1"
+                             FontSize="14"
+                             AcceptsReturn="True"
+                             Width="336" 
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                        <TextBox.Text>
+                            <Binding
+                                Path="SelectedWarehouse.Name"
+                                Mode="OneWay"
+                                UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <validationRules:NotEmptyValidationRule
+                                        ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
                         <b:Interaction.Behaviors>
-                            <behaviors:ClearButtonBehavior />
-                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
                             <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
                         </b:Interaction.Behaviors>
                     </TextBox>
                 </StackPanel>
-                <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Дефект"   Tag="{Binding ClearSelectedDefectCommand}"  Text="{Binding SelectedDefect.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,10,0,5">
+                    <TextBox materialDesign:HintAssist.Hint="Дефект" 
+                             Tag="{Binding ClearSelectedDefectCommand}"  
+                             Text="{Binding SelectedDefect.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                             IsReadOnly="True"
+                             materialDesign:TextFieldAssist.HasClearButton="True"
+                             materialDesign:HintAssist.HintPaddingBrush="White"
+                             materialDesign:HintAssist.FloatingScale="1"
+                             FontSize="14"
+                             AcceptsReturn="True"
+                             Width="336"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
                         <b:Interaction.Behaviors>
-                            <behaviors:ClearButtonBehavior />
-                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
                             <behaviors:MouseClickCommandBehavior Command="{Binding SelectDefectCommand}" />
                         </b:Interaction.Behaviors>
                     </TextBox>
                 </StackPanel>
             </Grid>
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="1" Margin="10,0,15,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="10,9,0,5">
-                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Номенклатура" Tag="{Binding ClearSearchTextCommand}" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                    <TextBox materialDesign:HintAssist.Hint="Номенклатура" 
+                             Tag="{Binding ClearSearchTextCommand}" 
+                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             materialDesign:TextFieldAssist.HasClearButton="True"
+                             materialDesign:HintAssist.HintPaddingBrush="White"
+                             materialDesign:HintAssist.FloatingScale="1"
+                             FontSize="14"
+                             AcceptsReturn="True"
+                             Width="400" 
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
                         <b:Interaction.Behaviors>
-                            <behaviors:ClearButtonBehavior />
-                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
                             <behaviors:MouseClickCommandBehavior/>
                         </b:Interaction.Behaviors>
                     </TextBox>
                 </StackPanel>
-                <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Техника" Tag="{Binding ClearSelectedEquipmentCommand}" Text="{Binding SelectedEquipment.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="10,10,0,5">
+                    <TextBox materialDesign:HintAssist.Hint="Техника" 
+                             Tag="{Binding ClearSelectedEquipmentCommand}" 
+                             Text="{Binding SelectedEquipment.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                             IsReadOnly="True"
+                             materialDesign:TextFieldAssist.HasClearButton="True"
+                             materialDesign:HintAssist.HintPaddingBrush="White"
+                             materialDesign:HintAssist.FloatingScale="1"
+                             FontSize="14"
+                             AcceptsReturn="True"
+                             Width="400" 
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
                         <b:Interaction.Behaviors>
-                            <behaviors:ClearButtonBehavior />
-                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
                             <behaviors:MouseClickCommandBehavior Command="{Binding SelectEquipmentCommand}" />
                         </b:Interaction.Behaviors>
                     </TextBox>
                 </StackPanel>
-                <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,5,0,5">
-                    <TextBox helpers:PlaceholderHelper.PlaceholderText="Водитель" Tag="{Binding ClearSelectedDriverCommand}" Text="{Binding SelectedDriver.ShortName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="336" Style="{StaticResource ClearableTextBoxStyle}">
+                <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,10,0,5">
+                    <TextBox materialDesign:HintAssist.Hint="Водитель" 
+                             Tag="{Binding ClearSelectedDriverCommand}" 
+                             Text="{Binding SelectedDriver.ShortName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                             IsReadOnly="True" 
+                             materialDesign:TextFieldAssist.HasClearButton="True"
+                             materialDesign:HintAssist.HintPaddingBrush="White"
+                             materialDesign:HintAssist.FloatingScale="1"
+                             FontSize="14"
+                             AcceptsReturn="True"
+                             Width="400" 
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
                         <b:Interaction.Behaviors>
-                            <behaviors:ClearButtonBehavior />
-                            <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
                             <behaviors:MouseClickCommandBehavior Command="{Binding SelectDriverCommand}" />
                         </b:Interaction.Behaviors>
                     </TextBox>
@@ -113,7 +174,7 @@
             </Grid>
         </Grid>
         <DataGrid Grid.Row="1" ItemsSource="{Binding ExpensesViewSource.View}" SelectedItem="{Binding SelectedExpense}"
-                  AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow" Name="ExpenseListDataGrid">
+                  AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,10,5" SelectionMode="Single" SelectionUnit="FullRow" Name="ExpenseListDataGrid">
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="White"/>
@@ -136,7 +197,7 @@
                     CommandParameter="{Binding Expenses/}"/>
             </DataGrid.InputBindings>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="" SortMemberPath="IsSelected" CanUserSort="True">
+                <DataGridTemplateColumn Header="" SortMemberPath="IsSelected" CanUserSort="True" Width="50">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -144,11 +205,11 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="80" />
+                <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="100" />
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*" />
                 <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="250" />
-                <DataGridTextColumn Header="Ед.изм." Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="60" />
-                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="50" />
+                <DataGridTextColumn Header="Ед.изм." Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="95" />
+                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="76" />
                 <DataGridTextColumn Header="Техника" Binding="{Binding Equipment.Name}" IsReadOnly="True" Width="*" />
                 <DataGridTextColumn Header="г.н." Binding="{Binding Equipment.StateNumber}" IsReadOnly="True" Width="100" />
                 <DataGridTextColumn Header="Водитель" Binding="{Binding Driver.ShortName}" IsReadOnly="True" Width="150" />

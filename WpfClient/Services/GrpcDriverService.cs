@@ -14,7 +14,7 @@ internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStor
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var client = clientFactory.CreateRequestClient();
+        var client = clientFactory.CreateDriverClient();
         var response = await client.GetAllDriversAsync(new GetAllDriversRequest { Filter = filter }, headers);
         return response.Drivers.Select(driver => new RequestManagement.Common.Models.Driver { Id = driver.Id, FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position}).ToList();
     }
@@ -26,7 +26,7 @@ internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStor
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var client = clientFactory.CreateRequestClient();
+        var client = clientFactory.CreateDriverClient();
         var result = await client.CreateDriverAsync(new CreateDriverRequest { Driver = new RequestManagement.Server.Controllers.Driver { FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position }}, headers);
         return result.Id;
     }
@@ -38,7 +38,7 @@ internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStor
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var client = clientFactory.CreateRequestClient();
+        var client = clientFactory.CreateDriverClient();
         var result = await client.UpdateDriverAsync(new UpdateDriverRequest { Driver = new RequestManagement.Server.Controllers.Driver { Id = driver.Id, FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position } }, headers);
         return result.Success;
     }
@@ -50,7 +50,7 @@ internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStor
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var client = clientFactory.CreateRequestClient();
+        var client = clientFactory.CreateDriverClient();
         var result = await client.DeleteDriverAsync(new DeleteDriverRequest { Id = id }, headers);
         return result.Success;
     }

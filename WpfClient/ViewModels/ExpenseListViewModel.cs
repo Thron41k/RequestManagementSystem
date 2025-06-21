@@ -41,7 +41,7 @@ public partial class ExpenseListViewModel : ObservableObject
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
         _expensesViewSource = new CollectionViewSource { Source = Expenses };
         var dispatcher = Dispatcher.CurrentDispatcher;
-        _filterTimer = new System.Timers.Timer(1000) { AutoReset = false };
+        _filterTimer = new System.Timers.Timer(Vars.SearchDelay) { AutoReset = false };
         _filterTimer.Elapsed += async (_, _) =>
         {
             await dispatcher.InvokeAsync(async () => { await LoadExpensesAsync(); });
@@ -98,7 +98,7 @@ public partial class ExpenseListViewModel : ObservableObject
     {
         if (SelectedExpense != null)
         {
-            await _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(ExpenseListViewModel), true, SelectedExpense.Id, SelectedExpense.Date, SelectedExpense.Quantity, SelectedExpense.Stock, SelectedExpense.Equipment, SelectedExpense.Driver, SelectedExpense.Defect));
+            await _messageBus.Publish(new ShowTaskMessage(MessagesEnum.ShowExpenseDialog, typeof(ExpenseListViewModel), true, SelectedExpense.Id, SelectedExpense.Date, SelectedExpense.Quantity, SelectedExpense.Term, SelectedExpense.Stock, SelectedExpense.Equipment, SelectedExpense.Driver, SelectedExpense.Defect));
         }
     }
     [RelayCommand]
@@ -222,7 +222,6 @@ public partial class ExpenseListViewModel : ObservableObject
     private async Task ClearSearchText()
     {
         SearchText = "";
-        await LoadExpensesAsync();
     }
     partial void OnSearchTextChanged(string value)
     {

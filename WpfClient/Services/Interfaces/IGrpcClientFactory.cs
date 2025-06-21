@@ -1,10 +1,4 @@
 ﻿using RequestManagement.Server.Controllers;
-using AuthService = RequestManagement.Server.Controllers.AuthService;
-using ExpenseService = RequestManagement.Server.Controllers.ExpenseService;
-using RequestService = RequestManagement.Server.Controllers.RequestService;
-using StockService = RequestManagement.Server.Controllers.StockService;
-using IncomingService = RequestManagement.Server.Controllers.IncomingService;
-using WarehouseService = RequestManagement.Server.Controllers.WarehouseService;
 
 namespace WpfClient.Services.Interfaces;
 
@@ -18,4 +12,6 @@ public interface IGrpcClientFactory
     WarehouseService.WarehouseServiceClient CreateWarehouseClient();
     CommissionsService.CommissionsServiceClient CreateCommissionsClient();
     NomenclatureAnalogService.NomenclatureAnalogServiceClient CreateNomenclatureAnalogClient();
+    EquipmentService.EquipmentServiceClient CreateEquipmentClient();
+    DriverService.DriverServiceClient CreateDriverClient();
 }

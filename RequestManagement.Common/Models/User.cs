@@ -27,4 +27,6 @@ public class User : IEntity
     /// Роль пользователя в системе
     /// </summary>
     public UserRole Role { get; set; }
+
+    public List<RefreshToken> RefreshTokens { get; set; } = [];
 }

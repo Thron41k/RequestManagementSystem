@@ -93,7 +93,7 @@ public class MainMenuViewModel
     {
         if (arg.Message == MessagesEnum.ShowLabelCountSelector && arg.Caller == typeof(IncomingListViewModel))
         {
-            ShowLabelCountAccept(arg.Items,arg.Caller);
+            ShowLabelCountAccept(arg.Items, arg.Caller);
         }
 
         if (arg.Message == MessagesEnum.ShowLabelPrintListViewDialog && arg.Caller == typeof(IncomingListViewModel))
@@ -148,7 +148,7 @@ public class MainMenuViewModel
     {
         ShowCommissions(true);
     }
-    private void ShowPrintReport(List<Expense> list,DateTime startDate,DateTime endDate)
+    private void ShowPrintReport(List<Expense> list, DateTime startDate, DateTime endDate)
     {
         var printReportView = new PrintReportView(_printReportViewModel);
         var window = new Window
@@ -159,7 +159,7 @@ public class MainMenuViewModel
             Height = 490,
             ResizeMode = ResizeMode.NoResize
         };
-        _printReportViewModel.Init(list,startDate,endDate);
+        _printReportViewModel.Init(list, startDate, endDate);
         window.ShowDialog();
     }
 
@@ -320,7 +320,7 @@ public class MainMenuViewModel
         switch (arg.Message)
         {
             case MessagesEnum.ShowExpenseDialog:
-                await ShowExpenseDialog(arg.EditMode, arg.Caller, arg.Id, arg.Date, arg.Quantity, arg.Item);
+                await ShowExpenseDialog(arg.EditMode, arg.Caller, arg.Id, arg.Date, arg.Quantity, arg.Term, arg.Item);
                 break;
         }
     }
@@ -329,32 +329,33 @@ public class MainMenuViewModel
         switch (arg.Message)
         {
             case MessagesEnum.ShowPrintReportDialog:
-                ShowPrintReport(arg.Item,arg.FromDate,arg.ToDate);
+                ShowPrintReport(arg.Item, arg.FromDate, arg.ToDate);
                 break;
         }
     }
-    private async Task ShowExpenseDialog(bool editMode, Type argCaller, int id, DateTime? date, decimal quantity, params IEntity?[] entity)
+    private async Task ShowExpenseDialog(bool editMode, Type argCaller, int id, DateTime? date, decimal quantity, int? term, params IEntity?[] entity)
     {
         var expenseView = new ExpenseView(_expenseViewModel);
         var window = new Window
         {
             Content = expenseView,
             Title = editMode ? "Редактирование расхода" : "Добавить расход",
-            Width = 650,
-            Height = 380,
+            Width = 675,
+            Height = 550,
             ResizeMode = ResizeMode.NoResize
         };
         _expenseViewModel.SetExpenseId(id);
         _expenseViewModel.DialogResult = false;
         _expenseViewModel.EditMode = editMode;
         _expenseViewModel.SelectedEquipmentText = "";
+        _expenseViewModel.TermForOperations = term != null && term != 0 ? term.Value.ToString() : "";
         _expenseViewModel.QuantityForExpense = "";
         if (date != null) _expenseViewModel.SelectedDate = date.Value;
         _expenseViewModel.SetCurrentQuantity(quantity);
         if (entity[0] != null) _expenseViewModel.ExpenseStock = entity[0] as Stock;
         _expenseViewModel.SetEquipment(entity[1] != null ? entity[1] as Equipment : new Equipment());
         _expenseViewModel.SelectedDriver = entity[2] != null ? entity[2] as Driver : new Driver();
-        _expenseViewModel.SelectedDefect = entity[3] != null ? entity[3] as Defect : _expenseViewModel.SelectedDefect;
+        _expenseViewModel.SetDefect(entity[3] != null ? entity[3] as Defect : _expenseViewModel.SelectedDefect);
         await _expenseViewModel.LoadNomenclatureMapingAsync();
         window.ShowDialog();
         if (_expenseViewModel.DialogResult)
@@ -390,20 +391,21 @@ public class MainMenuViewModel
         {
             Content = equipmentView,
             Title = "Транспорт и ДСТ",
-            Width = 800,
-            Height = 600
+            Width = 1200,
+            Height = 700
         };
         _equipmentViewModel.EditMode = editMode;
         _ = _equipmentViewModel.Load();
         window.ShowDialog();
-        if (_equipmentViewModel.SelectedEquipment != null && argCaller != null)
+        if (_equipmentViewModel.SelectedEquipment != null && argCaller != null && _equipmentViewModel.DialogResult)
             _messageBus.Publish(
                 new SelectResultMessage(
                     MessagesEnum.SelectEquipment, argCaller, new Equipment
                     {
                         Id = _equipmentViewModel.SelectedEquipment.Id,
                         Name = _equipmentViewModel.SelectedEquipment.Name,
-                        StateNumber = _equipmentViewModel.SelectedEquipment.LicensePlate
+                        StateNumber = _equipmentViewModel.SelectedEquipment.StateNumber,
+                        Code = _equipmentViewModel.SelectedEquipment.Code
                     }));
     }
     private void ShowDriver(bool editMode, Type? argCaller = null)
