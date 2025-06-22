@@ -2,44 +2,43 @@
 using Excel = Microsoft.Office.Interop.Excel;
 using WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services
+namespace WpfClient.Services;
+
+public class ExcelPrintService : IExcelPrintService
 {
-    public class ExcelPrintService : IExcelPrintService
+    public void Print(string filePath, string printerName, int copies = 1)
     {
-        public void Print(string filePath, string printerName, int copies = 1)
+        Excel.Application? excelApp = null;
+        Excel.Workbook? workbook = null;
+
+        try
         {
-            Excel.Application? excelApp = null;
-            Excel.Workbook? workbook = null;
-
-            try
+            excelApp = new Excel.Application
             {
-                excelApp = new Excel.Application
-                {
-                    Visible = false,
-                    DisplayAlerts = false
-                };
+                Visible = false,
+                DisplayAlerts = false
+            };
 
-                workbook = excelApp.Workbooks.Open(filePath, ReadOnly: true);
+            workbook = excelApp.Workbooks.Open(filePath, ReadOnly: true);
 
-                for (int i = 0; i < copies; i++)
-                {
-                    workbook.PrintOut(ActivePrinter: printerName);
-                }
-
-                workbook.Close(SaveChanges: false);
+            for (int i = 0; i < copies; i++)
+            {
+                workbook.PrintOut(ActivePrinter: printerName);
             }
-            catch (Exception ex)
+
+            workbook.Close(SaveChanges: false);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Ошибка при печати Excel-файла.", ex);
+        }
+        finally
+        {
+            if (workbook != null) Marshal.ReleaseComObject(workbook);
+            if (excelApp != null)
             {
-                throw new InvalidOperationException("Ошибка при печати Excel-файла.", ex);
-            }
-            finally
-            {
-                if (workbook != null) Marshal.ReleaseComObject(workbook);
-                if (excelApp != null)
-                {
-                    excelApp.Quit();
-                    Marshal.ReleaseComObject(excelApp);
-                }
+                excelApp.Quit();
+                Marshal.ReleaseComObject(excelApp);
             }
         }
     }

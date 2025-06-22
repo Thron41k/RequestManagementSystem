@@ -5,46 +5,45 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.Input;
 using WpfClient.Services.Interfaces;
 
-namespace WpfClient.ViewModels
-{
-    public partial class LabelCountSelectorViewModel : ObservableObject
-    {
-        private readonly IMessageBus _messageBus;
-        [ObservableProperty] private CollectionViewSource _labelListViewSource;
-        [ObservableProperty] private ObservableCollection<Incoming> _labelList = [];
-        public event EventHandler CloseWindowRequested;
-        public bool DialogResult { get; set; }
+namespace WpfClient.ViewModels;
 
-        public LabelCountSelectorViewModel()
-        {
+public partial class LabelCountSelectorViewModel : ObservableObject
+{
+    private readonly IMessageBus _messageBus;
+    [ObservableProperty] private CollectionViewSource _labelListViewSource;
+    [ObservableProperty] private ObservableCollection<Incoming> _labelList = [];
+    public event EventHandler CloseWindowRequested;
+    public bool DialogResult { get; set; }
+
+    public LabelCountSelectorViewModel()
+    {
             
-        }
-        public LabelCountSelectorViewModel(IMessageBus messageBus)
+    }
+    public LabelCountSelectorViewModel(IMessageBus messageBus)
+    {
+        _messageBus = messageBus;
+        _labelListViewSource = new CollectionViewSource
         {
-            _messageBus = messageBus;
-            _labelListViewSource = new CollectionViewSource
-            {
-                Source = LabelList
-            };
-        }
-        public void Init(List<Incoming> labelList)
+            Source = LabelList
+        };
+    }
+    public void Init(List<Incoming> labelList)
+    {
+        DialogResult = false;
+        foreach (var incoming in labelList.Where(incoming => incoming.Quantity < 1))
         {
-            DialogResult = false;
-            foreach (var incoming in labelList.Where(incoming => incoming.Quantity < 1))
-            {
-                incoming.Quantity = Math.Round(incoming.Quantity,MidpointRounding.AwayFromZero);
-            }
-            LabelList = new ObservableCollection<Incoming>(labelList);
-            LabelListViewSource = new CollectionViewSource
-            {
-                Source = LabelList
-            };
+            incoming.Quantity = Math.Round(incoming.Quantity,MidpointRounding.AwayFromZero);
         }
-        [RelayCommand]
-        private void Accept()
+        LabelList = new ObservableCollection<Incoming>(labelList);
+        LabelListViewSource = new CollectionViewSource
         {
-            DialogResult = true;
-            CloseWindowRequested?.Invoke(this, EventArgs.Empty);
-        }
+            Source = LabelList
+        };
+    }
+    [RelayCommand]
+    private void Accept()
+    {
+        DialogResult = true;
+        CloseWindowRequested?.Invoke(this, EventArgs.Empty);
     }
 }

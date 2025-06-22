@@ -1,7 +1,6 @@
-﻿namespace WpfClient.Services.Interfaces
+﻿namespace WpfClient.Services.Interfaces;
+
+public interface IFileSaveDialogService
 {
-    public interface IFileSaveDialogService
-    {
-        string? ShowSaveFileDialog(string defaultFileName, string filter);
-    }
+    string? ShowSaveFileDialog(string defaultFileName, string filter);
 }

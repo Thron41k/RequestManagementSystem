@@ -4,10 +4,10 @@ using System.Security.Claims;
 
 namespace RequestManagement.Server.Controllers;
 
-public class ExpenseController(IExpenseService expenseService, ILogger<RequestController> logger) : ExpenseService.ExpenseServiceBase
+public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseController> logger) : ExpenseService.ExpenseServiceBase
 {
     private readonly IExpenseService _expenseService = expenseService ?? throw new ArgumentNullException(nameof(expenseService));
-    private readonly ILogger<RequestController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<ExpenseController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public override async Task<GetNomenclatureMapingResponse> GetNomenclatureMaping(
         GetNomenclatureMapingRequest request, ServerCallContext context)

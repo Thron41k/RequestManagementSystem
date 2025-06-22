@@ -3,7 +3,6 @@ using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using MaterialDesignThemes.Wpf.Internal;
 
 namespace WpfClient.ViewModels.Behaviors;
 

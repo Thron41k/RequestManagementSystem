@@ -1,0 +1,50 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service NomenclatureService {
+    rpc GetAllNomenclatures (GetAllNomenclaturesRequest) returns (GetAllNomenclaturesResponse);
+    rpc CreateNomenclature(CreateNomenclatureRequest) returns (CreateNomenclatureResponse);
+    rpc UpdateNomenclature (UpdateNomenclatureRequest) returns (UpdateNomenclatureResponse);
+    rpc DeleteNomenclature (DeleteNomenclatureRequest) returns (DeleteNomenclatureResponse);
+}
+
+message GetAllNomenclaturesRequest {
+    string filter = 1;
+}
+
+message GetAllNomenclaturesResponse {
+    repeated Nomenclature nomenclature = 1;
+}
+
+message CreateNomenclatureRequest {
+    Nomenclature nomenclature = 1;
+}
+
+message CreateNomenclatureResponse {
+    int32 id = 1;
+}
+
+message UpdateNomenclatureRequest {
+    Nomenclature nomenclature = 1;
+}
+
+message UpdateNomenclatureResponse {
+    bool success = 1;
+}
+
+message DeleteNomenclatureRequest {
+    int32 id = 1;
+}
+
+message DeleteNomenclatureResponse {
+    bool success = 1;
+}
+
+message Nomenclature {
+    int32 id = 1;
+    string code = 2;
+    string name = 3;
+    string article = 4;
+    string unitOfMeasure = 5;
+}

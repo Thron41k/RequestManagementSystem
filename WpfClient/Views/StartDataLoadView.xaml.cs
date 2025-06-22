@@ -1,16 +1,15 @@
 ﻿using WpfClient.ViewModels;
 
-namespace WpfClient.Views
+namespace WpfClient.Views;
+
+/// <summary>
+/// Логика взаимодействия для StartDataLoadView.xaml
+/// </summary>
+public partial class StartDataLoadView
 {
-    /// <summary>
-    /// Логика взаимодействия для StartDataLoadView.xaml
-    /// </summary>
-    public partial class StartDataLoadView
+    public StartDataLoadView(StartDataLoadViewModel viewModel)
     {
-        public StartDataLoadView(StartDataLoadViewModel viewModel)
-        {
-            InitializeComponent();
-            DataContext = viewModel;
-        }
+        InitializeComponent();
+        DataContext = viewModel;
     }
 }

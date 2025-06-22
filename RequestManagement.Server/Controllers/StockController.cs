@@ -4,10 +4,10 @@ using WpfClient.Models;
 
 namespace RequestManagement.Server.Controllers;
 
-public class StockController(IStockService requestService, ILogger<RequestController> logger) : StockService.StockServiceBase
+public class StockController(IStockService requestService, ILogger<StockController> logger) : StockService.StockServiceBase
 {
     private readonly IStockService _requestService = requestService ?? throw new ArgumentNullException(nameof(requestService));
-    private readonly ILogger<RequestController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<StockController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public override async Task<UploadMaterialStockResponse> UploadMaterialStock(UploadMaterialStockRequest request, ServerCallContext context)
     {

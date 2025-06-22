@@ -3,7 +3,7 @@ using RequestManagement.Common.Interfaces;
 
 namespace RequestManagement.Server.Controllers;
 
-public class CommissionsController(ICommissionsService commissionsService, ILogger<RequestController> logger)
+public class CommissionsController(ICommissionsService commissionsService, ILogger<CommissionsController> logger)
     : CommissionsService.CommissionsServiceBase
 {
     public override async Task<GetAllCommissionsResponse> GetAllCommissions(GetAllCommissionsRequest request, ServerCallContext context)

@@ -5,10 +5,10 @@ using WpfClient.Models;
 
 namespace RequestManagement.Server.Controllers;
 
-public class IncomingController(IIncomingService incomingService, ILogger<RequestController> logger) : IncomingService.IncomingServiceBase
+public class IncomingController(IIncomingService incomingService, ILogger<IncomingController> logger) : IncomingService.IncomingServiceBase
 {
     private readonly IIncomingService _incomingService = incomingService ?? throw new ArgumentNullException(nameof(incomingService));
-    private readonly ILogger<RequestController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<IncomingController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public override async Task<UploadMaterialIncomingResponse> UploadMaterialIncoming(UploadMaterialIncomingRequest request, ServerCallContext context)
     {

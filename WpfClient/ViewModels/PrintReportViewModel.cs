@@ -8,150 +8,149 @@ using System.Drawing.Printing;
 using WpfClient.Models.ExcelWriterModels;
 using WpfClient.Services.ExcelTemplate;
 
-namespace WpfClient.ViewModels
+namespace WpfClient.ViewModels;
+
+public partial class PrintReportViewModel : ObservableObject
 {
-    public partial class PrintReportViewModel : ObservableObject
+    public bool EditMode { get; set; }
+    private readonly IMessageBus _messageBus;
+    private readonly IPrinterService _printerService;
+    private readonly IExcelWriterService _excelWriterService;
+    private DateTime _startDate = DateTime.Now;
+    private DateTime _endDate = DateTime.Now;
+    private List<Expense> _listExpense = new();
+    [ObservableProperty] private Commissions? _selectedCommissions = new();
+    [ObservableProperty] private Driver? _selectedFrp = new();
+    [ObservableProperty] private ObservableCollection<string> _printerList = [];
+    [ObservableProperty] private string _selectedPrinter = "";
+    [ObservableProperty] private int _selectedTypeDocumentForPrint = -1;
+    public PrintReportViewModel()
     {
-        public bool EditMode { get; set; }
-        private readonly IMessageBus _messageBus;
-        private readonly IPrinterService _printerService;
-        private readonly IExcelWriterService _excelWriterService;
-        private DateTime _startDate = DateTime.Now;
-        private DateTime _endDate = DateTime.Now;
-        private List<Expense> _listExpense = new();
-        [ObservableProperty] private Commissions? _selectedCommissions = new();
-        [ObservableProperty] private Driver? _selectedFrp = new();
-        [ObservableProperty] private ObservableCollection<string> _printerList = [];
-        [ObservableProperty] private string _selectedPrinter = "";
-        [ObservableProperty] private int _selectedTypeDocumentForPrint = -1;
-        public PrintReportViewModel()
-        {
             
-        }
-        public PrintReportViewModel(IMessageBus messageBus, IPrinterService printerService, IExcelWriterService excelWriterService)
-        {
-            _messageBus = messageBus;
-            _printerService = printerService;
-            _excelWriterService = excelWriterService;
-            _messageBus.Subscribe<SelectResultMessage>(OnSelect);
-        }
+    }
+    public PrintReportViewModel(IMessageBus messageBus, IPrinterService printerService, IExcelWriterService excelWriterService)
+    {
+        _messageBus = messageBus;
+        _printerService = printerService;
+        _excelWriterService = excelWriterService;
+        _messageBus.Subscribe<SelectResultMessage>(OnSelect);
+    }
 
-        public void Init(List<Expense> list,DateTime startDate,DateTime endDate)
-        {
-            PrinterList = new ObservableCollection<string>(PrinterSettings.InstalledPrinters);
-            SelectedPrinter = _printerService.GetDefaultPrinterName();
-            _listExpense = list;
-            _startDate = startDate;
-            _endDate = endDate;
-        }
-        private Task OnSelect(SelectResultMessage arg)
-        {
-            if (arg.Caller == typeof(PrintReportViewModel) && arg.Item != null)
-                switch (arg.Message)
-                {
-                    case MessagesEnum.SelectDriver:
-                        SelectedFrp = (Driver)arg.Item;
-                        break;
-                    case MessagesEnum.SelectCommissions:
-                        SelectedCommissions = (Commissions)arg.Item;
-                        break;
-                }
-            return null!;
-        }
-
-        [RelayCommand]
-        private void ClearSelectedFrp()
-        {
-            SelectedFrp = new();
-        }
-        [RelayCommand]
-        private void SelectFrp()
-        {
-            _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDriver, typeof(PrintReportViewModel)));
-        }
-        [RelayCommand]
-        private void ClearSelectedCommissions()
-        {
-            SelectedCommissions = new();
-        }
-        [RelayCommand]
-        private void SelectCommissions()
-        {
-            _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectCommissions, typeof(PrintReportViewModel)));
-        }
-
-        [RelayCommand]
-        private void SaveToFile()
-        {
-            if(SelectedCommissions == null && SelectedFrp == null) return;
-            switch (SelectedTypeDocumentForPrint)
+    public void Init(List<Expense> list,DateTime startDate,DateTime endDate)
+    {
+        PrinterList = new ObservableCollection<string>(PrinterSettings.InstalledPrinters);
+        SelectedPrinter = _printerService.GetDefaultPrinterName();
+        _listExpense = list;
+        _startDate = startDate;
+        _endDate = endDate;
+    }
+    private Task OnSelect(SelectResultMessage arg)
+    {
+        if (arg.Caller == typeof(PrintReportViewModel) && arg.Item != null)
+            switch (arg.Message)
             {
-                case 0:
-                    var actParts = new ActPartsModel
-                    {
-                        Commissions = SelectedCommissions,
-                        Frp = SelectedFrp,
-                        Expenses = _listExpense
-                    };
-                    _excelWriterService.ExportAndSave(ExcelTemplateType.ActParts, actParts, "Акты");
+                case MessagesEnum.SelectDriver:
+                    SelectedFrp = (Driver)arg.Item;
                     break;
-                case 1:
-                    var limitParts = new ActPartsModel
-                    {
-                        Commissions = SelectedCommissions,
-                        Frp = SelectedFrp,
-                        Expenses = _listExpense,
-                        StartDate = _startDate,
-                        EndDate = _endDate
-                    };
-                    _excelWriterService.ExportAndSave(ExcelTemplateType.LimitParts, limitParts, "Лимитные карты");
-                    break;
-                case 2:
-                    var defectParts = new ActPartsModel
-                    {
-                        Commissions = SelectedCommissions,
-                        Frp = SelectedFrp,
-                        Expenses = _listExpense,
-                        StartDate = _startDate,
-                        EndDate = _endDate
-                    };
-                    _excelWriterService.ExportAndSave(ExcelTemplateType.DefectParts, defectParts, "Дефектные ведомости");
-                    break;
-                case 3:
-                    var mb7 = new ActPartsModel
-                    {
-                        Commissions = SelectedCommissions,
-                        Frp = SelectedFrp,
-                        Expenses = _listExpense,
-                        StartDate = _startDate,
-                        EndDate = _endDate
-                    };
-                    _excelWriterService.ExportAndSave(ExcelTemplateType.Mb7Parts, mb7, "Ведомость учета выдачи автошин и АКБ");
-                    break;
-                case 4:
-                    var consumables = new ActPartsModel
-                    {
-                        Commissions = SelectedCommissions,
-                        Frp = SelectedFrp,
-                        Expenses = _listExpense,
-                        StartDate = _startDate,
-                        EndDate = _endDate
-                    };
-                    _excelWriterService.ExportAndSave(ExcelTemplateType.Consumables, consumables, "Расходные материалы");
-                    break;
-                case 5:
-                    var operations = new ActPartsModel
-                    {
-                        Commissions = SelectedCommissions,
-                        Frp = SelectedFrp,
-                        Expenses = _listExpense,
-                        StartDate = _startDate,
-                        EndDate = _endDate
-                    };
-                    _excelWriterService.ExportAndSave(ExcelTemplateType.Operations, operations, "Передача в эксплуатацию");
+                case MessagesEnum.SelectCommissions:
+                    SelectedCommissions = (Commissions)arg.Item;
                     break;
             }
+        return null!;
+    }
 
+    [RelayCommand]
+    private void ClearSelectedFrp()
+    {
+        SelectedFrp = new();
+    }
+    [RelayCommand]
+    private void SelectFrp()
+    {
+        _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDriver, typeof(PrintReportViewModel)));
+    }
+    [RelayCommand]
+    private void ClearSelectedCommissions()
+    {
+        SelectedCommissions = new();
+    }
+    [RelayCommand]
+    private void SelectCommissions()
+    {
+        _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectCommissions, typeof(PrintReportViewModel)));
+    }
+
+    [RelayCommand]
+    private void SaveToFile()
+    {
+        if(SelectedCommissions == null && SelectedFrp == null) return;
+        switch (SelectedTypeDocumentForPrint)
+        {
+            case 0:
+                var actParts = new ActPartsModel
+                {
+                    Commissions = SelectedCommissions,
+                    Frp = SelectedFrp,
+                    Expenses = _listExpense
+                };
+                _excelWriterService.ExportAndSave(ExcelTemplateType.ActParts, actParts, "Акты");
+                break;
+            case 1:
+                var limitParts = new ActPartsModel
+                {
+                    Commissions = SelectedCommissions,
+                    Frp = SelectedFrp,
+                    Expenses = _listExpense,
+                    StartDate = _startDate,
+                    EndDate = _endDate
+                };
+                _excelWriterService.ExportAndSave(ExcelTemplateType.LimitParts, limitParts, "Лимитные карты");
+                break;
+            case 2:
+                var defectParts = new ActPartsModel
+                {
+                    Commissions = SelectedCommissions,
+                    Frp = SelectedFrp,
+                    Expenses = _listExpense,
+                    StartDate = _startDate,
+                    EndDate = _endDate
+                };
+                _excelWriterService.ExportAndSave(ExcelTemplateType.DefectParts, defectParts, "Дефектные ведомости");
+                break;
+            case 3:
+                var mb7 = new ActPartsModel
+                {
+                    Commissions = SelectedCommissions,
+                    Frp = SelectedFrp,
+                    Expenses = _listExpense,
+                    StartDate = _startDate,
+                    EndDate = _endDate
+                };
+                _excelWriterService.ExportAndSave(ExcelTemplateType.Mb7Parts, mb7, "Ведомость учета выдачи автошин и АКБ");
+                break;
+            case 4:
+                var consumables = new ActPartsModel
+                {
+                    Commissions = SelectedCommissions,
+                    Frp = SelectedFrp,
+                    Expenses = _listExpense,
+                    StartDate = _startDate,
+                    EndDate = _endDate
+                };
+                _excelWriterService.ExportAndSave(ExcelTemplateType.Consumables, consumables, "Расходные материалы");
+                break;
+            case 5:
+                var operations = new ActPartsModel
+                {
+                    Commissions = SelectedCommissions,
+                    Frp = SelectedFrp,
+                    Expenses = _listExpense,
+                    StartDate = _startDate,
+                    EndDate = _endDate
+                };
+                _excelWriterService.ExportAndSave(ExcelTemplateType.Operations, operations, "Передача в эксплуатацию");
+                break;
         }
+
     }
 }

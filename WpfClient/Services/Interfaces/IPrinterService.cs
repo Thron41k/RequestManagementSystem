@@ -1,7 +1,6 @@
-﻿namespace WpfClient.Services.Interfaces
+﻿namespace WpfClient.Services.Interfaces;
+
+public interface IPrinterService
 {
-    public interface IPrinterService
-    {
-        string GetDefaultPrinterName();
-    }
+    string GetDefaultPrinterName();
 }

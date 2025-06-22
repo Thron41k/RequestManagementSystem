@@ -18,7 +18,7 @@ public class ServiceConfigurator
 
         // gRPC клиенты
         serviceCollection.AddGrpcClient<AuthService.AuthServiceClient>(o => {o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<RequestService.RequestServiceClient>(o => {o.Address = new Uri("http://localhost:5001");});
+        serviceCollection.AddGrpcClient<NomenclatureService.NomenclatureServiceClient>(o => {o.Address = new Uri("http://localhost:5001");});
         serviceCollection.AddGrpcClient<StockService.StockServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
@@ -27,6 +27,8 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<NomenclatureAnalogService.NomenclatureAnalogServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<EquipmentService.EquipmentServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
         serviceCollection.AddGrpcClient<DriverService.DriverServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<DefectService.DefectServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<DefectGroupService.DefectGroupServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();
@@ -68,6 +70,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
+        serviceCollection.AddScoped<IDefectGroupService, GrpcDefectGroupService>();
         serviceCollection.AddScoped<IWarehouseService, GrpcWarehouseService>();
         serviceCollection.AddScoped<INomenclatureService, GrpcNomenclatureService>();
         serviceCollection.AddScoped<IStockService, GrpcStockService>();

@@ -1,186 +1,151 @@
-﻿using System.ComponentModel;
-using RequestManagement.Server.Controllers;
-using System.Windows.Threading;
+﻿using System.Windows.Threading;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using Timer = System.Timers.Timer;
-using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using WpfClient.Services.Interfaces;
 using WpfClient.Messages;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Data;
+using RequestManagement.Common.Models;
 
 namespace WpfClient.ViewModels;
 
-public class DriverViewModel : INotifyPropertyChanged
+public partial class DriverViewModel : ObservableObject
 {
     private readonly IMessageBus _messageBus;
-    public event PropertyChangedEventHandler? PropertyChanged;
     private readonly IDriverService _requestService;
-    private Driver? _selectedDriver;
-    private string _newDriverFullName;
-    private string _newDriverShortName;
-    private string _newDriverPosition;
+    [ObservableProperty] private Driver? _selectedDriver;
+    [ObservableProperty] private string _newDriverFullName;
+    [ObservableProperty] private string _newDriverPosition;
+    [ObservableProperty] private string _newDriverCode;
+    [ObservableProperty] private string _filterText;
+    [ObservableProperty] private ObservableCollection<Driver> _driverList = [];
+    [ObservableProperty] private CollectionViewSource _driverViewSource;
     private readonly Timer _filterTimer;
-    private string _filterText;
     private readonly Dispatcher _dispatcher;
+    public bool DialogResult { get; private set; }
     public event EventHandler CloseWindowRequested;
-    public ObservableCollection<Driver> DriverList { get; } = [];
-    public ICommand LoadDriverCommand { get; }
-    public ICommand AddDriverCommand { get; }
-    public ICommand UpdateDriverCommand { get; }
-    public ICommand DeleteDriverCommand { get; }
-    public ICommand SelectRowCommand { get; }
+    public bool EditMode { get; set; }
 
     public DriverViewModel(IDriverService requestService, IMessageBus messageBus)
     {
         _requestService = requestService;
         _messageBus = messageBus;
-        LoadDriverCommand = new RelayCommand(Execute1);
-        AddDriverCommand = new RelayCommand(Execute2);
-        UpdateDriverCommand = new RelayCommand(Execute3);
-        DeleteDriverCommand = new RelayCommand(Execute4);
-        SelectRowCommand = new RelayCommand(Execute5);
+        DriverViewSource = new CollectionViewSource { Source = DriverList };
         _dispatcher = Dispatcher.CurrentDispatcher;
-        _filterTimer = new Timer(1000) { AutoReset = false }; // Задержка 1 секунда
-        _filterTimer.Elapsed += async (s, e) => await LoadDriverAsync();
-        return;
-        async void Execute4() => await DeleteDriverAsync();
-        async void Execute3() => await UpdateDriverAsync();
-        async void Execute2() => await AddDriverAsync();
-        async void Execute1() => await LoadDriverAsync();
-        void Execute5() => SelectAndClose();
+        _filterTimer = new Timer(Vars.SearchDelay) { AutoReset = false };
+        _filterTimer.Elapsed += async (_, _) => await LoadDriverAsync();
     }
 
-    public string FilterText
+    partial void OnFilterTextChanged(string value)
     {
-        get => _filterText;
-        set
-        {
-            if (_filterText == value) return;
-            _filterText = value;
-            OnPropertyChanged();
-            _filterTimer.Stop(); // Сбрасываем таймер при каждом вводе
-            _filterTimer.Start(); // Запускаем таймер заново
-        }
+        _filterTimer.Stop();
+        _filterTimer.Start();
     }
+
     public async Task Load()
     {
         await LoadDriverAsync();
     }
-    private async Task DeleteDriverAsync()
+    [RelayCommand]
+    private async Task DeleteDriver()
     {
-        if (_selectedDriver != null)
+        if (SelectedDriver != null)
         {
-            await _requestService.DeleteDriverAsync(_selectedDriver.Id);
-            await LoadDriverAsync(); // Обновляем список после удаления
+            await _requestService.DeleteDriverAsync(SelectedDriver.Id);
+            await LoadDriverAsync();
             NewDriverFullName = string.Empty;
-            NewDriverShortName = string.Empty;
             NewDriverPosition = string.Empty;
+            NewDriverCode = string.Empty;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DriverUpdated));
         }
     }
     private async Task LoadDriverAsync()
     {
-        var filter = string.IsNullOrWhiteSpace(_filterText) ? "" : _filterText.Trim();
+        var filter = string.IsNullOrWhiteSpace(FilterText) ? "" : FilterText.Trim();
         var driverList = await _requestService.GetAllDriversAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
-            DriverList.Clear();
-            foreach (var item in driverList)
-            {
-                DriverList.Add(new Driver { Id = item.Id, FullName = item.FullName, ShortName = item.ShortName, Position = item.Position });
-            }
+            DriverList = new ObservableCollection<Driver>(driverList);
+            DriverViewSource.Source = DriverList;
+            NewDriverFullName = string.Empty;
+            NewDriverPosition = string.Empty;
+            NewDriverCode = string.Empty;
             return Task.CompletedTask;
         });
     }
-    private async Task UpdateDriverAsync()
+
+    [RelayCommand]
+    private async Task UpdateDriver()
     {
-        if (_selectedDriver != null && !string.IsNullOrEmpty(NewDriverFullName.Trim()) && !string.IsNullOrEmpty(NewDriverShortName.Trim()) && !string.IsNullOrEmpty(NewDriverPosition.Trim()))
+        if (SelectedDriver != null && !string.IsNullOrEmpty(NewDriverFullName.Trim()) && !string.IsNullOrEmpty(NewDriverCode.Trim()))
         {
-            await _requestService.UpdateDriverAsync(new RequestManagement.Common.Models.Driver { Id = _selectedDriver.Id, FullName = NewDriverFullName, ShortName = NewDriverShortName, Position = NewDriverPosition });
+            await _requestService.UpdateDriverAsync(new Driver { Id = SelectedDriver.Id, FullName = NewDriverFullName, ShortName = RequestManagement.Common.Utilities.NameFormatter.FormatToShortName(NewDriverFullName), Position = NewDriverPosition, Code = NewDriverCode });
             await LoadDriverAsync();
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DriverUpdated));
         }
     }
-    private async Task AddDriverAsync()
+
+    [RelayCommand]
+    private async Task AddDriver()
     {
-        if (!string.IsNullOrWhiteSpace(NewDriverFullName) && !string.IsNullOrWhiteSpace(NewDriverShortName))
+        if (!string.IsNullOrEmpty(NewDriverFullName.Trim()) && !string.IsNullOrEmpty(NewDriverCode.Trim()))
         {
-            await _requestService.CreateDriverAsync(new RequestManagement.Common.Models.Driver { FullName = NewDriverFullName.Trim(), ShortName = NewDriverShortName.Trim(), Position = !string.IsNullOrEmpty(NewDriverPosition) ? NewDriverPosition.Trim() : "" });
+            await _requestService.CreateDriverAsync(new Driver { FullName = NewDriverFullName.Trim(), ShortName = RequestManagement.Common.Utilities.NameFormatter.FormatToShortName(NewDriverFullName), Position = !string.IsNullOrEmpty(NewDriverPosition) ? NewDriverPosition.Trim() : "", Code = NewDriverCode.Trim() });
             await LoadDriverAsync();
             NewDriverFullName = string.Empty;
-            NewDriverShortName = string.Empty;
+            NewDriverCode = string.Empty;
             NewDriverPosition = string.Empty;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DriverUpdated));
         }
     }
 
-    public string NewDriverFullName
+    partial void OnSelectedDriverChanged(Driver? value)
     {
-        get => _newDriverFullName;
-        set
+        if (value != null)
         {
-            if (_newDriverFullName == value) return;
-            _newDriverFullName = value;
-            OnPropertyChanged(); // Уведомляем UI об изменении
+            NewDriverFullName = value.FullName;
+            NewDriverCode = value.Code;
+            NewDriverPosition = value.Position;
+        }
+        else
+        {
+            NewDriverFullName = string.Empty;
+            NewDriverCode = string.Empty;
+            NewDriverPosition = string.Empty;
         }
     }
 
-    public string NewDriverShortName
-    {
-        get => _newDriverShortName;
-        set
-        {
-            if (_newDriverShortName == value) return;
-            _newDriverShortName = value;
-            OnPropertyChanged(); // Уведомляем UI об изменении
-        }
-    }
-
-    public string NewDriverPosition
-    {
-        get => _newDriverPosition;
-        set
-        {
-            if (_newDriverPosition == value) return;
-            _newDriverPosition = value;
-            OnPropertyChanged(); // Уведомляем UI об изменении
-        }
-    }
-
-    public Driver? SelectedDriver
-    {
-        get => _selectedDriver ?? null;
-        set
-        {
-            _selectedDriver = value;
-            AddToEdit();
-        }
-    }
-
-    public bool EditMode { get; set; }
-
-    private void AddToEdit()
-    {
-        if (_selectedDriver != null)
-        {
-            NewDriverFullName = _selectedDriver.FullName;
-            NewDriverShortName = _selectedDriver.ShortName;
-            NewDriverPosition = _selectedDriver.Position;
-        }
-    }
-
+    [RelayCommand]
     private void SelectAndClose()
     {
-        if (!EditMode && _selectedDriver != null)
-        {
-            CloseWindowRequested?.Invoke(this, EventArgs.Empty);
-        }
+        if (EditMode || SelectedDriver == null) return;
+        DialogResult = true;
+        CloseWindowRequested.Invoke(this, EventArgs.Empty);
     }
 
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    [RelayCommand]
+    private void ClearFilterText()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        FilterText = string.Empty;
+    }
+
+    [RelayCommand]
+    private void ClearDriverFullName()
+    {
+        NewDriverFullName = string.Empty;
+    }
+
+    [RelayCommand]
+    private void ClearDriverCode()
+    {
+        NewDriverCode = string.Empty;
+    }
+
+    [RelayCommand]
+    private void ClearDriverPosition()
+    {
+        NewDriverPosition = string.Empty;
     }
 }

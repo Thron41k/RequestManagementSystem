@@ -16,7 +16,7 @@ public class DefectGroupViewModel : INotifyPropertyChanged
 {
     private readonly IMessageBus _messageBus;
     public event PropertyChangedEventHandler? PropertyChanged;
-    private readonly IDefectService _requestService;
+    private readonly IDefectGroupService _requestService;
     private DefectGroup ? _selectedDefectGroup;
     private string _newDefectGroupName;
     private readonly Timer _filterTimer;
@@ -29,7 +29,7 @@ public class DefectGroupViewModel : INotifyPropertyChanged
     public ICommand UpdateDefectGroupCommand { get; }
     public ICommand DeleteDefectGroupCommand { get; }
     public ICommand SelectRowCommand { get; }
-    public DefectGroupViewModel(IDefectService requestService, IMessageBus messageBus)
+    public DefectGroupViewModel(IDefectGroupService requestService, IMessageBus messageBus)
     {
         _requestService = requestService;
         _messageBus = messageBus;

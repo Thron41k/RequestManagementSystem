@@ -1,7 +1,6 @@
-﻿namespace WpfClient.Services.Interfaces
+﻿namespace WpfClient.Services.Interfaces;
+
+public interface IExcelPrintService
 {
-    public interface IExcelPrintService
-    {
-        void Print(string filePath, string printerName, int copies = 1);
-    }
+    void Print(string filePath, string printerName, int copies = 1);
 }

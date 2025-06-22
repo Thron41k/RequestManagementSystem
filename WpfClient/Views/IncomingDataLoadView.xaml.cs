@@ -1,29 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
 using WpfClient.ViewModels;
 
-namespace WpfClient.Views
+namespace WpfClient.Views;
+
+/// <summary>
+/// Логика взаимодействия для IncomingDataLoadView.xaml
+/// </summary>
+public partial class IncomingDataLoadView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для IncomingDataLoadView.xaml
-    /// </summary>
-    public partial class IncomingDataLoadView : UserControl
+    public IncomingDataLoadView(IncomingDataLoadViewModel incomingDataLoadViewModel)
     {
-        public IncomingDataLoadView(IncomingDataLoadViewModel incomingDataLoadViewModel)
-        {
-            InitializeComponent();
-            DataContext = incomingDataLoadViewModel;
-        }
+        InitializeComponent();
+        DataContext = incomingDataLoadViewModel;
     }
 }

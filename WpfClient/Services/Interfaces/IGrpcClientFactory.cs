@@ -5,7 +5,7 @@ namespace WpfClient.Services.Interfaces;
 public interface IGrpcClientFactory
 {
     AuthService.AuthServiceClient CreateAuthClient();
-    RequestService.RequestServiceClient CreateRequestClient();
+    NomenclatureService.NomenclatureServiceClient CreateNomenclatureClient();
     StockService.StockServiceClient CreateStockClient();
     ExpenseService.ExpenseServiceClient CreateExpenseClient();
     IncomingService.IncomingServiceClient CreateIncomingClient();
@@ -14,4 +14,6 @@ public interface IGrpcClientFactory
     NomenclatureAnalogService.NomenclatureAnalogServiceClient CreateNomenclatureAnalogClient();
     EquipmentService.EquipmentServiceClient CreateEquipmentClient();
     DriverService.DriverServiceClient CreateDriverClient();
+    DefectService.DefectServiceClient CreateDefectClient();
+    DefectGroupService.DefectGroupServiceClient CreateDefectGroupClient();
 }

@@ -1,22 +1,21 @@
 ﻿using System.Windows;
 using WpfClient.ViewModels;
 
-namespace WpfClient.Views
+namespace WpfClient.Views;
+
+/// <summary>
+/// Логика взаимодействия для CommissionsView.xaml
+/// </summary>
+public partial class CommissionsView
 {
-    /// <summary>
-    /// Логика взаимодействия для CommissionsView.xaml
-    /// </summary>
-    public partial class CommissionsView
+    public CommissionsView(CommissionsViewModel viewModel)
     {
-        public CommissionsView(CommissionsViewModel viewModel)
-        {
-            InitializeComponent();
-            DataContext = viewModel;
-            viewModel.CloseWindowRequested += ViewModel_CloseWindowRequested;
-        }
-        private void ViewModel_CloseWindowRequested(object? sender, EventArgs e)
-        {
-            Window.GetWindow(this)?.Close(); // Закрываем окно, содержащее UserControl
-        }
+        InitializeComponent();
+        DataContext = viewModel;
+        viewModel.CloseWindowRequested += ViewModel_CloseWindowRequested;
+    }
+    private void ViewModel_CloseWindowRequested(object? sender, EventArgs e)
+    {
+        Window.GetWindow(this)?.Close(); // Закрываем окно, содержащее UserControl
     }
 }

@@ -3,7 +3,7 @@ using RequestManagement.Common.Interfaces;
 
 namespace RequestManagement.Server.Controllers;
 
-public class WarehouseController(IWarehouseService warehouseService, ILogger<RequestController> logger)
+public class WarehouseController(IWarehouseService warehouseService, ILogger<WarehouseController> logger)
     : WarehouseService.WarehouseServiceBase
 {
     public override async Task<GetAllWarehousesResponse> GetAllWarehouses(GetAllWarehousesRequest request, ServerCallContext context)

@@ -7,7 +7,6 @@ using WpfClient.Services.Interfaces;
 using Expense = RequestManagement.Common.Models.Expense;
 using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
 using Stock = RequestManagement.Common.Models.Stock;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WpfClient.Services;
 

@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace WpfClient;
 
-namespace WpfClient
+public static class Vars
 {
-    public static class Vars
-    {
-        public const int SearchDelay = 500;
-    }
+    public const int SearchDelay = 500;
 }

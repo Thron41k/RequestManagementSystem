@@ -1,0 +1,47 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service DefectGroupService {
+    rpc GetAllDefectGroups (GetAllDefectGroupsRequest) returns (GetAllDefectGroupsResponse);
+    rpc CreateDefectGroup (CreateDefectGroupRequest) returns (CreateDefectGroupResponse);
+    rpc UpdateDefectGroup (UpdateDefectGroupRequest) returns (UpdateDefectGroupResponse);
+    rpc DeleteDefectGroup (DeleteDefectGroupRequest) returns (DeleteDefectGroupResponse);
+}
+
+message GetAllDefectGroupsRequest {
+    string filter = 1;
+}
+
+message GetAllDefectGroupsResponse {
+    repeated DefectGroup defectGroup = 1;
+}
+
+message CreateDefectGroupRequest {
+    DefectGroup defectGroup = 1;
+}
+
+message CreateDefectGroupResponse {
+    int32 id = 1;
+}
+
+message UpdateDefectGroupRequest {
+    DefectGroup defectGroup = 1;
+}
+
+message UpdateDefectGroupResponse {
+    bool success = 1;
+}
+
+message DeleteDefectGroupRequest {
+    int32 id = 1;
+}
+
+message DeleteDefectGroupResponse {
+    bool success = 1;
+}
+
+message DefectGroup {
+    int32 id = 1;
+    string name = 2;   
+}

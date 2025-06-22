@@ -13,7 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Регистрация сервисов
-builder.Services.AddScoped<IRequestService, RequestService>();
+builder.Services.AddScoped<INomenclatureService, NomenclatureService>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -24,6 +24,8 @@ builder.Services.AddScoped<ICommissionsService, CommissionsService>();
 builder.Services.AddScoped<INomenclatureAnalogService, NomenclatureAnalogService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
+builder.Services.AddScoped<IDefectGroupService, DefectGroupService>();
+builder.Services.AddScoped<IDefectService, DefectService>();
 
 // Настройка JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException());
@@ -54,7 +56,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGrpcService<RequestManagement.Server.Controllers.RequestController>();
+app.MapGrpcService<RequestManagement.Server.Controllers.NomenclatureController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.StockController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.AuthController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.ExpenseController>();
@@ -64,5 +66,7 @@ app.MapGrpcService<RequestManagement.Server.Controllers.CommissionsController>()
 app.MapGrpcService<RequestManagement.Server.Controllers.NomenclatureAnalogController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.EquipmentController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.DriverController>();
+app.MapGrpcService<RequestManagement.Server.Controllers.DefectController>();
+app.MapGrpcService<RequestManagement.Server.Controllers.DefectGroupController>();
 
 app.Run();

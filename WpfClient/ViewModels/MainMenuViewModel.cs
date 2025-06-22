@@ -421,7 +421,7 @@ public class MainMenuViewModel
         _ = _driverViewModel.Load();
         _driverViewModel.EditMode = editMode;
         window.ShowDialog();
-        if (_driverViewModel.SelectedDriver != null && argCaller != null)
+        if (_driverViewModel.SelectedDriver != null && argCaller != null && _driverViewModel.DialogResult)
             _messageBus.Publish(
                 new SelectResultMessage(
                     MessagesEnum.SelectDriver, argCaller, new Driver
@@ -429,7 +429,8 @@ public class MainMenuViewModel
                         Id = _driverViewModel.SelectedDriver.Id,
                         FullName = _driverViewModel.SelectedDriver.FullName,
                         ShortName = _driverViewModel.SelectedDriver.ShortName,
-                        Position = _driverViewModel.SelectedDriver.Position
+                        Position = _driverViewModel.SelectedDriver.Position,
+                        Code = _driverViewModel.SelectedDriver.Code
                     }));
     }
     private void ShowDefectGroup(bool editMode, Type? argCaller = null)
@@ -452,7 +453,7 @@ public class MainMenuViewModel
         {
             Content = defectView,
             Title = "Дефекты",
-            Width = 800,
+            Width = 815,
             Height = 600
         };
         _ = _defectViewModel.Load();

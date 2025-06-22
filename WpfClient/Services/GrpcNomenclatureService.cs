@@ -14,7 +14,7 @@ internal class GrpcNomenclatureService(IGrpcClientFactory clientFactory, AuthTok
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var client = clientFactory.CreateRequestClient();
+        var client = clientFactory.CreateNomenclatureClient();
         var response = await client.GetAllNomenclaturesAsync(new GetAllNomenclaturesRequest { Filter = filter }, headers);
         return response.Nomenclature.Select(nomenclature => new RequestManagement.Common.Models.Nomenclature { Id = nomenclature.Id, Name = nomenclature.Name,Code = nomenclature.Code,Article = nomenclature.Article,UnitOfMeasure = nomenclature.UnitOfMeasure}).ToList();
     }
@@ -28,8 +28,8 @@ internal class GrpcNomenclatureService(IGrpcClientFactory clientFactory, AuthTok
             {
                 headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
             }
-            var client = clientFactory.CreateRequestClient();
-            var result = await client.CreateNomenclatureAsync(new CreateNomenclatureRequest { Nomenclature = new RequestManagement.Server.Controllers.Nomenclature { Name = nomenclature.Name,Code = nomenclature.Code,Article = nomenclature.Article,UnitOfMeasure = nomenclature.UnitOfMeasure } }, headers);
+            var client = clientFactory.CreateNomenclatureClient();
+            var result = await client.CreateNomenclatureAsync(new CreateNomenclatureRequest { Nomenclature = new Nomenclature { Name = nomenclature.Name,Code = nomenclature.Code,Article = nomenclature.Article,UnitOfMeasure = nomenclature.UnitOfMeasure } }, headers);
             return result.Id;
         }
         catch (Exception ex)
@@ -46,8 +46,8 @@ internal class GrpcNomenclatureService(IGrpcClientFactory clientFactory, AuthTok
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var client = clientFactory.CreateRequestClient();
-        var result = await client.UpdateNomenclatureAsync(new UpdateNomenclatureRequest { Nomenclature = new RequestManagement.Server.Controllers.Nomenclature { Id = nomenclature.Id, Name = nomenclature.Name,Code = nomenclature.Code,Article = nomenclature.Article,UnitOfMeasure = nomenclature.UnitOfMeasure } }, headers);
+        var client = clientFactory.CreateNomenclatureClient();
+        var result = await client.UpdateNomenclatureAsync(new UpdateNomenclatureRequest { Nomenclature = new Nomenclature { Id = nomenclature.Id, Name = nomenclature.Name,Code = nomenclature.Code,Article = nomenclature.Article,UnitOfMeasure = nomenclature.UnitOfMeasure } }, headers);
         return result.Success;
     }
 
@@ -58,7 +58,7 @@ internal class GrpcNomenclatureService(IGrpcClientFactory clientFactory, AuthTok
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var client = clientFactory.CreateRequestClient();
+        var client = clientFactory.CreateNomenclatureClient();
         var result = await client.DeleteNomenclatureAsync(new DeleteNomenclatureRequest { Id = id }, headers);
         return result.Success;
     }

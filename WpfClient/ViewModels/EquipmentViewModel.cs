@@ -1,19 +1,13 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Data;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
-using RequestManagement.Common.Models;
-using RequestManagement.Server.Controllers;
 using WpfClient.Messages;
 using WpfClient.Services.Interfaces;
 using Dispatcher = System.Windows.Threading.Dispatcher;
 using Equipment = RequestManagement.Common.Models.Equipment;
 using Timer = System.Timers.Timer;
-
 
 namespace WpfClient.ViewModels;
 
@@ -30,7 +24,7 @@ public partial class EquipmentViewModel : ObservableObject
     [ObservableProperty] private CollectionViewSource _equipmentViewSource;
     private readonly Timer _filterTimer;
     private readonly Dispatcher _dispatcher;
-    public bool DialogResult { get; set; }
+    public bool DialogResult { get; private set; }
     public event EventHandler CloseWindowRequested;
 
     public bool EditMode { get; set; }

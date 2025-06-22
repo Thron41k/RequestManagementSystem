@@ -1,12 +1,11 @@
-﻿namespace WpfClient.Services.ExcelTemplate
+﻿namespace WpfClient.Services.ExcelTemplate;
+
+public enum ExcelTemplateType
 {
-    public enum ExcelTemplateType
-    {
-        ActParts,
-        LimitParts,
-        DefectParts,
-        Mb7Parts,
-        Consumables,
-        Operations
-    }
+    ActParts,
+    LimitParts,
+    DefectParts,
+    Mb7Parts,
+    Consumables,
+    Operations
 }

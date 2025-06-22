@@ -11,9 +11,9 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
         return serviceProvider.GetRequiredService<AuthService.AuthServiceClient>();
     }
 
-    public RequestService.RequestServiceClient CreateRequestClient()
+    public NomenclatureService.NomenclatureServiceClient CreateNomenclatureClient()
     {
-        return serviceProvider.GetRequiredService<RequestService.RequestServiceClient>();
+        return serviceProvider.GetRequiredService<NomenclatureService.NomenclatureServiceClient>();
     }
     public StockService.StockServiceClient CreateStockClient()
     {
@@ -53,5 +53,15 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     public DriverService.DriverServiceClient CreateDriverClient()
     {
         return serviceProvider.GetRequiredService<DriverService.DriverServiceClient>();
+    }
+
+    public DefectService.DefectServiceClient CreateDefectClient()
+    {
+        return serviceProvider.GetRequiredService<DefectService.DefectServiceClient>();
+    }
+
+    public DefectGroupService.DefectGroupServiceClient CreateDefectGroupClient()
+    {
+        return serviceProvider.GetRequiredService<DefectGroupService.DefectGroupServiceClient>();
     }
 }

@@ -16,7 +16,7 @@ internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStor
         }
         var client = clientFactory.CreateDriverClient();
         var response = await client.GetAllDriversAsync(new GetAllDriversRequest { Filter = filter }, headers);
-        return response.Drivers.Select(driver => new RequestManagement.Common.Models.Driver { Id = driver.Id, FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position}).ToList();
+        return response.Drivers.Select(driver => new RequestManagement.Common.Models.Driver { Id = driver.Id, FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position, Code = driver.Code}).ToList();
     }
 
     public async Task<int> CreateDriverAsync(RequestManagement.Common.Models.Driver driver)
@@ -27,7 +27,7 @@ internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStor
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
         var client = clientFactory.CreateDriverClient();
-        var result = await client.CreateDriverAsync(new CreateDriverRequest { Driver = new RequestManagement.Server.Controllers.Driver { FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position }}, headers);
+        var result = await client.CreateDriverAsync(new CreateDriverRequest { Driver = new RequestManagement.Server.Controllers.Driver { FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position, Code = driver.Code }}, headers);
         return result.Id;
     }
 
@@ -39,7 +39,7 @@ internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStor
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
         var client = clientFactory.CreateDriverClient();
-        var result = await client.UpdateDriverAsync(new UpdateDriverRequest { Driver = new RequestManagement.Server.Controllers.Driver { Id = driver.Id, FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position } }, headers);
+        var result = await client.UpdateDriverAsync(new UpdateDriverRequest { Driver = new RequestManagement.Server.Controllers.Driver { Id = driver.Id, FullName = driver.FullName, ShortName = driver.ShortName, Position = driver.Position, Code = driver.Code } }, headers);
         return result.Success;
     }
 

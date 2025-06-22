@@ -61,7 +61,7 @@
     <Page Include="App.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="..\RequestManagement.Server\Protos\request.proto" GrpcServices="Client" Link="Protos\request.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\nomenclature.proto" GrpcServices="Client" Link="Protos\nomenclature.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\auth.proto" GrpcServices="Client" Link="Protos\auth.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\stock.proto" GrpcServices="Client" Link="Protos\stock.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\expense.proto" GrpcServices="Client" Link="Protos\expense.proto" />
@@ -71,6 +71,8 @@
     <Protobuf Include="..\RequestManagement.Server\Protos\nomenclatureanalog.proto" GrpcServices="Client" Link="Protos\nomenclatureanalog.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\equipment.proto" GrpcServices="Client" Link="Protos\equipment.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\driver.proto" GrpcServices="Client" Link="Protos\driver.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\defect.proto" GrpcServices="Client" Link="Protos\defect.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\defectgroup.proto" GrpcServices="Client" Link="Protos\defectgroup.proto" />
   </ItemGroup>
 
   <ItemGroup>

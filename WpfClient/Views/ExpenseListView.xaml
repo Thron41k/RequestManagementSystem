@@ -149,7 +149,7 @@
                 <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="10,10,0,5">
                     <TextBox materialDesign:HintAssist.Hint="Водитель" 
                              Tag="{Binding ClearSelectedDriverCommand}" 
-                             Text="{Binding SelectedDriver.ShortName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                             Text="{Binding SelectedDriver.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                              IsReadOnly="True" 
                              materialDesign:TextFieldAssist.HasClearButton="True"
                              materialDesign:HintAssist.HintPaddingBrush="White"

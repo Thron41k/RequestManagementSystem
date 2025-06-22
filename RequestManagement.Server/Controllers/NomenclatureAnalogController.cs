@@ -3,7 +3,7 @@ using RequestManagement.Common.Interfaces;
 
 namespace RequestManagement.Server.Controllers;
 
-public class NomenclatureAnalogController(INomenclatureAnalogService nomenclatureAnalogService, ILogger<RequestController> logger)
+public class NomenclatureAnalogController(INomenclatureAnalogService nomenclatureAnalogService, ILogger<NomenclatureAnalogController> logger)
     : NomenclatureAnalogService.NomenclatureAnalogServiceBase
 {
     public override async Task<GetAllNomenclatureAnalogsResponse> GetAllNomenclatureAnalogs(GetAllNomenclatureAnalogsRequest request, ServerCallContext context)
