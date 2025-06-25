@@ -1,10 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using Timer = System.Timers.Timer;
-using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Input;
-using System.Runtime.CompilerServices;
 using RequestManagement.Common.Interfaces;
 using WpfClient.Services.Interfaces;
 using WpfClient.Messages;
@@ -88,6 +85,7 @@ public partial class DefectViewModel : ObservableObject
         var defectList = await _defectService.GetAllDefectsAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
+            var currentSortDescriptions = DefectViewSource.View?.SortDescriptions.ToList() ?? [];
             var list = defectList.Select(x =>
                 new DefectViewItem(x, DefectGroupList.First(y => y.Id == x.DefectGroupId).Name));
             DefectViewItemList = new ObservableCollection<DefectViewItem>(list);
@@ -95,6 +93,11 @@ public partial class DefectViewModel : ObservableObject
             SelectedDefect = null;
             NewDefectName = string.Empty;
             SelectedDefectGroupIndex = -1;
+            if (!currentSortDescriptions.Any()) return Task.CompletedTask;
+            foreach (var sortDescription in currentSortDescriptions)
+            {
+                DefectViewSource.View?.SortDescriptions.Add(sortDescription);
+            }
             return Task.CompletedTask;
         });
     }

@@ -415,7 +415,7 @@ public class MainMenuViewModel
         {
             Content = driverView,
             Title = "Сотрудники",
-            Width = 850,
+            Width = 1070,
             Height = 700
         };
         _ = _driverViewModel.Load();
@@ -440,11 +440,20 @@ public class MainMenuViewModel
         {
             Content = defectGroupView,
             Title = "Группы дефектов",
-            Width = 800,
+            Width = 770,
             Height = 600
         };
         _ = _defectGroupViewModel.Load();
+        _defectGroupViewModel.EditMode = editMode;
         window.ShowDialog();
+        if (_defectGroupViewModel.SelectedDefectGroup != null && argCaller != null && _defectGroupViewModel.DialogResult)
+            _messageBus.Publish(
+                new SelectResultMessage(
+                    MessagesEnum.SelectDefectGroup, argCaller, new DefectGroup
+                    {
+                        Id = _defectGroupViewModel.SelectedDefectGroup.Id,
+                        Name = _defectGroupViewModel.SelectedDefectGroup.Name
+                    }));
     }
     private void ShowDefect(bool editMode, Type? argCaller = null)
     {
@@ -459,7 +468,7 @@ public class MainMenuViewModel
         _ = _defectViewModel.Load();
         _defectViewModel.EditMode = editMode;
         window.ShowDialog();
-        if (_defectViewModel.SelectedDefect != null && argCaller != null)
+        if (_defectViewModel.SelectedDefect != null && argCaller != null && _defectViewModel.DialogResult)
             _messageBus.Publish(
                 new SelectResultMessage(
                     MessagesEnum.SelectDefect, argCaller, new Defect
@@ -479,8 +488,9 @@ public class MainMenuViewModel
             Height = 600
         };
         _ = _warehouseViewModel.Load();
+        _warehouseViewModel.EditMode = editMode;
         window.ShowDialog();
-        if (_warehouseViewModel.SelectedWarehouse != null && argCaller != null)
+        if (_warehouseViewModel.SelectedWarehouse != null && argCaller != null && _warehouseViewModel.DialogResult)
         {
             _messageBus.Publish(
                 new SelectResultMessage(

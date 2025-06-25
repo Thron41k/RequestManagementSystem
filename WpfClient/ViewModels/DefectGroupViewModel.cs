@@ -1,158 +1,133 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using Timer = System.Timers.Timer;
-using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Input;
-using RequestManagement.Server.Controllers;
-using System.Runtime.CompilerServices;
 using RequestManagement.Common.Interfaces;
 using WpfClient.Services.Interfaces;
 using WpfClient.Messages;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Data;
 
 namespace WpfClient.ViewModels;
 
-public class DefectGroupViewModel : INotifyPropertyChanged
+public partial class DefectGroupViewModel : ObservableObject
 {
     private readonly IMessageBus _messageBus;
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private readonly IDefectGroupService _requestService;
-    private DefectGroup ? _selectedDefectGroup;
-    private string _newDefectGroupName;
-    private readonly Timer _filterTimer;
-    private string _filterText;
+    private readonly IDefectGroupService _defectGroupService;
+    [ObservableProperty] private RequestManagement.Common.Models.DefectGroup? _selectedDefectGroup;
+    [ObservableProperty] private string _newDefectGroupName;
+    [ObservableProperty] private string _filterText;
+    [ObservableProperty] private ObservableCollection<RequestManagement.Common.Models.DefectGroup> _defectGroupList = [];
+    [ObservableProperty] private CollectionViewSource _defectGroupViewSource;
+    public bool DialogResult { get; private set; }
+    public bool EditMode { get; set; }
     private readonly Dispatcher _dispatcher;
+    private readonly Timer _filterTimer;
     public event EventHandler CloseWindowRequested;
-    public ObservableCollection<DefectGroup> DefectGroupList { get; } = [];
-    public ICommand LoadDefectGroupCommand { get; }
-    public ICommand AddDefectGroupCommand { get; }
-    public ICommand UpdateDefectGroupCommand { get; }
-    public ICommand DeleteDefectGroupCommand { get; }
-    public ICommand SelectRowCommand { get; }
-    public DefectGroupViewModel(IDefectGroupService requestService, IMessageBus messageBus)
+
+    public DefectGroupViewModel(IDefectGroupService defectGroupService, IMessageBus messageBus)
     {
-        _requestService = requestService;
+        _defectGroupService = defectGroupService;
         _messageBus = messageBus;
-        LoadDefectGroupCommand = new RelayCommand(Execute1);
-        AddDefectGroupCommand = new RelayCommand(Execute2);
-        UpdateDefectGroupCommand = new RelayCommand(Execute3);
-        DeleteDefectGroupCommand = new RelayCommand(Execute4);
-        SelectRowCommand = new RelayCommand(Execute5);
         _dispatcher = Dispatcher.CurrentDispatcher;
-        _filterTimer = new Timer(1000) { AutoReset = false }; // Задержка 1 секунда
-        _filterTimer.Elapsed += async (s, e) => await LoadDefectGroupAsync();
-        return;
-        async void Execute4() => await DeleteDefectGroupAsync();
-        async void Execute3() => await UpdateDefectGroupAsync();
-        async void Execute2() => await AddDefectGroupAsync();
-        async void Execute1() => await LoadDefectGroupAsync();
-        void Execute5() => SelectAndClose();
+        DefectGroupViewSource = new CollectionViewSource { Source = DefectGroupList };
+        _filterTimer = new Timer(Vars.SearchDelay) { AutoReset = false };
+        _filterTimer.Elapsed += async (_, _) => await LoadDefectGroupAsync();
     }
 
-    public string NewDefectGroupName
+    partial void OnSelectedDefectGroupChanged(RequestManagement.Common.Models.DefectGroup? value) => AddToEdit();
+
+    partial void OnFilterTextChanged(string value)
     {
-        get => _newDefectGroupName;
-        set
-        {
-            if (_newDefectGroupName == value) return;
-            _newDefectGroupName = value;
-            OnPropertyChanged(); // Уведомляем UI об изменении
-        }
+        _filterTimer.Stop();
+        _filterTimer.Start();
     }
 
     public async Task Load()
     {
         await LoadDefectGroupAsync();
     }
+
+    [RelayCommand]
     private async Task DeleteDefectGroupAsync()
     {
-        if (_selectedDefectGroup != null)
+        if (SelectedDefectGroup != null)
         {
-            await _requestService.DeleteDefectGroupAsync(_selectedDefectGroup.Id);
-            await LoadDefectGroupAsync(); // Обновляем список после удаления
-            NewDefectGroupName = string.Empty;
+            await _defectGroupService.DeleteDefectGroupAsync(SelectedDefectGroup.Id);
+            await LoadDefectGroupAsync();
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DefectGroupUpdated));
         }
     }
+
+    [RelayCommand]
     private async Task LoadDefectGroupAsync()
     {
-        var filter = string.IsNullOrWhiteSpace(_filterText) ? "" : _filterText.Trim();
-        var defectGroupList = await _requestService.GetAllDefectGroupsAsync(filter.ToLower());
+        var filter = string.IsNullOrWhiteSpace(FilterText) ? "" : FilterText.Trim();
+        var defectGroupList = await _defectGroupService.GetAllDefectGroupsAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
-            DefectGroupList.Clear();
-            foreach (var item in defectGroupList)
+            var currentSortDescriptions = DefectGroupViewSource.View?.SortDescriptions.ToList() ?? [];
+            DefectGroupList = new ObservableCollection<RequestManagement.Common.Models.DefectGroup>(defectGroupList);
+            DefectGroupViewSource.Source = DefectGroupList;
+            SelectedDefectGroup = null;
+            NewDefectGroupName = string.Empty;
+            if (!currentSortDescriptions.Any()) return Task.CompletedTask;
+            foreach (var sortDescription in currentSortDescriptions)
             {
-                DefectGroupList.Add(new DefectGroup { Id = item.Id, Name = item.Name });
+                DefectGroupViewSource.View?.SortDescriptions.Add(sortDescription);
             }
             return Task.CompletedTask;
         });
     }
+
+    [RelayCommand]
     private async Task UpdateDefectGroupAsync()
     {
-        if (_selectedDefectGroup != null && !string.IsNullOrEmpty(NewDefectGroupName.Trim()))
+        if (SelectedDefectGroup != null && !string.IsNullOrEmpty(NewDefectGroupName.Trim()))
         {
-            await _requestService.UpdateDefectGroupAsync(new RequestManagement.Common.Models.DefectGroup
+            await _defectGroupService.UpdateDefectGroupAsync(new RequestManagement.Common.Models.DefectGroup
             {
-                Id = _selectedDefectGroup.Id,
-                Name = _selectedDefectGroup.Name,
+                Id = SelectedDefectGroup.Id,
+                Name = NewDefectGroupName.Trim()
             });
             await LoadDefectGroupAsync();
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DefectGroupUpdated));
         }
     }
+
+    [RelayCommand]
     private async Task AddDefectGroupAsync()
     {
         if (!string.IsNullOrWhiteSpace(NewDefectGroupName.Trim()))
         {
-            await _requestService.CreateDefectGroupAsync(new RequestManagement.Common.Models.DefectGroup
+            await _defectGroupService.CreateDefectGroupAsync(new RequestManagement.Common.Models.DefectGroup
             {
-                Name = NewDefectGroupName
+                Name = NewDefectGroupName.Trim()
             });
             await LoadDefectGroupAsync();
-            NewDefectGroupName = string.Empty;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.DefectGroupUpdated));
         }
     }
-    public DefectGroup? SelectedDefectGroup
-    {
-        get => _selectedDefectGroup ?? null;
-        set
-        {
-            _selectedDefectGroup = value;
-            AddToEdit();
-        }
-    }
 
-    public string FilterText
-    {
-        get => _filterText;
-        set
-        {
-            if (_filterText == value) return;
-            _filterText = value;
-            OnPropertyChanged();
-            _filterTimer.Stop(); // Сбрасываем таймер при каждом вводе
-            _filterTimer.Start(); // Запускаем таймер заново
-        }
-    }
     private void AddToEdit()
     {
-        if (_selectedDefectGroup != null)
+        if (SelectedDefectGroup != null)
         {
-            NewDefectGroupName = _selectedDefectGroup.Name;
-        }
-    }
-    private void SelectAndClose()
-    {
-        if (_selectedDefectGroup != null)
-        {
-            CloseWindowRequested.Invoke(this, EventArgs.Empty);
+            NewDefectGroupName = SelectedDefectGroup.Name;
         }
     }
 
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    [RelayCommand]
+    private void SelectAndClose()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        if (EditMode || SelectedDefectGroup == null) return;
+        DialogResult = true;
+        CloseWindowRequested.Invoke(this, EventArgs.Empty);
+    }
+
+    [RelayCommand]
+    private void ClearDefectGroupName()
+    {
+        NewDefectGroupName = string.Empty;
     }
 }
