@@ -15,7 +15,7 @@ public class LimitPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         using var stream = GetTemplateStream("LimitPartsTemplate.xlsx");
         using var package = new ExcelPackage(stream);
         var templateSheet = package.Workbook.Worksheets[0];
-        templateSheet.Cells[3, 1].Value = data.Commissions?.Name;
+        templateSheet.Cells[3, 1].Value = data.Commissions?.BranchName;
         templateSheet.Cells[3, 1, 3, 4].Merge = true;
         templateSheet.Cells[3, 1, 3, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
         templateSheet.Cells[4, 9].Value = data.Commissions?.ApproveForDefectAndLimit?.Position;

@@ -8,6 +8,8 @@
              xmlns:behaviors="clr-namespace:WpfClient.ViewModels.Behaviors"
              xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
              xmlns:vm="clr-namespace:WpfClient.ViewModels"
+             xmlns:validationRules="clr-namespace:WpfClient.ViewModels.ValidationRules"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="470" d:DesignWidth="830">
     <UserControl.Resources>
@@ -20,7 +22,7 @@
     <UserControl.DataContext>
         <vm:CommissionsViewModel />
     </UserControl.DataContext>
-    <Grid>
+    <Grid Margin="15,15,15,15">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="Auto"/>
@@ -60,80 +62,206 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="5,30,5,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Филиал" Tag="{Binding ClearNameTextCommand}" Text="{Binding CommissionsName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="5,10,5,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Утверждаю(Акты)" Tag="{Binding ClearSelectedApproveForActCommand}" Text="{Binding SelectedApproveForAct.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectApproveForActCommand}" />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Grid.Row="2"  Orientation="Horizontal" Margin="5,10,5,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Утверждаю(Дефектные и лимитные ведомости)" Tag="{Binding ClearSelectedApproveForDefectAndLimitCommand}" Text="{Binding SelectedApproveForDefectAndLimit.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectApproveForDefectAndLimitCommand}" />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Grid.Row="3"  Orientation="Horizontal" Margin="5,10,5,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Председатель комиссии" Tag="{Binding ClearSelectedChairmanCommand}" Text="{Binding SelectedChairman.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectChairmanCommand}" />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Grid.Row="4"  Orientation="Horizontal" Margin="5,10,5,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Член комиссии 1" Tag="{Binding ClearSelectedMember1Command}" Text="{Binding SelectedMember1.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectMember1Command}" />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Grid.Row="5"  Orientation="Horizontal" Margin="5,10,5,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Член комиссии 2" Tag="{Binding ClearSelectedMember2Command}" Text="{Binding SelectedMember2.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectMember2Command}" />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Grid.Row="6"  Orientation="Horizontal" Margin="5,10,5,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Член комиссии 3" Tag="{Binding ClearSelectedMember3Command}" Text="{Binding SelectedMember3.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectMember3Command}" />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Grid.Row="7"  Orientation="Horizontal" Margin="5,10,5,5">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Член комиссии 4" Tag="{Binding ClearSelectedMember4Command}" Text="{Binding SelectedMember4.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectMember4Command}" />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Grid.Row="8"  Orientation="Horizontal" Margin="5,17,5,5" HorizontalAlignment="Center">
-                <Button Content="Сохранить" Command="{Binding SaveCommissionsCommand}" />
+            <TextBox Grid.Row="0" materialDesign:HintAssist.Hint="Название комиссии"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearNameTextCommand}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="CommissionsName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validationRules:NotEmptyValidationRule
+                                ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox Grid.Row="1" materialDesign:HintAssist.Hint="Филиал"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearBranchNameTextCommand}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="BranchName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validationRules:NotEmptyValidationRule
+                                ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox Grid.Row="2" materialDesign:HintAssist.Hint="Утверждаю(Акты)"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     IsReadOnly="True"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearSelectedApproveForActCommand}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="SelectedApproveForAct.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior  Command="{Binding SelectApproveForActCommand}"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox Grid.Row="3" materialDesign:HintAssist.Hint="Утверждаю(Дефектные и лимитные ведомости)"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     IsReadOnly="True"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearSelectedApproveForDefectAndLimitCommand}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="SelectedApproveForDefectAndLimit.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior  Command="{Binding SelectApproveForDefectAndLimitCommand}"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox Grid.Row="4" materialDesign:HintAssist.Hint="Председатель комиссии"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     IsReadOnly="True"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearSelectedChairmanCommand}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="SelectedChairman.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior  Command="{Binding SelectChairmanCommand}"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox Grid.Row="5" materialDesign:HintAssist.Hint="Член комиссии 1"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     IsReadOnly="True"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearSelectedMember1Command}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="SelectedMember1.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior  Command="{Binding SelectMember1Command}"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox Grid.Row="6" materialDesign:HintAssist.Hint="Член комиссии 2"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     IsReadOnly="True"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearSelectedMember2Command}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="SelectedMember2.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior  Command="{Binding SelectMember2Command}"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox Grid.Row="7" materialDesign:HintAssist.Hint="Член комиссии 3"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     IsReadOnly="True"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearSelectedMember3Command}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="SelectedMember3.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior  Command="{Binding SelectMember3Command}"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox Grid.Row="8" materialDesign:HintAssist.Hint="Член комиссии 4"
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     IsReadOnly="True"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearSelectedMember4Command}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="SelectedMember4.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior  Command="{Binding SelectMember4Command}"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <StackPanel Grid.Row="9"  Orientation="Horizontal" Margin="5,17,5,5" HorizontalAlignment="Center">
+                <Button Content="Сохранить" Command="{Binding SaveCommissionsCommand}" Margin="0,0,20,0"/>
+                <Button Content="Удалить" Command="{Binding RemoveCommissionsCommand}" />
             </StackPanel>
         </Grid>
     </Grid>

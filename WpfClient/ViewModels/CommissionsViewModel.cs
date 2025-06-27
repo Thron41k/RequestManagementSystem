@@ -18,7 +18,8 @@ public partial class CommissionsViewModel : ObservableObject
     private readonly ICommissionsService _commissionsService;
     private CommissionType _commissionType = CommissionType.None;
     [ObservableProperty] private string _commissionsName = "";
-    [ObservableProperty] private Commissions _selectedCommissions = new();
+    [ObservableProperty] private string _branchName = "";
+    [ObservableProperty] private Commissions? _selectedCommissions = new();
     [ObservableProperty] private Driver _selectedApproveForAct = new();
     [ObservableProperty] private Driver _selectedApproveForDefectAndLimit = new();
     [ObservableProperty] private Driver _selectedChairman = new();
@@ -53,6 +54,7 @@ public partial class CommissionsViewModel : ObservableObject
     partial void OnSelectedCommissionsChanged(Commissions value)
     {
         CommissionsName = value.Name;
+        BranchName = value.BranchName;
         if (value.ApproveForAct != null) SelectedApproveForAct = value.ApproveForAct;
         if (value.ApproveForDefectAndLimit != null) SelectedApproveForDefectAndLimit = value.ApproveForDefectAndLimit;
         if (value.Chairman != null) SelectedChairman = value.Chairman;
@@ -108,10 +110,12 @@ public partial class CommissionsViewModel : ObservableObject
     {
         CloseWindowRequested?.Invoke(this, EventArgs.Empty);
     }
+
     [RelayCommand]
     private void Click()
     {
         CommissionsName = SelectedCommissions.Name;
+        BranchName = SelectedCommissions.BranchName;
         if (SelectedCommissions.ApproveForAct != null) SelectedApproveForAct = SelectedCommissions.ApproveForAct;
         if (SelectedCommissions.ApproveForDefectAndLimit != null) SelectedApproveForDefectAndLimit = SelectedCommissions.ApproveForDefectAndLimit;
         if (SelectedCommissions.Chairman != null) SelectedChairman = SelectedCommissions.Chairman;
@@ -120,6 +124,19 @@ public partial class CommissionsViewModel : ObservableObject
         if (SelectedCommissions.Member3 != null) SelectedMember3 = SelectedCommissions.Member3;
         if (SelectedCommissions.Member4 != null) SelectedMember4 = SelectedCommissions.Member4;
     }
+
+    [RelayCommand]
+    private void ClearBranchNameText()
+    {
+        BranchName = string.Empty;
+    }
+
+    [RelayCommand]
+    private void ClearNameText()
+    {
+        CommissionsName = string.Empty;
+    }
+
     [RelayCommand]
     private async Task SelectApproveForAct()
     {
@@ -201,11 +218,12 @@ public partial class CommissionsViewModel : ObservableObject
     [RelayCommand]
     private async Task AddCommissions()
     {
-        if (CommissionsName != "")
+        if (CommissionsName != "" && BranchName != "")
         {
-            var commission = new Commissions()
+            var commission = new Commissions
             {
                 Name = CommissionsName,
+                BranchName = BranchName,
                 ApproveForAct = SelectedApproveForAct,
                 ApproveForDefectAndLimit = SelectedApproveForDefectAndLimit,
                 Chairman = SelectedChairman,
@@ -222,12 +240,13 @@ public partial class CommissionsViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveCommissions()
     {
-        if (CommissionsName != "")
+        if (SelectedCommissions != null && CommissionsName != "" && BranchName != "")
         {
             var commission = new Commissions()
             {
                 Id = SelectedCommissions.Id,
                 Name = CommissionsName,
+                BranchName = BranchName,
                 ApproveForAct = SelectedApproveForAct,
                 ApproveForDefectAndLimit = SelectedApproveForDefectAndLimit,
                 Chairman = SelectedChairman,
@@ -237,6 +256,16 @@ public partial class CommissionsViewModel : ObservableObject
                 Member4 = SelectedMember4,
             };
             await _commissionsService.UpdateCommissionsAsync(commission);
+            await LoadCommissionAsync();
+        }
+    }
+
+    [RelayCommand]
+    private async Task RemoveCommissions()
+    {
+        if (SelectedCommissions != null)
+        {
+            await _commissionsService.DeleteCommissionsAsync(SelectedCommissions.Id);
             await LoadCommissionAsync();
         }
     }

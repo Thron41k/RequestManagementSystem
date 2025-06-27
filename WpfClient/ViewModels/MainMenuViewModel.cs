@@ -191,7 +191,7 @@ public class MainMenuViewModel
             Content = commissionsView,
             Title = "Комиссия",
             Width = 850,
-            Height = 490,
+            Height = 790,
             ResizeMode = ResizeMode.NoResize
         };
         _ = _commissionsViewModel.Load();
@@ -513,7 +513,7 @@ public class MainMenuViewModel
         };
         _ = _nomenclatureViewModel.Load();
         window.ShowDialog();
-        if (_nomenclatureViewModel.SelectedNomenclature != null && argCaller != null)
+        if (_nomenclatureViewModel.SelectedNomenclature != null && argCaller != null && _nomenclatureViewModel.DialogResult)
             _messageBus.Publish(
                 new SelectResultMessage(
                     MessagesEnum.SelectNomenclature, argCaller, new Nomenclature

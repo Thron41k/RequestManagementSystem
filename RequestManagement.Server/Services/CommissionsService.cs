@@ -22,6 +22,7 @@ public class CommissionsService(ApplicationDbContext dbContext) : ICommissionsSe
             {
                 Id = e.Id,
                 Name = e.Name,
+                BranchName = e.BranchName,
                 ApproveForAct = e.ApproveForAct,
                 ApproveForDefectAndLimit = e.ApproveForDefectAndLimit,
                 Chairman = e.Chairman,
@@ -51,6 +52,7 @@ public class CommissionsService(ApplicationDbContext dbContext) : ICommissionsSe
                 return false;
 
             existCommissions.Name = commissions.Name;
+            existCommissions.BranchName = commissions.BranchName;
             existCommissions.ApproveForActId = commissions.ApproveForActId;
             existCommissions.ApproveForDefectAndLimitId = commissions.ApproveForDefectAndLimitId;
             existCommissions.ChairmanId = commissions.ChairmanId;

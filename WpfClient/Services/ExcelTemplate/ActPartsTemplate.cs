@@ -15,7 +15,7 @@ public class ActPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         using var stream = GetTemplateStream("ActPartsTemplate.xlsx");
         using var package = new ExcelPackage(stream);
         var templateSheet = package.Workbook.Worksheets[0];
-        templateSheet.Cells[5, 1].Value = data.Commissions?.Name;
+        templateSheet.Cells[5, 1].Value = data.Commissions?.BranchName;
         templateSheet.Cells[5, 1, 5, 3].Merge = true;
         templateSheet.Cells[5, 1, 5, 3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
         templateSheet.Cells[6, 6].Value = data.Commissions?.ApproveForAct?.Position;

@@ -22,6 +22,7 @@ public class CommissionsController(ICommissionsService commissionsService, ILogg
         {
             Id = e.Id,
             Name = e.Name,
+            BranchName = e.BranchName,
             ApproveAct = e.ApproveForAct != null ? new CommissionsDriver
             {
                 Id = e.ApproveForAct.Id,
@@ -82,6 +83,7 @@ public class CommissionsController(ICommissionsService commissionsService, ILogg
         var commissions = new RequestManagement.Common.Models.Commissions
         {
             Name = request.Name,
+            BranchName = request.BranchName,
             ApproveForActId = request.ApproveActId == 0 ? 1 : request.ApproveActId,
             ApproveForDefectAndLimitId = request.ApproveDefectAndLimitId == 0 ? 1 : request.ApproveDefectAndLimitId,
             ChairmanId = request.ChairmanId == 0 ? 1 : request.ChairmanId,
@@ -105,6 +107,7 @@ public class CommissionsController(ICommissionsService commissionsService, ILogg
             {
                 Id = request.Id,
                 Name = request.Name,
+                BranchName = request.BranchName,
                 ApproveForActId = request.ApproveActId == 0 ? 1 : request.ApproveActId,
                 ApproveForDefectAndLimitId = request.ApproveDefectAndLimitId == 0 ? 1 : request.ApproveDefectAndLimitId,
                 ChairmanId = request.ChairmanId == 0 ? 1 : request.ChairmanId,

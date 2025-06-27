@@ -116,4 +116,10 @@ public partial class WarehouseViewModel : ObservableObject
         DialogResult = true;
         CloseWindowRequested.Invoke(this, EventArgs.Empty);
     }
+
+    [RelayCommand]
+    private void ClearWarehouseName()
+    {
+        NewWarehouseName = string.Empty;
+    }
 }

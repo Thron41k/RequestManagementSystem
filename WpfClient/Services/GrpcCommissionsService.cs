@@ -22,6 +22,7 @@ public class GrpcCommissionsService(IGrpcClientFactory clientFactory, AuthTokenS
         {
             Id = commissions.Id, 
             Name = commissions.Name,
+            BranchName = commissions.BranchName,
             ApproveForAct = new Driver
             {
                 Id = commissions.ApproveAct.Id, 
@@ -85,6 +86,7 @@ public class GrpcCommissionsService(IGrpcClientFactory clientFactory, AuthTokenS
         var result = await client.CreateCommissionsAsync(new CreateCommissionsRequest
         {
             Name = commissions.Name,
+            BranchName = commissions.BranchName,
             ApproveActId = commissions.ApproveForAct?.Id ?? 0,
             ApproveDefectAndLimitId = commissions.ApproveForDefectAndLimit?.Id ?? 0,
             ChairmanId = commissions.Chairman?.Id ?? 0,
@@ -108,6 +110,7 @@ public class GrpcCommissionsService(IGrpcClientFactory clientFactory, AuthTokenS
         {
             Id = commissions.Id,
             Name = commissions.Name,
+            BranchName = commissions.BranchName,
             ApproveActId = commissions.ApproveForAct?.Id ?? 0,
             ApproveDefectAndLimitId = commissions.ApproveForDefectAndLimit?.Id ?? 0,
             ChairmanId = commissions.Chairman?.Id ?? 0,

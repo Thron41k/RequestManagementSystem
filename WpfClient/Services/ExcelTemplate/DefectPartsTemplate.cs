@@ -16,7 +16,7 @@ public class DefectPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         using var stream = GetTemplateStream("DefectPartsTemplate.xlsx");
         using var package = new ExcelPackage(stream);
         var templateSheet = package.Workbook.Worksheets[0];
-        templateSheet.Cells[4, 1].Value = data.Commissions?.Name;
+        templateSheet.Cells[4, 1].Value = data.Commissions?.BranchName;
         templateSheet.Cells[4, 1, 4, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
         templateSheet.Cells[5, 6].Value = data.Commissions?.ApproveForDefectAndLimit?.Position;
         templateSheet.Cells[5, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;

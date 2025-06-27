@@ -14,7 +14,7 @@ public class OperationsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         using var stream = GetTemplateStream("OperationsTemplate.xlsx");
         using var package = new ExcelPackage(stream);
         var templateSheet = package.Workbook.Worksheets[0];
-        templateSheet.Cells[16, 4].Value = data.Commissions?.Name;
+        templateSheet.Cells[16, 4].Value = data.Commissions?.BranchName;
         templateSheet.Cells[5, 20].Value = data.Commissions?.ApproveForAct?.Position;
         templateSheet.Cells[7, 20].Value = data.Commissions?.ApproveForAct?.ShortName;
         templateSheet.Cells[28, 13].Value = data.Commissions?.ApproveForDefectAndLimit?.Position;

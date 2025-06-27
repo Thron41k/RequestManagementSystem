@@ -14,7 +14,7 @@ public class Mb7PartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         using var stream = GetTemplateStream("Mb7PartsTemplate.xlsx");
         using var package = new ExcelPackage(stream);
         var templateSheet = package.Workbook.Worksheets[0];
-        templateSheet.Cells[6, 3].Value = data.Commissions?.Name;
+        templateSheet.Cells[6, 3].Value = data.Commissions?.BranchName;
         templateSheet.Cells[18, 12].Value = data.Commissions?.ApproveForDefectAndLimit?.Position;
         templateSheet.Cells[18, 17].Value = data.Commissions?.ApproveForDefectAndLimit?.ShortName;
         templateSheet.Cells[18, 3].Value = data.Frp?.Position;

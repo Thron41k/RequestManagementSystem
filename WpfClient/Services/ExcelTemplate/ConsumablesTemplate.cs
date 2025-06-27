@@ -15,7 +15,7 @@ public class ConsumablesTemplate : ExcelTemplateWriterBase<ActPartsModel>
         using var stream = GetTemplateStream("ConsumablesTemplate.xlsx");
         using var package = new ExcelPackage(stream);
         var templateSheet = package.Workbook.Worksheets[0];
-        templateSheet.Cells[4, 1].Value = data.Commissions?.Name;
+        templateSheet.Cells[4, 1].Value = data.Commissions?.BranchName;
         templateSheet.Cells[5, 8].Value = data.Commissions?.ApproveForAct?.Position;
         templateSheet.Cells[7, 7].Value = data.Commissions?.ApproveForAct?.ShortName;
         templateSheet.Cells[23, 2].Value = data.Commissions?.Chairman?.Position;
