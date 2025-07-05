@@ -18,6 +18,8 @@ namespace RequestManagement.Common.Models
         public string RegistratorType { get; set; }
         public string RegistratorNumber { get; set; }
         public string RegistratorDate { get; set; }
+        public string InWarehouseName { get; set; }
+        public string InWarehouseCode { get; set; }
         public string ReceiptOrderNumber { get; set; }
         public string ReceiptOrderDate { get; set; }
         public string ApplicationNumber { get; set; }

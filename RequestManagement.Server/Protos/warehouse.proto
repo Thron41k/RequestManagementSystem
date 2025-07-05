@@ -50,9 +50,19 @@ message DeleteWarehouseResponse {
     bool success = 1;
 }
 
+message WarehouseDriver {
+    int32 id = 1;
+    string full_name = 2; 
+    string short_name = 3; 
+    string position = 4;    
+    string code = 5;
+}
+
 message Warehouse {
     int32 id = 1;
     string name = 2;
     string last_updated = 3;
     string code = 4;
+    WarehouseDriver financially_responsible_person = 5;
+    int32 financially_responsible_person_id = 6;
 }

@@ -22,6 +22,7 @@ public partial class SparePartsAnalogsViewModel : ObservableObject
     [ObservableProperty] private Nomenclature? _selectedNomenclatureAnalog;
     [ObservableProperty] private CollectionViewSource _nomenclatureAnalogViewSource;
     [ObservableProperty] private string _filterText = "";
+    [ObservableProperty] private bool _addButtonIsEnabled;
     private readonly System.Timers.Timer _filterTimer;
     public SparePartsAnalogsViewModel()
     {
@@ -44,7 +45,15 @@ public partial class SparePartsAnalogsViewModel : ObservableObject
 
     partial void OnSelectedNomenclatureChanged(Nomenclature? value)
     {
-        _ = LoadNomenclatureAnalogAsync();
+        if (value == null)
+        {
+            AddButtonIsEnabled = false;
+        }
+        else
+        {
+            _ = LoadNomenclatureAnalogAsync();
+            AddButtonIsEnabled = true;
+        }
     }
     partial void OnFilterTextChanged(string value)
     {

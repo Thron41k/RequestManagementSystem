@@ -90,12 +90,23 @@ public class ApplicationDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100);
             entity.Property(e => e.Code)
-                .HasMaxLength(50);
+                .HasMaxLength(50)
+                .IsRequired(false); // Code is nullable in the model
             entity.Property(e => e.LastUpdated)
                 .HasColumnType("timestamp with time zone");
+            entity.HasOne(e => e.FinanciallyResponsiblePerson)
+                .WithMany() // No navigation property in Driver
+                .HasForeignKey(e => e.FinanciallyResponsiblePersonId)
+                .IsRequired(false) // FinanciallyResponsiblePersonId is nullable
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.HasMany(e => e.Stocks)
+                .WithOne(s => s.Warehouse)
+                .HasForeignKey(s => s.WarehouseId)
+                .OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.Name);
         });
     }
+
 
     private void ConfigureNomenclature(ModelBuilder modelBuilder)
     {
@@ -230,6 +241,9 @@ public class ApplicationDbContext : DbContext
                 .HasColumnType("decimal(18,2)");
             entity.Property(e => e.Date)
                 .HasColumnType("timestamp with time zone");
+            entity.Property(e => e.DocType)
+                .IsRequired()
+                .HasMaxLength(50); // Added max length for consistency
             entity.Property(e => e.Code)
                 .IsRequired()
                 .HasMaxLength(50);
@@ -241,6 +255,11 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.ApplicationId)
                 .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.InWarehouse)
+                .WithMany()
+                .HasForeignKey(e => e.InWarehouseId)
+                .IsRequired(false) // InWarehouseId is nullable
+                .OnDelete(DeleteBehavior.SetNull);
             entity.HasIndex(e => e.Date);
         });
     }

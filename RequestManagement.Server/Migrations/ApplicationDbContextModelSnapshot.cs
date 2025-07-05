@@ -442,7 +442,11 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<string>("DocType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int?>("InWarehouseId")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18,2)");
@@ -455,6 +459,8 @@ namespace RequestManagement.Server.Migrations
                     b.HasIndex("ApplicationId");
 
                     b.HasIndex("Date");
+
+                    b.HasIndex("InWarehouseId");
 
                     b.HasIndex("StockId");
 
@@ -723,6 +729,9 @@ namespace RequestManagement.Server.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<int?>("FinanciallyResponsiblePersonId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
 
@@ -732,6 +741,8 @@ namespace RequestManagement.Server.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FinanciallyResponsiblePersonId");
 
                     b.HasIndex("Name");
 
@@ -863,6 +874,11 @@ namespace RequestManagement.Server.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("RequestManagement.Common.Models.Warehouse", "InWarehouse")
+                        .WithMany()
+                        .HasForeignKey("InWarehouseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("RequestManagement.Common.Models.Stock", "Stock")
                         .WithMany()
                         .HasForeignKey("StockId")
@@ -870,6 +886,8 @@ namespace RequestManagement.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Application");
+
+                    b.Navigation("InWarehouse");
 
                     b.Navigation("Stock");
                 });
@@ -976,6 +994,16 @@ namespace RequestManagement.Server.Migrations
                     b.Navigation("Equipment");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.Warehouse", b =>
+                {
+                    b.HasOne("RequestManagement.Common.Models.Driver", "FinanciallyResponsiblePerson")
+                        .WithMany()
+                        .HasForeignKey("FinanciallyResponsiblePersonId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("FinanciallyResponsiblePerson");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.DefectGroup", b =>

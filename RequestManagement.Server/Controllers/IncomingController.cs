@@ -27,6 +27,8 @@ public class IncomingController(IIncomingService incomingService, ILogger<Incomi
                 RegistratorNumber = x.RegistratorNumber,
                 RegistratorType = x.RegistratorType,
                 RegistratorDate = x.RegistratorDate,
+                InWarehouseName = x.InWarehouseName,
+                InWarehouseCode = x.InWarehouseCode,
                 ReceiptOrderNumber = x.ReceiptOrderNumber,
                 ReceiptOrderDate = x.ReceiptOrderDate,
                 ApplicationNumber = x.ApplicationNumber,
@@ -69,7 +71,7 @@ public class IncomingController(IIncomingService incomingService, ILogger<Incomi
         {
             StockId = request.StockId,
             Quantity = (decimal)request.Quantity,
-            Date = DateTime.Parse(request.Date)
+            Date = DateTime.Parse(request.Date),
         };
         var newIncoming = await _incomingService.CreateIncomingAsync(incoming);
         return new CreateIncomingResponse { Id = newIncoming.Id };

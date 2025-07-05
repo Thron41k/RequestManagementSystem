@@ -86,7 +86,7 @@
             <Button Content="Удалить" Command="{Binding DeleteEquipmentCommand}" Margin="5"/>
         </StackPanel>
 
-        <DataGrid Grid.Row="2" ItemsSource="{Binding EquipmentList.View}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="5,0,5,15" CanUserResizeRows="False" CanUserAddRows="False">
+        <DataGrid Grid.Row="2" ItemsSource="{Binding EquipmentViewSource.View}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="5,0,5,15" CanUserResizeRows="False" CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Гос.номер" Binding="{Binding StateNumber}" IsReadOnly="True" Width="120"/>
@@ -94,6 +94,7 @@
             </DataGrid.Columns>
             <DataGrid.InputBindings>
                 <MouseBinding Gesture="LeftDoubleClick" Command="{Binding SelectAndCloseCommand}" />
+                <MouseBinding Gesture="LeftClick" Command="{Binding UpdateSelectedItemCommand}" />
             </DataGrid.InputBindings>
         </DataGrid>
         <TextBox Grid.Row="1" materialDesign:HintAssist.Hint="Фильтр" 

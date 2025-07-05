@@ -53,6 +53,8 @@ internal class GrpcIncomingService(IGrpcClientFactory clientFactory, AuthTokenSt
                 ApplicationResponsibleName = item.ApplicationResponsibleName ?? "",
                 ApplicationEquipmentName = item.ApplicationEquipmentName ?? "",
                 ApplicationEquipmentCode = item.ApplicationEquipmentCode ?? "",
+                InWarehouseName = item.InWarehouseName ?? "",
+                InWarehouseCode = item.InWarehouseCode ?? ""
             };
             foreach (var i in item.Items)
             {

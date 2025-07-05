@@ -40,10 +40,6 @@ public class ExcelReaderService : IExcelReaderService
                 var article = worksheet.Cells[row, 11].Value?.ToString()?.Trim() ?? string.Empty;
                 var unit = worksheet.Cells[row, 12].Value?.ToString()?.Trim() ?? string.Empty;
                 var quantity = worksheet.Cells[row, 13].Value?.ToString()?.Trim() ?? string.Empty;
-                if (name == "Штуцер топливной трубки угловой d-12мм")
-                {
-                    Console.WriteLine(name);
-                }
                 if (code == string.Empty && article == string.Empty && unit == string.Empty)
                 {
                     var numberAndDate = name.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -150,10 +146,10 @@ public class ExcelReaderService : IExcelReaderService
             for (var row = startRow; row < rowCount; row++)
             {
                 var name = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty;
-                var code = worksheet.Cells[row, 11].Value?.ToString()?.Trim() ?? string.Empty;
-                var article = worksheet.Cells[row, 12].Value?.ToString()?.Trim() ?? string.Empty;
-                var unit = worksheet.Cells[row, 13].Value?.ToString()?.Trim() ?? string.Empty;
-                var quantity = worksheet.Cells[row, 14].Value?.ToString()?.Trim() ?? string.Empty;
+                var code = worksheet.Cells[row, 13].Value?.ToString()?.Trim() ?? string.Empty;
+                var article = worksheet.Cells[row, 14].Value?.ToString()?.Trim() ?? string.Empty;
+                var unit = worksheet.Cells[row, 15].Value?.ToString()?.Trim() ?? string.Empty;
+                var quantity = worksheet.Cells[row, 16].Value?.ToString()?.Trim() ?? string.Empty;
                 if (string.IsNullOrEmpty(code) && string.IsNullOrEmpty(article) && string.IsNullOrEmpty(unit))
                 {
                     if (newMaterialIncoming != null)
@@ -171,31 +167,41 @@ public class ExcelReaderService : IExcelReaderService
                     var index = newMaterialIncoming.RegistratorType == "Перемещение" ? 4 : 2;
                     newMaterialIncoming.RegistratorNumber = registrator[index];
                     newMaterialIncoming.RegistratorDate = registrator[index + 2];
-                    var receiptOrderCleared = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
+                    var warehouseSenderNameCleared = worksheet.Cells[row, 5].Value?.ToString()?.Trim() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(warehouseSenderNameCleared))
+                    {
+                        newMaterialIncoming.InWarehouseName = warehouseSenderNameCleared;
+                    }
+                    var warehouseSenderCodeCleared = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(warehouseSenderCodeCleared))
+                    {
+                        newMaterialIncoming.InWarehouseCode = warehouseSenderCodeCleared;
+                    }
+                    var receiptOrderCleared = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
                     if (!string.IsNullOrEmpty(receiptOrderCleared))
                     {
                         var receiptOrder = receiptOrderCleared.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         newMaterialIncoming.ReceiptOrderNumber = receiptOrder[2];
                         newMaterialIncoming.ReceiptOrderDate = receiptOrder[4];
                     }
-                    var applicationCleared = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
+                    var applicationCleared = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
                     if (!string.IsNullOrEmpty(applicationCleared))
                     {
                         var application = applicationCleared.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         newMaterialIncoming.ApplicationNumber = application[3];
                         newMaterialIncoming.ApplicationDate = application[5];
                     }
-                    var applicationResponsibleName = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
+                    var applicationResponsibleName = worksheet.Cells[row, 10].Value?.ToString()?.Trim() ?? string.Empty;
                     if (!string.IsNullOrEmpty(applicationResponsibleName))
                     {
                         newMaterialIncoming.ApplicationResponsibleName = applicationResponsibleName;
                     }
-                    var applicationEquipmentName = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
+                    var applicationEquipmentName = worksheet.Cells[row, 11].Value?.ToString()?.Trim() ?? string.Empty;
                     if (!string.IsNullOrEmpty(applicationEquipmentName))
                     {
                         newMaterialIncoming.ApplicationEquipmentName = applicationEquipmentName;
                     }
-                    var applicationEquipmentCode = worksheet.Cells[row, 10].Value?.ToString()?.Trim() ?? string.Empty;
+                    var applicationEquipmentCode = worksheet.Cells[row, 12].Value?.ToString()?.Trim() ?? string.Empty;
                     if (!string.IsNullOrEmpty(applicationEquipmentCode))
                     {
                         newMaterialIncoming.ApplicationEquipmentCode = applicationEquipmentCode;
@@ -203,7 +209,9 @@ public class ExcelReaderService : IExcelReaderService
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(newMaterialIncoming?.RegistratorType) && string.IsNullOrEmpty(newMaterialIncoming?.RegistratorNumber) && string.IsNullOrEmpty(newMaterialIncoming?.RegistratorDate)) continue;
+                    if (string.IsNullOrEmpty(newMaterialIncoming?.RegistratorType) && 
+                        string.IsNullOrEmpty(newMaterialIncoming?.RegistratorNumber) && 
+                        string.IsNullOrEmpty(newMaterialIncoming?.RegistratorDate)) continue;
                     newMaterialIncoming.Items ??= [];
                     newMaterialIncoming.Items.Add(new MaterialStock
                     {

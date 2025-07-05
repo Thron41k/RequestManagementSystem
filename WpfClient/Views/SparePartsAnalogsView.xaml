@@ -7,6 +7,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:WpfClient.ViewModels.Behaviors"
              xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -20,7 +21,7 @@
     <UserControl.DataContext>
         <vm:SparePartsAnalogsViewModel />
     </UserControl.DataContext>
-    <Grid Margin="10">
+    <Grid Margin="15,15,15,15">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.5*"/>
             <ColumnDefinition Width="0.5*"/>
@@ -28,15 +29,17 @@
         <Grid Grid.Column="0" Margin="0,0,5,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
-                <TextBox helpers:PlaceholderHelper.PlaceholderText="Номенклатура" Tag="{Binding ClearFilterTextCommand}" Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource ClearableTextBoxStyle}">
-                    <b:Interaction.Behaviors>
-                        <behaviors:ClearButtonBehavior />
-                        <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
-                        <behaviors:MouseClickCommandBehavior/>
-                    </b:Interaction.Behaviors>
+                <TextBox materialDesign:HintAssist.Hint="Поиск номенклатуры" 
+                         FontSize="14"
+                         Margin="0,3,0,0"
+                         materialDesign:HintAssist.FloatingScale="1"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         materialDesign:HintAssist.HintPaddingBrush="White"
+                         Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
                 </TextBox>
             </StackPanel>
             <DataGrid Grid.Row="1" ItemsSource="{Binding NomenclatureViewSource.View}" SelectedItem="{Binding SelectedNomenclature}"
@@ -53,16 +56,25 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
-        <Grid Grid.Column="1" Margin="5,2,0,0">
+        <Grid Grid.Column="1" Margin="5,5,0,0" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0">
-                <Button Content="Добавить аналог" Command="{Binding AddNomenclatureAnalogCommand}" Style="{StaticResource StyledButton}"/>
+            <StackPanel Grid.Row="0" Margin="0,10,0,0">
+                <Button Content="Добавить аналог" 
+                        Command="{Binding AddNomenclatureAnalogCommand}" 
+                        Width="200" 
+                        IsEnabled="{Binding AddButtonIsEnabled}"
+                        HorizontalAlignment="Left"/>
             </StackPanel>
-            <DataGrid Grid.Row="1" ItemsSource="{Binding NomenclatureAnalogViewSource.View}" SelectedItem="{Binding SelectedNomenclatureAnalog}"
-                      AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,10,0,0" SelectionMode="Single" SelectionUnit="FullRow">
+            <DataGrid Grid.Row="1" ItemsSource="{Binding NomenclatureAnalogViewSource.View}" 
+                      SelectedItem="{Binding SelectedNomenclatureAnalog}"
+                      AutoGenerateColumns="False" 
+                      CanUserAddRows="False" 
+                      Margin="0,18.5,0,0" 
+                      SelectionMode="Single" 
+                      SelectionUnit="FullRow">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="White"/>

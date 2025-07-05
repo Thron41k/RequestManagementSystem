@@ -22,20 +22,27 @@
     <UserControl.DataContext>
         <vm:CommissionsViewModel />
     </UserControl.DataContext>
-    <Grid Margin="15,15,15,15">
+    <Grid Margin="15,5,15,15">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Margin="5">
+        <Grid Grid.Column="0" Margin="0,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="400" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="5">
-                <Button Content="Добавить" Command="{Binding AddCommissionsCommand}" />
+                
             </StackPanel>
-            <DataGrid Grid.Row="1" ItemsSource="{Binding CommissionsViewSource.View}" SelectedItem="{Binding SelectedCommissions}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow">
+            <DataGrid Grid.Row="1" 
+                      ItemsSource="{Binding CommissionsViewSource.View}" 
+                      SelectedItem="{Binding SelectedCommissions}" 
+                      AutoGenerateColumns="False" 
+                      CanUserAddRows="False" 
+                      Margin="0,10,0,0" 
+                      SelectionMode="Single" 
+                      SelectionUnit="FullRow">
                 <DataGrid.InputBindings>
                     <MouseBinding
                         MouseAction="LeftDoubleClick"
@@ -47,11 +54,11 @@
                         CommandParameter="{Binding CommissionsList/}"/>
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Филиал" Binding="{Binding Name}" IsReadOnly="True" Width="*" />
+                    <DataGridTextColumn Header="Филиал" Binding="{Binding Name}" IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
-        <Grid Grid.Column="1" Margin="5">
+        <Grid Grid.Column="1" Margin="15,15,5,5" Width="370">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -67,7 +74,7 @@
             <TextBox Grid.Row="0" materialDesign:HintAssist.Hint="Название комиссии"
                      FontSize="14"
                      materialDesign:HintAssist.FloatingScale="1"
-                     Margin="5"
+                     Margin="5,5,5,15"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
                      materialDesign:HintAssist.HintPaddingBrush="White"
@@ -91,7 +98,7 @@
             <TextBox Grid.Row="1" materialDesign:HintAssist.Hint="Филиал"
                      FontSize="14"
                      materialDesign:HintAssist.FloatingScale="1"
-                     Margin="5"
+                     Margin="5,5,5,15"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
                      materialDesign:HintAssist.HintPaddingBrush="White"
@@ -115,7 +122,7 @@
             <TextBox Grid.Row="2" materialDesign:HintAssist.Hint="Утверждаю(Акты)"
                      FontSize="14"
                      materialDesign:HintAssist.FloatingScale="1"
-                     Margin="5"
+                     Margin="5,5,5,15"
                      IsReadOnly="True"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
@@ -136,7 +143,7 @@
             <TextBox Grid.Row="3" materialDesign:HintAssist.Hint="Утверждаю(Дефектные и лимитные ведомости)"
                      FontSize="14"
                      materialDesign:HintAssist.FloatingScale="1"
-                     Margin="5"
+                     Margin="5,5,5,15"
                      IsReadOnly="True"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
@@ -154,10 +161,11 @@
                     <behaviors:MouseClickCommandBehavior  Command="{Binding SelectApproveForDefectAndLimitCommand}"/>
                 </b:Interaction.Behaviors>
             </TextBox>
-            <TextBox Grid.Row="4" materialDesign:HintAssist.Hint="Председатель комиссии"
+            <TextBox Grid.Row="4" 
+                     materialDesign:HintAssist.Hint="Председатель комиссии"
                      FontSize="14"
                      materialDesign:HintAssist.FloatingScale="1"
-                     Margin="5"
+                     Margin="5,5,5,15"
                      IsReadOnly="True"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
@@ -175,10 +183,11 @@
                     <behaviors:MouseClickCommandBehavior  Command="{Binding SelectChairmanCommand}"/>
                 </b:Interaction.Behaviors>
             </TextBox>
-            <TextBox Grid.Row="5" materialDesign:HintAssist.Hint="Член комиссии 1"
+            <TextBox Grid.Row="5" 
+                     materialDesign:HintAssist.Hint="Член комиссии 1"
                      FontSize="14"
                      materialDesign:HintAssist.FloatingScale="1"
-                     Margin="5"
+                     Margin="5,5,5,15"
                      IsReadOnly="True"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
@@ -199,7 +208,7 @@
             <TextBox Grid.Row="6" materialDesign:HintAssist.Hint="Член комиссии 2"
                      FontSize="14"
                      materialDesign:HintAssist.FloatingScale="1"
-                     Margin="5"
+                     Margin="5,5,5,15"
                      IsReadOnly="True"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
@@ -220,7 +229,7 @@
             <TextBox Grid.Row="7" materialDesign:HintAssist.Hint="Член комиссии 3"
                      FontSize="14"
                      materialDesign:HintAssist.FloatingScale="1"
-                     Margin="5"
+                     Margin="5,5,5,15"
                      IsReadOnly="True"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
@@ -259,8 +268,12 @@
                     <behaviors:MouseClickCommandBehavior  Command="{Binding SelectMember4Command}"/>
                 </b:Interaction.Behaviors>
             </TextBox>
-            <StackPanel Grid.Row="9"  Orientation="Horizontal" Margin="5,17,5,5" HorizontalAlignment="Center">
-                <Button Content="Сохранить" Command="{Binding SaveCommissionsCommand}" Margin="0,0,20,0"/>
+            <StackPanel Grid.Row="9"  
+                        Orientation="Horizontal" 
+                        Margin="5,25,5,5" 
+                        HorizontalAlignment="Center">
+                <Button Content="Добавить" Command="{Binding AddCommissionsCommand}" />
+                <Button Content="Сохранить" Command="{Binding SaveCommissionsCommand}" Margin="5"/>
                 <Button Content="Удалить" Command="{Binding RemoveCommissionsCommand}" />
             </StackPanel>
         </Grid>

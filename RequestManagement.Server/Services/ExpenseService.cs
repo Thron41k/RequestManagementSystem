@@ -20,6 +20,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
             .ThenInclude(s => s.Nomenclature)
             .Include(e => e.Stock)
             .ThenInclude(s => s.Warehouse)
+            .ThenInclude(d=>d.FinanciallyResponsiblePerson)
             .Include(e => e.Equipment)
             .Include(e => e.Driver)
             .Include(e => e.Defect)

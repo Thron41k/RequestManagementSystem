@@ -13,13 +13,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,0,5" HorizontalAlignment="Left">
             <TextBox materialDesign:HintAssist.Hint="Наименование склада" 
                      FontSize="14"
-                     Width="400"
+                     Width="494"
                      materialDesign:HintAssist.FloatingScale="1"
                      Margin="5"
                      materialDesign:ValidationAssist.UsePopup="True"
@@ -46,17 +47,72 @@
             <Button Content="Сохранить" Command="{Binding UpdateWarehouseCommand}" Margin="5"/>
             <Button Content="Удалить" Command="{Binding DeleteWarehouseCommand}" Margin="5"/>
         </StackPanel>
-
-        <DataGrid Grid.Row="2" ItemsSource="{Binding WarehouseViewSource.View}"  SelectedItem="{Binding SelectedWarehouse}" AutoGenerateColumns="False" Margin="5" CanUserResizeRows="False" CanUserAddRows="False">
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,5,5,10">
+            <TextBox 
+                materialDesign:HintAssist.Hint="Код" 
+                Width="130" 
+                FontSize="14"
+                materialDesign:HintAssist.FloatingScale="1"
+                materialDesign:ValidationAssist.UsePopup="True"
+                materialDesign:TextFieldAssist.HasClearButton="True"
+                materialDesign:HintAssist.HintPaddingBrush="White"
+                Tag="{Binding ClearWarehouseCodeCommand}" 
+                Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="NewWarehouseCode"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validationRules:NotEmptyValidationRule
+                                ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox materialDesign:HintAssist.Hint="МОЛ" 
+                     Margin="15,0,0,0"
+                     Tag="{Binding ClearSelectedFinanciallyResponsiblePersonCommand}" 
+                     IsReadOnly="True" 
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     FontSize="14"
+                     AcceptsReturn="True"
+                     Width="350" 
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="SelectedFinanciallyResponsiblePerson.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validationRules:NotEmptyDriverNameValidationRule
+                                ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior Command="{Binding SelectFinanciallyResponsiblePersonCommand}" />
+                </b:Interaction.Behaviors>
+            </TextBox>
+        </StackPanel>
+                <DataGrid Grid.Row="3" ItemsSource="{Binding WarehouseViewSource.View}"  SelectedItem="{Binding SelectedWarehouse}" AutoGenerateColumns="False" Margin="5" CanUserResizeRows="False" CanUserAddRows="False">
             <DataGrid.Columns>
+                <DataGridTextColumn Header="Код" Binding="{Binding Code}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="МОЛ" Binding="{Binding FinanciallyResponsiblePerson.ShortName}" IsReadOnly="True"/>
             </DataGrid.Columns>
             <DataGrid.InputBindings>
                 <MouseBinding Gesture="LeftDoubleClick" Command="{Binding SelectAndCloseCommand}" />
             </DataGrid.InputBindings>
         </DataGrid>
 
-        <TextBox Grid.Row="1" materialDesign:HintAssist.Hint="Фильтр" 
+        <TextBox Grid.Row="2" materialDesign:HintAssist.Hint="Фильтр" 
                  FontSize="14"
                  materialDesign:HintAssist.FloatingScale="1"
                  Margin="5,5,5,15" 

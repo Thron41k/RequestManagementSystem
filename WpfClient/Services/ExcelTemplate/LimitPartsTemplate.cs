@@ -29,6 +29,7 @@ public class LimitPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         var grouped = data.Expenses
             .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 2 && e.Defect.Id != 3 && e.Defect.DefectGroupId != 15 && e.Defect.DefectGroupId != 16)
             .GroupBy(e => e.Code!)
+            .OrderBy(g => g.Key)
             .ToList();
         foreach (var group in grouped)
         {

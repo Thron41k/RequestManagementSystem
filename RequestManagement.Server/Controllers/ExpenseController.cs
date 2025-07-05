@@ -107,7 +107,7 @@ public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseCo
                 Warehouse = new ExpenseWarehouse
                 {
                     Id = e.Stock.Warehouse.Id,
-                    Name = e.Stock.Warehouse.Name
+                    Name = e.Stock.Warehouse.Name,
                 },
                 Nomenclature = new ExpenseNomenclature
                 {

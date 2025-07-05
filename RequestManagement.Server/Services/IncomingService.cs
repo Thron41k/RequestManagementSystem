@@ -3,9 +3,16 @@ using Microsoft.Extensions.Logging;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.Common.Utilities;
+using RequestManagement.Server.Controllers;
 using RequestManagement.Server.Data;
 using System.Diagnostics;
 using System.Globalization;
+using Driver = RequestManagement.Common.Models.Driver;
+using Equipment = RequestManagement.Common.Models.Equipment;
+using Incoming = RequestManagement.Common.Models.Incoming;
+using Nomenclature = RequestManagement.Common.Models.Nomenclature;
+using Stock = RequestManagement.Common.Models.Stock;
+using Warehouse = RequestManagement.Common.Models.Warehouse;
 
 namespace RequestManagement.Server.Services;
 
@@ -14,10 +21,13 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
     public async Task<List<Incoming>> GetAllIncomingsAsync(string filter, int requestWarehouseId, string requestFromDate, string requestToDate)
     {
         var query = dbContext.Incomings
+            .Include(e => e.InWarehouse)
+            .ThenInclude(s => s!.FinanciallyResponsiblePerson)
             .Include(e => e.Stock)
             .ThenInclude(s => s.Nomenclature)
             .Include(e => e.Stock)
             .ThenInclude(s => s.Warehouse)
+            .ThenInclude(d => d.FinanciallyResponsiblePerson)
             .Include(e => e.Application)
             .ThenInclude(s => s!.Responsible)
             .Include(e => e.Application)
@@ -72,17 +82,23 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
         {
             var warehouse = await dbContext.Warehouses
                 .FirstOrDefaultAsync(w => w.Name == incoming.WarehouseName) ?? new Warehouse
-            {
-                Name = incoming.WarehouseName,
-                Code = string.Empty,
-                LastUpdated = DateTime.UtcNow
-            };
+                {
+                    Name = incoming.WarehouseName,
+                    Code = string.Empty,
+                    LastUpdated = DateTime.UtcNow
+                };
 
             if (warehouse.Id == 0)
             {
                 dbContext.Warehouses.Add(warehouse);
                 await dbContext.SaveChangesAsync();
             }
+
+            var inWarehouses = incoming.Items
+                .Select(i => (i.InWarehouseName, i.InWarehouseCode))
+                .Where(item => !string.IsNullOrEmpty(item.InWarehouseName) && !string.IsNullOrEmpty(item.InWarehouseCode))
+                .Distinct()
+                .ToHashSet();
 
             var incomingCodes = incoming.Items
                 .Select(i => i.ReceiptOrderNumber == "" ? i.RegistratorNumber : i.ReceiptOrderNumber)
@@ -115,6 +131,12 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
 
             //logger.LogInformation("Подготовлены списки: Drivers={DriverCount}, Equipments={EquipmentCount}, Nomenclatures={NomenclatureCount}",
             //   driverNames.Count, equipmentCodes.Count, nomenclatureKeys.Count);
+
+            var existingWarehouses = inWarehouses.Any()
+                ? (await dbContext.Warehouses.ToListAsync())
+                .Where(d => inWarehouses.Any(w => w.InWarehouseName == d.Name && w.InWarehouseCode == d.Code))
+                .ToDictionary(d => d.Name)
+                : new Dictionary<string, Warehouse>();
 
             var existingIncomings = await dbContext.Incomings
                 .Where(i => incomingCodes.Contains(i.Code))
@@ -160,6 +182,27 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                 }
                 existingNomenclatures = existingNomenclaturesList
                     .ToDictionary(n => (n.Code, n.Article ?? string.Empty, n.Name, n.UnitOfMeasure), n => n);
+            }
+
+            var newWarehouses = new List<Warehouse>();
+            foreach (var item in inWarehouses)
+            {
+                if (!existingWarehouses.ContainsKey(item.InWarehouseName))
+                {
+                    var newWarehouse = new Warehouse
+                    {
+                        Name = item.InWarehouseName,
+                        Code = item.InWarehouseCode,
+                        LastUpdated = DateTime.UtcNow
+                    };
+                    newWarehouses.Add(newWarehouse);
+                    existingWarehouses[item.InWarehouseName] = newWarehouse;
+                }
+            }
+            if (newWarehouses.Any())
+            {
+                await dbContext.Warehouses.AddRangeAsync(newWarehouses);
+                await dbContext.SaveChangesAsync();
             }
 
             // 3. Создаем новые Drivers и сохраняем их
@@ -233,10 +276,10 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
             // 6. Подготавливаем Applications
             var applicationKeys = incoming.Items
                 .Where(i => !string.IsNullOrEmpty(i.ApplicationNumber) && !string.IsNullOrEmpty(i.ApplicationDate))
-                .Select(i => {
+                .Select(i =>
+                {
                     if (DateTime.TryParse(i.ApplicationDate, out var date))
                     {
-                        // Берем только дату (без времени)
                         return (Number: i.ApplicationNumber, Date: date.Date);
                     }
                     return (Number: i.ApplicationNumber, Date: (DateTime?)null);
@@ -346,8 +389,6 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
             var incomingsToUpdate = new List<Incoming>();
             foreach (var item in incoming.Items)
             {
-                if(item.ReceiptOrderNumber == "БПТР0005663")
-                    Console.WriteLine(item.ReceiptOrderNumber);
                 Application? application = null;
                 if (!string.IsNullOrEmpty(item.ApplicationNumber) && !string.IsNullOrEmpty(item.ApplicationDate) &&
                     DateTime.TryParse(item.ApplicationDate, out var applicationDate))
@@ -356,6 +397,7 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                     existingApplications.TryGetValue(appKey, out application);
                 }
 
+                existingWarehouses.TryGetValue(item.InWarehouseName, out var currentWarehouse);
                 foreach (var material in item.Items)
                 {
                     var nomenclatureKey = (material.Code, material.Article, material.ItemName, material.Unit);
@@ -371,42 +413,22 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                         //logger.LogWarning("Запас с ключом {StockKey} не найден для номенклатуры {NomenclatureId}.", stockKey, nomenclature.Id);
                         continue;
                     }
-
-                    string incomingCode;
-                    DateTime incomingDate;
-                    string incomingType;
-                    if (!string.IsNullOrEmpty(item.ReceiptOrderNumber) &&
-                        !string.IsNullOrEmpty(item.ReceiptOrderDate) &&
-                        DateTime.TryParse(item.ReceiptOrderDate, out var receiptOrderDate))
-                    {
-                        incomingCode = item.ReceiptOrderNumber;
-                        incomingDate = receiptOrderDate;
-                        incomingType = "Приходный ордер";
-                    }
-                    else
-                    {
-                        incomingCode = item.RegistratorNumber ?? $"AUTO_{Guid.NewGuid().ToString("N")[..8]}";
-                        incomingDate = DateTime.TryParse(item.RegistratorDate, out var registratorDate)
-                            ? registratorDate
-                            : DateTime.UtcNow;
-                        incomingType = item.RegistratorType;
-                    }
-
-                    if (incomingCode == "БПТР0006356") 
-                        Console.WriteLine("БПТР0006356");
+                    var incomingCode = item.RegistratorNumber ?? $"AUTO_{Guid.NewGuid().ToString("N")[..8]}";
+                    var incomingDate = DateTime.TryParse(item.RegistratorDate, out var registratorDate)
+                        ? registratorDate
+                        : DateTime.UtcNow;
+                    var incomingType = item.RegistratorType;
                     var incomingKey = (stock.Id, application?.Id ?? 1, incomingCode);
                     if (existingIncomings.TryGetValue(incomingKey, out var existingIncoming))
                     {
-                        // Обновляем существующую запись, если количество изменилось
-                        if (existingIncoming.Quantity != (decimal)material.FinalBalance)
-                        {
-                            var quantityDifference = (decimal)material.FinalBalance - existingIncoming.Quantity;
-                            existingIncoming.Quantity = (decimal)material.FinalBalance;
-                            existingIncoming.Date = incomingDate;
-                            existingIncoming.DocType = incomingType;
-                            stock.ReceivedQuantity += quantityDifference;
-                            incomingsToUpdate.Add(existingIncoming);
-                        }
+
+                        var quantityDifference = (decimal)material.FinalBalance - existingIncoming.Quantity;
+                        existingIncoming.Quantity = (decimal)material.FinalBalance;
+                        existingIncoming.Date = incomingDate;
+                        existingIncoming.DocType = incomingType;
+                        existingIncoming.InWarehouseId = currentWarehouse?.Id ?? null;
+                        stock.ReceivedQuantity += quantityDifference;
+                        incomingsToUpdate.Add(existingIncoming);
                         continue;
                     }
                     var incomingEntry = new Incoming
@@ -416,7 +438,8 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                         Date = incomingDate,
                         Code = incomingCode,
                         DocType = incomingType,
-                        ApplicationId = application?.Id ?? 1
+                        ApplicationId = application?.Id ?? 1,
+                        InWarehouseId = currentWarehouse?.Id ?? null
                     };
                     stock.ReceivedQuantity += incomingEntry.Quantity;
                     newIncomings.Add(incomingEntry);
@@ -502,7 +525,7 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
         }
         oldStock.ReceivedQuantity -= existingIncoming.Quantity;
         newStock.ReceivedQuantity += incoming.Quantity;
-
+        existingIncoming.InWarehouseId = incoming.InWarehouseId;
         existingIncoming.StockId = incoming.StockId;
         existingIncoming.Quantity = incoming.Quantity;
         existingIncoming.Date = incoming.Date;

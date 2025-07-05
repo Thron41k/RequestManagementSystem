@@ -13,6 +13,7 @@
              d:DesignHeight="270" d:DesignWidth="410">
     <UserControl.Resources>
         <ResourceDictionary>
+            <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" Invert="True"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/TextBoxClearButton.xaml" />
                 <ResourceDictionary Source="Styles/StyledCheckBox.xaml" />
@@ -42,8 +43,13 @@
                 </b:Interaction.Behaviors>
             </TextBox>
         </StackPanel>
-        <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
-            <TextBox helpers:PlaceholderHelper.PlaceholderText="Материально-ответственное лицо" Tag="{Binding ClearSelectedFrpCommand}" Text="{Binding SelectedFrp.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
+        <StackPanel Grid.Row="1"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center" Visibility="{Binding IncomingMode, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBox helpers:PlaceholderHelper.PlaceholderText="Материально-ответственное лицо" 
+                     Tag="{Binding ClearSelectedFrpCommand}" 
+                     Text="{Binding SelectedFrp.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                     IsReadOnly="True" 
+                     Width="400" 
+                     Style="{StaticResource ClearableTextBoxStyle}">
                 <b:Interaction.Behaviors>
                     <behaviors:ClearButtonBehavior />
                     <behaviors:PlaceholderBehavior PlaceholderTargetName="Placeholder"/>
@@ -60,14 +66,9 @@
         </StackPanel>
         <StackPanel Grid.Row="3"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
             <ComboBox Width="400"
+                      ItemsSource="{Binding Path=DocTypeList}"
                       SelectedIndex="{Binding Path=SelectedTypeDocumentForPrint, Mode=TwoWay}" 
                       Style="{StaticResource StyledComboBox}">
-                <system:String>Акты</system:String>
-                <system:String>Лимитные карты</system:String>
-                <system:String>Дефектные ведомости</system:String>
-                <system:String>Ведомости выдачи АКБ и Автошин</system:String>
-                <system:String>Расходные материалы</system:String>
-                <system:String>Эксплуатация</system:String>
             </ComboBox>
         </StackPanel>
         <StackPanel Grid.Row="4"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">

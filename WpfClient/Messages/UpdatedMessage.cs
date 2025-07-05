@@ -24,7 +24,7 @@ public class ShowTaskMessage(MessagesEnum message, Type caller, bool editMode, i
     public IEntity?[] Item { get; } = items;
     public int? Term { get; set; } = term;
 }
-public class ShowTaskPrintDialogMessage(MessagesEnum message, Type caller, bool editMode, List<Expense> items, DateTime fromDate, DateTime toDate)
+public class ShowTaskPrintDialogMessageExpense(MessagesEnum message, Type caller, bool editMode, List<Expense> items, DateTime fromDate, DateTime toDate)
 {
     public MessagesEnum Message { get; } = message;
     public Type Caller { get; } = caller;
@@ -33,6 +33,17 @@ public class ShowTaskPrintDialogMessage(MessagesEnum message, Type caller, bool 
     public DateTime FromDate { get; } = fromDate;
     public DateTime ToDate { get; } = toDate;
 }
+
+public class ShowTaskPrintDialogMessageIncoming(MessagesEnum message, Type caller, bool editMode, List<Incoming> items, DateTime fromDate, DateTime toDate)
+{
+    public MessagesEnum Message { get; } = message;
+    public Type Caller { get; } = caller;
+    public bool EditMode { get; } = editMode;
+    public List<Incoming> Item { get; } = items;
+    public DateTime FromDate { get; } = fromDate;
+    public DateTime ToDate { get; } = toDate;
+}
+
 public class SelectResultMessage(MessagesEnum message, Type caller, IEntity? item = null)
 {
     public MessagesEnum Message { get; } = message;

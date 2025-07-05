@@ -33,7 +33,7 @@ public partial class CommissionsViewModel : ObservableObject
 
     private enum CommissionType { None, Act, DefectAndLimit, Chairman, Member1, Member2, Member3, Member4 };
 
-    public CommissionsViewModel(IMessageBus messageBus, ICommissionsService commissionsService, IDriverService driverService)
+    public CommissionsViewModel(IMessageBus messageBus, ICommissionsService commissionsService)
     {
         _messageBus = messageBus;
         _commissionsService = commissionsService;
@@ -51,8 +51,9 @@ public partial class CommissionsViewModel : ObservableObject
         CommissionsViewSource.Source = CommissionsList;
     }
 
-    partial void OnSelectedCommissionsChanged(Commissions value)
+    partial void OnSelectedCommissionsChanged(Commissions? value)
     {
+        if (value == null) return;
         CommissionsName = value.Name;
         BranchName = value.BranchName;
         if (value.ApproveForAct != null) SelectedApproveForAct = value.ApproveForAct;
@@ -114,6 +115,7 @@ public partial class CommissionsViewModel : ObservableObject
     [RelayCommand]
     private void Click()
     {
+        if (SelectedCommissions == null) return;
         CommissionsName = SelectedCommissions.Name;
         BranchName = SelectedCommissions.BranchName;
         if (SelectedCommissions.ApproveForAct != null) SelectedApproveForAct = SelectedCommissions.ApproveForAct;

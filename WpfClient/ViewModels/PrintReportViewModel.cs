@@ -12,21 +12,23 @@ namespace WpfClient.ViewModels;
 
 public partial class PrintReportViewModel : ObservableObject
 {
-    public bool EditMode { get; set; }
     private readonly IMessageBus _messageBus;
     private readonly IPrinterService _printerService;
     private readonly IExcelWriterService _excelWriterService;
     private DateTime _startDate = DateTime.Now;
     private DateTime _endDate = DateTime.Now;
     private List<Expense> _listExpense = new();
+    private List<Incoming> _listIncoming = new();
     [ObservableProperty] private Commissions? _selectedCommissions = new();
     [ObservableProperty] private Driver? _selectedFrp = new();
     [ObservableProperty] private ObservableCollection<string> _printerList = [];
     [ObservableProperty] private string _selectedPrinter = "";
     [ObservableProperty] private int _selectedTypeDocumentForPrint = -1;
+    [ObservableProperty] private ObservableCollection<string> _docTypeList = [];
+    [ObservableProperty] private bool _incomingMode;
     public PrintReportViewModel()
     {
-            
+
     }
     public PrintReportViewModel(IMessageBus messageBus, IPrinterService printerService, IExcelWriterService excelWriterService)
     {
@@ -36,8 +38,28 @@ public partial class PrintReportViewModel : ObservableObject
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
     }
 
-    public void Init(List<Expense> list,DateTime startDate,DateTime endDate)
+    public void Init(List<Incoming> list, DateTime startDate, DateTime endDate)
     {
+        IncomingMode = true;
+        DocTypeList =
+        [
+            "Требования-накладные"
+        ];
+        PrinterList = new ObservableCollection<string>(PrinterSettings.InstalledPrinters);
+        SelectedPrinter = _printerService.GetDefaultPrinterName();
+        _listIncoming = list;
+        _startDate = startDate;
+        _endDate = endDate;
+    }
+
+    public void Init(List<Expense> list, DateTime startDate, DateTime endDate)
+    {
+        IncomingMode = false;
+        DocTypeList =
+        [
+            "Акты", "Лимитные карты", "Дефектные ведомости", "Ведомости выдачи АКБ и Автошин",
+                "Расходные материалы", "Эксплуатация"
+        ];
         PrinterList = new ObservableCollection<string>(PrinterSettings.InstalledPrinters);
         SelectedPrinter = _printerService.GetDefaultPrinterName();
         _listExpense = list;
@@ -83,74 +105,97 @@ public partial class PrintReportViewModel : ObservableObject
     [RelayCommand]
     private void SaveToFile()
     {
-        if(SelectedCommissions == null && SelectedFrp == null) return;
-        switch (SelectedTypeDocumentForPrint)
+        if (IncomingMode)
         {
-            case 0:
-                var actParts = new ActPartsModel
-                {
-                    Commissions = SelectedCommissions,
-                    Frp = SelectedFrp,
-                    Expenses = _listExpense
-                };
-                _excelWriterService.ExportAndSave(ExcelTemplateType.ActParts, actParts, "Акты");
-                break;
-            case 1:
-                var limitParts = new ActPartsModel
-                {
-                    Commissions = SelectedCommissions,
-                    Frp = SelectedFrp,
-                    Expenses = _listExpense,
-                    StartDate = _startDate,
-                    EndDate = _endDate
-                };
-                _excelWriterService.ExportAndSave(ExcelTemplateType.LimitParts, limitParts, "Лимитные карты");
-                break;
-            case 2:
-                var defectParts = new ActPartsModel
-                {
-                    Commissions = SelectedCommissions,
-                    Frp = SelectedFrp,
-                    Expenses = _listExpense,
-                    StartDate = _startDate,
-                    EndDate = _endDate
-                };
-                _excelWriterService.ExportAndSave(ExcelTemplateType.DefectParts, defectParts, "Дефектные ведомости");
-                break;
-            case 3:
-                var mb7 = new ActPartsModel
-                {
-                    Commissions = SelectedCommissions,
-                    Frp = SelectedFrp,
-                    Expenses = _listExpense,
-                    StartDate = _startDate,
-                    EndDate = _endDate
-                };
-                _excelWriterService.ExportAndSave(ExcelTemplateType.Mb7Parts, mb7, "Ведомость учета выдачи автошин и АКБ");
-                break;
-            case 4:
-                var consumables = new ActPartsModel
-                {
-                    Commissions = SelectedCommissions,
-                    Frp = SelectedFrp,
-                    Expenses = _listExpense,
-                    StartDate = _startDate,
-                    EndDate = _endDate
-                };
-                _excelWriterService.ExportAndSave(ExcelTemplateType.Consumables, consumables, "Расходные материалы");
-                break;
-            case 5:
-                var operations = new ActPartsModel
-                {
-                    Commissions = SelectedCommissions,
-                    Frp = SelectedFrp,
-                    Expenses = _listExpense,
-                    StartDate = _startDate,
-                    EndDate = _endDate
-                };
-                _excelWriterService.ExportAndSave(ExcelTemplateType.Operations, operations, "Передача в эксплуатацию");
-                break;
+            if (SelectedCommissions == null) return;
+            switch (SelectedTypeDocumentForPrint)
+            {
+                case 0:
+                    var actParts = new IncomingPrintModel
+                    {
+                        Commissions = SelectedCommissions,
+                        StartDate = _startDate,
+                        EndDate = _endDate,
+                        Incomings = _listIncoming
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.RequisitionInvoice, actParts, "Перемещения");
+                    break;
+            }
         }
-
+        else
+        {
+            if (SelectedCommissions == null && SelectedFrp == null) return;
+            switch (SelectedTypeDocumentForPrint)
+            {
+                case 0:
+                    var actParts = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.ActParts, actParts, "Акты");
+                    break;
+                case 1:
+                    var limitParts = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.LimitParts, limitParts, "Лимитные карты");
+                    break;
+                case 2:
+                    var defectParts = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.DefectParts, defectParts,
+                        "Дефектные ведомости");
+                    break;
+                case 3:
+                    var mb7 = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.Mb7Parts, mb7,
+                        "Ведомость учета выдачи автошин и АКБ");
+                    break;
+                case 4:
+                    var consumables = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.Consumables, consumables,
+                        "Расходные материалы");
+                    break;
+                case 5:
+                    var operations = new ActPartsModel
+                    {
+                        Commissions = SelectedCommissions,
+                        Frp = SelectedFrp,
+                        Expenses = _listExpense,
+                        StartDate = _startDate,
+                        EndDate = _endDate
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.Operations, operations,
+                        "Передача в эксплуатацию");
+                    break;
+            }
+        }
     }
 }

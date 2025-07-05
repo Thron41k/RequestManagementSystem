@@ -127,7 +127,10 @@
                 <Button Content="Удалить" Command="{Binding DeleteNomenclatureCommand}" Margin="5"/>
             </StackPanel>
         </Grid>
-        <DataGrid Grid.Row="2" ItemsSource="{Binding NomenclatureViewSource.View}"  SelectedItem="{Binding SelectedNomenclature}" AutoGenerateColumns="False" Margin="5" CanUserResizeRows="False" CanUserAddRows="False">
+        <DataGrid Grid.Row="2" 
+                  ItemsSource="{Binding NomenclatureViewSource.View}"  
+                  SelectedItem="{Binding SelectedNomenclature}" 
+                  AutoGenerateColumns="False" Margin="5" CanUserResizeRows="False" CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Код" Binding="{Binding Code}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" IsReadOnly="True"/>

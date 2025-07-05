@@ -20,4 +20,6 @@ public class Incoming : IEntity
     public string Code { get; set; } = string.Empty;
     public Application? Application { get; set; }
     public int ApplicationId { get; set; }
+    public Warehouse? InWarehouse { get; set; }
+    public int? InWarehouseId { get; set; }
 }

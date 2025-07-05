@@ -22,7 +22,16 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
         {
             Id = e.Id,
             Name = e.Name,
-            LastUpdated = e.LastUpdated.ToString("o")
+            Code = e.Code,
+            LastUpdated = e.LastUpdated.ToString("o"),
+            FinanciallyResponsiblePerson = e.FinanciallyResponsiblePerson != null ? new WarehouseDriver
+            {
+                Id = e.FinanciallyResponsiblePerson.Id,
+                FullName = e.FinanciallyResponsiblePerson.FullName,
+                ShortName = e.FinanciallyResponsiblePerson.ShortName,
+                Position = e.FinanciallyResponsiblePerson.Position
+            } : new WarehouseDriver(),
+            FinanciallyResponsiblePersonId = e.FinanciallyResponsiblePersonId ?? 0
         }));
 
         return response;
@@ -41,7 +50,21 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
         var warehouse = await warehouseService.GetOrCreateWarehousesAsync(request.Filter);
         var response = new GetOrCreateWarehouseResponse
         {
-            Warehouse = new Warehouse { Id = warehouse.Id, Name = warehouse.Name, LastUpdated = warehouse.LastUpdated.ToString("o") }
+            Warehouse = new Warehouse
+            {
+                Id = warehouse.Id, 
+                Name = warehouse.Name,
+                Code = warehouse.Code,
+                LastUpdated = warehouse.LastUpdated.ToString("o"),
+                FinanciallyResponsiblePerson = warehouse.FinanciallyResponsiblePerson != null ? new WarehouseDriver
+                {
+                    Id = warehouse.FinanciallyResponsiblePerson.Id,
+                    FullName = warehouse.FinanciallyResponsiblePerson.FullName,
+                    ShortName = warehouse.FinanciallyResponsiblePerson.ShortName,
+                    Position = warehouse.FinanciallyResponsiblePerson.Position
+                } : new WarehouseDriver(),
+                FinanciallyResponsiblePersonId = warehouse.FinanciallyResponsiblePersonId ?? 0
+            }
         };
         return response;
     }
@@ -53,7 +76,9 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
         var warehouse = new RequestManagement.Common.Models.Warehouse
         {
             Name = request.Warehouse.Name,
-            LastUpdated = DateTime.Parse(request.Warehouse.LastUpdated)
+            Code = request.Warehouse.Code,
+            LastUpdated = DateTime.Parse(request.Warehouse.LastUpdated),
+            FinanciallyResponsiblePersonId = request.Warehouse.FinanciallyResponsiblePersonId
         };
 
         var id = await warehouseService.CreateWarehouseAsync(warehouse);
@@ -68,7 +93,9 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
         {
             Id = request.Warehouse.Id,
             Name = request.Warehouse.Name,
-            LastUpdated = DateTime.Parse(request.Warehouse.LastUpdated)
+            Code = request.Warehouse.Code,
+            LastUpdated = DateTime.Parse(request.Warehouse.LastUpdated),
+            FinanciallyResponsiblePersonId = request.Warehouse.FinanciallyResponsiblePersonId == 0 ? null : request.Warehouse.FinanciallyResponsiblePersonId
         };
 
         var success = await warehouseService.UpdateWarehouseAsync(warehouse);

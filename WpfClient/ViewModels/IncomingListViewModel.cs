@@ -46,14 +46,14 @@ public partial class IncomingListViewModel : ObservableObject
         _incomingsDocsViewSource = new CollectionViewSource { Source = _incomingsDocs };
         IncomingsItemsViewSource = new CollectionViewSource { Source = _incomingsItems };
         var dispatcher = Dispatcher.CurrentDispatcher;
-        _filterTimer = new System.Timers.Timer(1000) { AutoReset = false };
+        _filterTimer = new System.Timers.Timer(Vars.SearchDelay) { AutoReset = false };
         _filterTimer.Elapsed += async (_, _) =>
         {
             await dispatcher.InvokeAsync(async () => { await LoadIncomingsAsync(); });
         };
     }
 
-    private async Task OnShow(ShowResultMessage arg)
+    private Task OnShow(ShowResultMessage arg)
     {
         if (arg.Caller == typeof(IncomingListViewModel) && arg.Items.Count != 0)
             switch (arg.Message)
@@ -67,6 +67,8 @@ public partial class IncomingListViewModel : ObservableObject
                     NotificationCount = LabelList.Select(x=>(int)x.Quantity).Sum();
                     break;
             }
+
+        return Task.CompletedTask;
     }
 
     public async Task Load()
@@ -86,10 +88,22 @@ public partial class IncomingListViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task Print()
+    {
+        var selectedDoc = IncomingsDocs.Where(x => x.IsSelected).ToList();
+        await _messageBus.Publish(new ShowTaskPrintDialogMessageIncoming(
+            MessagesEnum.ShowPrintReportDialog, 
+            typeof(IncomingListViewModel), 
+            false, 
+            _incomings.Where(x => selectedDoc.Any(y=>y.Code == x.Code) && x.DocType == "Перемещение").ToList(), FromDate, ToDate));
+    }
+
+    [RelayCommand]
     private async Task ShowLabelPrintDialog()
     {
         await _messageBus.Publish(new ShowResultMessage(MessagesEnum.ShowLabelPrintListViewDialog, typeof(IncomingListViewModel), LabelList.ToList()));
     }
+
     [RelayCommand]
     private async Task IncomingDeleteAsync()
     {
@@ -101,50 +115,6 @@ public partial class IncomingListViewModel : ObservableObject
         //        await LoadIncomingsAsync();
         //    }
         //}
-    }
-    [RelayCommand]
-    private async Task IncomingDeleteRangeAsync()
-    {
-        //var list = Incomings.Where(x => x.IsSelected).Select(x => x.Id).ToList();
-        //if (list.Count > 0)
-        //{
-        //    var result = await _incomingService.DeleteIncomingsAsync(list);
-        //    if (result)
-        //    {
-        //        await LoadIncomingsAsync();
-        //    }
-        //}
-    }
-    [RelayCommand]
-    private void SelectAll()
-    {
-        //foreach (var incoming in Incomings)
-        //{
-        //    incoming.IsSelected = true;
-        //}
-
-        //IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
-        //IncomingListCheckedUpdate();
-    }
-    [RelayCommand]
-    private void DeselectAll()
-    {
-        //foreach (var incoming in Incomings)
-        //{
-        //    incoming.IsSelected = false;
-        //}
-        //IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
-        //IncomingListCheckedUpdate();
-    }
-    [RelayCommand]
-    private void InvertSelected()
-    {
-        //foreach (var incoming in Incomings)
-        //{
-        //    incoming.IsSelected = !incoming.IsSelected;
-        //}
-        //IncomingsViewSource.View.Refresh(); // Принудительно обновляем DataGrid
-        //IncomingListCheckedUpdate();
     }
 
     [RelayCommand]
@@ -170,7 +140,12 @@ public partial class IncomingListViewModel : ObservableObject
     private async Task LoadIncomingsAsync()
     {
         if (!ValidateDates()) return;
-        if (SelectedWarehouse.Id == 0) return;
+        if (SelectedWarehouse.Id == 0)
+        {
+            IncomingsDocs = [];
+            IncomingsDocsViewSource.Source = IncomingsDocs;
+            return;
+        }
         var currentSortDescriptions = IncomingsDocsViewSource.View?.SortDescriptions.ToList() ?? [];
         _incomings = await _incomingService.GetAllIncomingsAsync(SearchText, SelectedWarehouse.Id, FromDate.ToString(CultureInfo.CurrentCulture), ToDate.ToString(CultureInfo.CurrentCulture));
         IncomingsDocs = new ObservableCollection<Incoming>(_incomings.DistinctBy(x=>x.Code));
@@ -182,13 +157,8 @@ public partial class IncomingListViewModel : ObservableObject
                 IncomingsDocsViewSource.View?.SortDescriptions.Add(sortDescription);
             }
         }
-        IncomingListCheckedUpdate();
     }
-    [RelayCommand]
-    private void IncomingListCheckedUpdate()
-    {
-       // MenuDeleteItemText = $"Удалить отмеченные({Incomings.Count(x => x.IsSelected)})";
-    }
+
     [RelayCommand]
     private async Task SelectWarehouse()
     {
@@ -201,15 +171,45 @@ public partial class IncomingListViewModel : ObservableObject
         await LoadIncomingsAsync();
     }
     [RelayCommand]
-    private async Task ClearSearchText()
+    private void ClearSearchText()
     {
         SearchText = "";
-        await LoadIncomingsAsync();
     }
     partial void OnSearchTextChanged(string value)
     {
         _filterTimer.Stop();
         _filterTimer.Start();
+    }
+
+    [RelayCommand]
+    private void SelectAll()
+    {
+        foreach (var incoming in IncomingsDocs)
+        {
+            incoming.IsSelected = true;
+        }
+
+        IncomingsDocsViewSource.View.Refresh();
+    }
+    [RelayCommand]
+    private void DeselectAll()
+    {
+        foreach (var incoming in IncomingsDocs)
+        {
+            incoming.IsSelected = false;
+        }
+
+        IncomingsDocsViewSource.View.Refresh();
+    }
+    [RelayCommand]
+    private void InvertSelected()
+    {
+        foreach (var incoming in IncomingsDocs)
+        {
+            incoming.IsSelected = !incoming.IsSelected;
+        }
+
+        IncomingsDocsViewSource.View.Refresh();
     }
 
     partial void OnSelectedIncomingDocChanged(Incoming? value)

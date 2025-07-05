@@ -78,6 +78,12 @@ public partial class EquipmentViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void UpdateSelectedItem()
+    {
+        AddToEdit();
+    }
+
+    [RelayCommand]
     private void SelectAndClose()
     {
         if (!EditMode && SelectedEquipment != null)

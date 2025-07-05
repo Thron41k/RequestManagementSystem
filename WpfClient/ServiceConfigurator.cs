@@ -43,6 +43,7 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<IExcelTemplateWriter, Mb7PartsTemplate>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, ConsumablesTemplate>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, OperationsTemplate>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, RequisitionInvoiceTemplate>();
         serviceCollection.AddSingleton<IFileSaveDialogService, FileSaveDialogService>();
         serviceCollection.AddSingleton<IExcelPrintService, ExcelPrintService>();
 

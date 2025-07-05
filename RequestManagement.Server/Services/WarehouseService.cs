@@ -24,7 +24,9 @@ public class WarehouseService(ApplicationDbContext dbContext) : IWarehouseServic
                 Id = e.Id,
                 Name = e.Name,
                 LastUpdated = e.LastUpdated,
-                Code = e.Code
+                Code = e.Code,
+                FinanciallyResponsiblePerson = e.FinanciallyResponsiblePerson,
+                FinanciallyResponsiblePersonId = e.FinanciallyResponsiblePersonId
             })
             .ToListAsync();
     }
@@ -43,7 +45,8 @@ public class WarehouseService(ApplicationDbContext dbContext) : IWarehouseServic
                 Id = e.Id,
                 Name = e.Name,
                 LastUpdated = e.LastUpdated,
-                Code = e.Code
+                Code = e.Code,
+                FinanciallyResponsiblePersonId = e.FinanciallyResponsiblePersonId
             })
             .ToListAsync();
         if (result.Count != 0) return result[0];
@@ -69,7 +72,9 @@ public class WarehouseService(ApplicationDbContext dbContext) : IWarehouseServic
             return false;
 
         existWarehouse.Name = warehouse.Name;
+        existWarehouse.Code = warehouse.Code;
         existWarehouse.LastUpdated = warehouse.LastUpdated;
+        existWarehouse.FinanciallyResponsiblePersonId = warehouse.FinanciallyResponsiblePersonId == 0 ? null : warehouse.FinanciallyResponsiblePersonId;
         await _dbContext.SaveChangesAsync();
         return true;
     }

@@ -71,7 +71,8 @@ public class MainMenuViewModel
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
-        _messageBus.Subscribe<ShowTaskPrintDialogMessage>(OnShowPrintDialog);
+        _messageBus.Subscribe<ShowTaskPrintDialogMessageExpense>(OnShowPrintDialogExpense);
+        _messageBus.Subscribe<ShowTaskPrintDialogMessageIncoming>(OnShowPrintDialogIncoming);
         _messageBus.Subscribe<ShowResultMessage>(OnShowResultMessageDialog);
         ShowEquipmentCommand = new RelayCommand(ShowEquipment);
         ShowDriverCommand = new RelayCommand(ShowDriver);
@@ -148,7 +149,22 @@ public class MainMenuViewModel
     {
         ShowCommissions(true);
     }
-    private void ShowPrintReport(List<Expense> list, DateTime startDate, DateTime endDate)
+    private void ShowPrintReportExpense(List<Expense> list, DateTime startDate, DateTime endDate)
+    {
+        var printReportView = new PrintReportView(_printReportViewModel);
+        var window = new Window
+        {
+            Content = printReportView,
+            Title = "Печать отчётов",
+            Width = 850,
+            Height = 490,
+            ResizeMode = ResizeMode.NoResize
+        };
+        _printReportViewModel.Init(list, startDate, endDate);
+        window.ShowDialog();
+    }
+
+    private void ShowPrintReportIncoming(List<Incoming> list, DateTime startDate, DateTime endDate)
     {
         var printReportView = new PrintReportView(_printReportViewModel);
         var window = new Window
@@ -190,10 +206,11 @@ public class MainMenuViewModel
         {
             Content = commissionsView,
             Title = "Комиссия",
-            Width = 850,
-            Height = 790,
+            Width = 830,
+            Height = 800,
             ResizeMode = ResizeMode.NoResize
         };
+        _commissionsViewModel.EditMode = editMode;
         _ = _commissionsViewModel.Load();
         window.ShowDialog();
         if (argCaller != null)
@@ -324,15 +341,30 @@ public class MainMenuViewModel
                 break;
         }
     }
-    private async Task OnShowPrintDialog(ShowTaskPrintDialogMessage arg)
+    private Task OnShowPrintDialogExpense(ShowTaskPrintDialogMessageExpense arg)
     {
         switch (arg.Message)
         {
             case MessagesEnum.ShowPrintReportDialog:
-                ShowPrintReport(arg.Item, arg.FromDate, arg.ToDate);
+                ShowPrintReportExpense(arg.Item, arg.FromDate, arg.ToDate);
                 break;
         }
+
+        return Task.CompletedTask;
     }
+
+    private Task OnShowPrintDialogIncoming(ShowTaskPrintDialogMessageIncoming arg)
+    {
+        switch (arg.Message)
+        {
+            case MessagesEnum.ShowPrintReportDialog:
+                ShowPrintReportIncoming(arg.Item, arg.FromDate, arg.ToDate);
+                break;
+        }
+
+        return Task.CompletedTask;
+    }
+
     private async Task ShowExpenseDialog(bool editMode, Type argCaller, int id, DateTime? date, decimal quantity, int? term, params IEntity?[] entity)
     {
         var expenseView = new ExpenseView(_expenseViewModel);

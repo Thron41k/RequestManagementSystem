@@ -33,6 +33,8 @@ message IncomingMaterialItem{
     string application_equipment_name = 9;
     string application_equipment_code = 10;
     repeated IncomingMaterialStockMessage items = 11;
+    string in_warehouse_name = 12;
+    string in_warehouse_code = 13;
 }
 
 message IncomingMaterialStockMessage {
@@ -101,12 +103,14 @@ message Incoming {
   string code = 5;
   string doc_type = 6;
   int32 application_id = 7;
+  int32 in_warehouse_id = 8;
 }
 
 message IncomingWarehouse {
     int32 id = 1;
     string name = 2;
     string Code = 3;
+    int32 financially_responsible_person_id = 4;
 }
 
 message IncomingApplication {

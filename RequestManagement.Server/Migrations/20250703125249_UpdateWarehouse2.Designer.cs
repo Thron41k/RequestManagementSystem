@@ -12,8 +12,8 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250517054152_app1")]
-    partial class app1
+    [Migration("20250703125249_UpdateWarehouse2")]
+    partial class UpdateWarehouse2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,6 +82,10 @@ namespace RequestManagement.Server.Migrations
                     b.Property<int>("ApproveForDefectAndLimitId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("BranchName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("ChairmanId")
                         .HasColumnType("integer");
 
@@ -128,6 +132,7 @@ namespace RequestManagement.Server.Migrations
                             Id = 1,
                             ApproveForActId = 1,
                             ApproveForDefectAndLimitId = 1,
+                            BranchName = "",
                             ChairmanId = 1,
                             Member1Id = 1,
                             Member2Id = 1,
@@ -401,6 +406,9 @@ namespace RequestManagement.Server.Migrations
                     b.Property<int>("StockId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("Term")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Date");
@@ -437,7 +445,8 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<string>("DocType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18,2)");
@@ -540,6 +549,9 @@ namespace RequestManagement.Server.Migrations
                     b.Property<int>("NomenclatureId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Term")
+                        .HasColumnType("integer");
+
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
@@ -552,6 +564,49 @@ namespace RequestManagement.Server.Migrations
                     b.HasIndex("UserId", "NomenclatureId");
 
                     b.ToTable("NomenclatureDefectMappings");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByIp")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReplacedByToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Revoked")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RevokedByIp")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Stock", b =>
@@ -869,6 +924,13 @@ namespace RequestManagement.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("RequestManagement.Common.Models.RefreshToken", b =>
+                {
+                    b.HasOne("RequestManagement.Common.Models.User", null)
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("RequestManagement.Common.Models.Stock", b =>
                 {
                     b.HasOne("RequestManagement.Common.Models.Nomenclature", "Nomenclature")
@@ -928,6 +990,11 @@ namespace RequestManagement.Server.Migrations
             modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>
                 {
                     b.Navigation("Stocks");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.User", b =>
+                {
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Warehouse", b =>

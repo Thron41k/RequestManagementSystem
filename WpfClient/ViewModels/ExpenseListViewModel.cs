@@ -116,8 +116,9 @@ public partial class ExpenseListViewModel : ObservableObject
         //    new()
         //};
         //_excelWriterService.ExportAndPrint(ExcelTemplateType.ActParts, data);
-        await _messageBus.Publish(new ShowTaskPrintDialogMessage(MessagesEnum.ShowPrintReportDialog, typeof(ExpenseListViewModel), false, Expenses.Where(x => x is { IsSelected: true}).ToList(),FromDate, ToDate));
+        await _messageBus.Publish(new ShowTaskPrintDialogMessageExpense(MessagesEnum.ShowPrintReportDialog, typeof(ExpenseListViewModel), false, Expenses.Where(x => x is { IsSelected: true}).ToList(),FromDate, ToDate));
     }
+
     [RelayCommand]
     private async Task ExpenseDeleteAsync()
     {
@@ -143,6 +144,7 @@ public partial class ExpenseListViewModel : ObservableObject
             }
         }
     }
+
     [RelayCommand]
     private void SelectAll()
     {
@@ -154,6 +156,7 @@ public partial class ExpenseListViewModel : ObservableObject
         ExpensesViewSource.View.Refresh(); // Принудительно обновляем DataGrid
         ExpenseListCheckedUpdate();
     }
+
     [RelayCommand]
     private void DeselectAll()
     {
@@ -164,6 +167,7 @@ public partial class ExpenseListViewModel : ObservableObject
         ExpensesViewSource.View.Refresh(); // Принудительно обновляем DataGrid
         ExpenseListCheckedUpdate();
     }
+
     [RelayCommand]
     private void InvertSelected()
     {
@@ -174,6 +178,7 @@ public partial class ExpenseListViewModel : ObservableObject
         ExpensesViewSource.View.Refresh(); // Принудительно обновляем DataGrid
         ExpenseListCheckedUpdate();
     }
+
     [RelayCommand]
     private async Task SelectWarehouse()
     {

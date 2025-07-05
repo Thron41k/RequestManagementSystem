@@ -23,8 +23,30 @@ public static class IncomingConverter
                 Date = DateTime.Parse(incomingProto.Date),
                 Code = incomingProto.Code,
                 DocType = incomingProto.DocType,
-                ApplicationId = incomingProto.ApplicationId
+                ApplicationId = incomingProto.ApplicationId,
+                InWarehouseId = incomingProto.InWarehouseId
             };
+            if (warehousesDict.TryGetValue(incomingProto.InWarehouseId,out var inWarehouseProto))
+            {
+                incoming.InWarehouse = new RequestManagement.Common.Models.Warehouse
+                {
+                    Id = inWarehouseProto.Id,
+                    Name = inWarehouseProto.Name,
+                    Code = inWarehouseProto.Code,
+                    FinanciallyResponsiblePersonId = inWarehouseProto.FinanciallyResponsiblePersonId
+                };
+                if (inWarehouseProto.FinanciallyResponsiblePersonId > 0 && driversDict.TryGetValue(inWarehouseProto.FinanciallyResponsiblePersonId, out var driverProto))
+                {
+                    incoming.InWarehouse.FinanciallyResponsiblePerson = new RequestManagement.Common.Models.Driver
+                    {
+                        Id = driverProto.Id,
+                        FullName = driverProto.FullName,
+                        ShortName = driverProto.ShortName,
+                        Position = driverProto.Position,
+                        Code = driverProto.Code
+                    };
+                }
+            }
             if (stocksDict.TryGetValue(incomingProto.StockId, out var stockProto))
             {
                 incoming.Stock = new RequestManagement.Common.Models.Stock
@@ -42,8 +64,20 @@ public static class IncomingConverter
                     {
                         Id = warehouseProto.Id,
                         Name = warehouseProto.Name,
-                        Code = warehouseProto.Code
+                        Code = warehouseProto.Code,
+                        FinanciallyResponsiblePersonId = warehouseProto.FinanciallyResponsiblePersonId
                     };
+                    if (warehouseProto.FinanciallyResponsiblePersonId > 0 && driversDict.TryGetValue(warehouseProto.FinanciallyResponsiblePersonId, out var driverProto))
+                    {
+                        incoming.Stock.Warehouse.FinanciallyResponsiblePerson = new RequestManagement.Common.Models.Driver
+                        {
+                            Id = driverProto.Id,
+                            FullName = driverProto.FullName,
+                            ShortName = driverProto.ShortName,
+                            Position = driverProto.Position,
+                            Code = driverProto.Code
+                        };
+                    }
                 }
                 if (nomenclaturesDict.TryGetValue(stockProto.NomenclatureId, out var nomenclatureProto))
                 {

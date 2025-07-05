@@ -7,5 +7,6 @@ public enum ExcelTemplateType
     DefectParts,
     Mb7Parts,
     Consumables,
-    Operations
+    Operations,
+    RequisitionInvoice
 }
