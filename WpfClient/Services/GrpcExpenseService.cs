@@ -94,9 +94,9 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         }).ToList();
     }
 
-    public async Task<bool> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId)
+    public async Task<(bool, List<MaterialExpense>)> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId)
     {
-        if(materials == null) return false;
+        if(materials == null) return (false,[]);
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
         {
@@ -125,7 +125,20 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                         })
                 },WarehouseId = warehouseId
             }, headers);
-        return result.Success;
+        return (result.Success,result.MaterialExpenses.Select(x=> new MaterialExpense
+        {
+            Number = x.Number,
+            DriverFullName = x.DriverFullName,
+            DriverCode = x.DriverCode,
+            EquipmentName = x.EquipmentName,
+            Date = Convert.ToDateTime(x.Date),
+            EquipmentCode = x.EquipmentCode,
+            NomenclatureName = x.NomenclatureName,
+            NomenclatureCode = x.NomenclatureCode,
+            NomenlatureUnitOfMeasure = x.NomenlatureUnitOfMeasure,
+            Quantity = (decimal)x.Quantity,
+            NomenclatureArticle = x.NomenclatureArticle
+        }).ToList());
     }
 
     public async Task<Expense> CreateExpenseAsync(Expense expense)

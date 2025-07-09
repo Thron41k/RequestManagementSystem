@@ -114,7 +114,7 @@ public class MainMenuViewModel
             Width = 1500,
             Height = 820
         };
-        _labelPrintListViewModel.Init(labelList);
+        _ = _labelPrintListViewModel.Init(labelList);
         window.ShowDialog();
     }
     private void ShowIncomingDataLoading()

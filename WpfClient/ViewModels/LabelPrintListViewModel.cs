@@ -22,11 +22,14 @@ using Color = System.Drawing.Color;
 using Pen = System.Drawing.Pen;
 using Size = System.Windows.Size;
 using System.Windows.Data;
+using WpfClient.Messages;
+using WpfClient.Services.Interfaces;
 
 namespace WpfClient.ViewModels;
 
 public partial class LabelPrintListViewModel : ObservableObject
 {
+    private readonly IMessageBus _messageBus;
     private const int LabelPerPage = 10;
     [ObservableProperty] private CollectionViewSource _incomingsViewSource;
     [ObservableProperty] private ObservableCollection<Incoming> _labelList = [];
@@ -39,11 +42,15 @@ public partial class LabelPrintListViewModel : ObservableObject
     [ObservableProperty] private string _fastSearchText = "";
     public event EventHandler CloseWindowRequested;
 
-    public LabelPrintListViewModel()
+    public LabelPrintListViewModel(IMessageBus messageBus)
     {
-
+        _messageBus = messageBus;
     }
 
+    public LabelPrintListViewModel()
+    {
+        
+    }
 
     private Bitmap CreateLabel(Incoming i)
     {
@@ -83,7 +90,7 @@ public partial class LabelPrintListViewModel : ObservableObject
         return bmp;
     }
     [RelayCommand]
-    public void Print()
+    private void Print()
     {
         var printDialog = new PrintDialog();
         if (printDialog.ShowDialog() == true)
@@ -213,6 +220,9 @@ public partial class LabelPrintListViewModel : ObservableObject
     }
     public async Task UpdateLabelList()
     {
+        await _messageBus.Publish(
+            new ShowResultMessage(
+                MessagesEnum.UpdateLabelPrintList, typeof(IncomingListViewModel), LabelList.ToList()));
         Images.Clear();
         if (!string.IsNullOrEmpty(FastSearchText))
         {

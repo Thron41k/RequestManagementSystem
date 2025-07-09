@@ -5,12 +5,14 @@ using RequestManagement.Common.Utilities;
 using RequestManagement.Server.Controllers;
 using RequestManagement.Server.Data;
 using System.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
 
 namespace RequestManagement.Server.Services;
 
 public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
 {
-    public readonly record struct NomenclatureKey(string Name, string Code, string Article, string UnitOfMeasure);
+    private readonly record struct NomenclatureKey(string Name, string Code, string Article, string UnitOfMeasure);
 
     public async Task<List<RequestManagement.Common.Models.Expense>> GetAllExpensesAsync(string filter, int requestWarehouseId, int requestEquipmentId, int requestDriverId,
         int requestDefectId, string requestFromDate, string requestToDate)
@@ -69,11 +71,11 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
         return await query.ToListAsync();
     }
 
-    public async Task<bool> UploadMaterialsExpenseAsync(List<RequestManagement.Common.Models.MaterialExpense>? materials, int warehouseId)
+    public async Task<(bool, List<MaterialExpense>)> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId)
     {
         if (materials == null || materials.Count == 0)
-            return true;
-
+            return (false, []);
+        var error = new List<MaterialExpense>();
         try
         {
             // Подготовка данных для запросов
@@ -160,8 +162,17 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                     material.NomenclatureArticle,
                     material.NomenlatureUnitOfMeasure);
 
+
                 if (!stockMap.TryGetValue(key, out var stock))
+                {
+                    error.Add(material);
                     continue;
+                }
+                if(stock.FinalQuantity < material.Quantity)
+                {
+                    error.Add(material);
+                    continue;
+                }
 
                 // Проверка существующего Expense
                 if (existingExpenses.TryGetValue((material.Number, stock.Id), out var existingExpense))
@@ -207,12 +218,12 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
             }
 
             await dbContext.SaveChangesAsync();
-            return true;
+            return (true, error);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return false;
+            return (false, error);
         }
     }
 

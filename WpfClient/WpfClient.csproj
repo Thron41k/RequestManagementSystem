@@ -15,6 +15,7 @@
     <None Remove="Resources\LimitPartsTemplate.xlsx" />
     <None Remove="Resources\Mb7PartsTemplate.xlsx" />
     <None Remove="Resources\OperationsTemplate.xlsx" />
+    <None Remove="Resources\RequisitionInvoiceTemplate.xlsx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +37,7 @@
     <EmbeddedResource Include="Resources\LimitPartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\Mb7PartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\OperationsTemplate.xlsx" />
+    <EmbeddedResource Include="Resources\RequisitionInvoiceTemplate.xlsx" />
   </ItemGroup>
 
   <ItemGroup>

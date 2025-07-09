@@ -69,7 +69,7 @@ public partial class ExpenseDataLoadViewModel : ObservableObject
             IsBusy = true;
             var result =
                 await _expenseService.UploadMaterialsExpenseAsync(MaterialExpense, SelectedWarehouse!.Id);
-            ResultDialogText = result ? "Data uploaded successfully" : "Error uploading data";
+            ResultDialogText = result.Item1 ? "Data uploaded successfully" : "Error uploading data";
             IsShowResultDialog = true;
         }
         catch (Exception ex)

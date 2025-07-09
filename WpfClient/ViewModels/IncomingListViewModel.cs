@@ -63,8 +63,15 @@ public partial class IncomingListViewModel : ObservableObject
                     {
                         LabelList.Add(incoming);
                     }
-
                     NotificationCount = LabelList.Select(x=>(int)x.Quantity).Sum();
+                    break;
+                case MessagesEnum.UpdateLabelPrintList:
+                    LabelList.Clear();
+                    foreach (var incoming in arg.Items)
+                    {
+                        LabelList.Add(incoming);
+                    }
+                    NotificationCount = LabelList.Select(x => (int)x.Quantity).Sum();
                     break;
             }
 

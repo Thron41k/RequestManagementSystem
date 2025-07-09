@@ -33,7 +33,8 @@ message UploadMaterialExpenseRequest{
 }
 
 message UploadMaterialExpenseResponse{
-	bool success = 1;
+    repeated MaterialExpense materialExpenses = 1;
+	bool success = 2;
 }
 
 message GetAllExpensesRequest {

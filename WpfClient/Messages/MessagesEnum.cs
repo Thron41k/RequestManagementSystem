@@ -20,5 +20,6 @@ public enum MessagesEnum
     ShowPrintReportDialog,
     ResultLabelCountSelector,
     ShowLabelCountSelector,
-    ShowLabelPrintListViewDialog
+    ShowLabelPrintListViewDialog,
+    UpdateLabelPrintList
 }

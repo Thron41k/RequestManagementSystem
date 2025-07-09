@@ -250,6 +250,25 @@ public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseCo
                 Quantity = (decimal)x.Quantity,
             }).ToList();
         var success = await _expenseService.UploadMaterialsExpenseAsync(materialExpense, request.WarehouseId);
-        return new UploadMaterialExpenseResponse { Success = success };
+        return new UploadMaterialExpenseResponse
+        {
+            Success = success.Item1, MaterialExpenses =
+            {
+                success.Item2.Select(s => new MaterialExpense
+                {
+                    Number = s.Number,
+                    Date = s.Date.ToString("o"), // ISO 8601 format
+                    DriverFullName = s.DriverFullName,
+                    EquipmentCode = s.EquipmentCode,
+                    NomenclatureArticle = s.NomenclatureArticle,
+                    NomenlatureUnitOfMeasure = s.NomenlatureUnitOfMeasure,
+                    DriverCode = s.DriverCode,
+                    NomenclatureName = s.NomenclatureName,
+                    EquipmentName = s.EquipmentName,
+                    NomenclatureCode = s.NomenclatureCode,
+                    Quantity = (double)s.Quantity
+                })
+            }
+        };
     }
 }
