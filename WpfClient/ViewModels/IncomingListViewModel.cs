@@ -20,6 +20,7 @@ public partial class IncomingListViewModel : ObservableObject
     private readonly IIncomingService _incomingService;
     private readonly System.Timers.Timer _filterTimer;
     private List<Incoming> _incomings = [];
+    private int _lastSelectionIndex = -1;
     [ObservableProperty] private ObservableCollection<Incoming> _labelList = [];
     [ObservableProperty] private CollectionViewSource _incomingsDocsViewSource;
     [ObservableProperty] private ObservableCollection<Incoming> _incomingsDocs = [];
@@ -34,8 +35,14 @@ public partial class IncomingListViewModel : ObservableObject
     [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.04.2025");
     [ObservableProperty] private DateTime _toDate = DateTime.Parse("30.04.2025");
     [ObservableProperty] private int _notificationCount = 0;
+    [ObservableProperty] private int _selectionIndex = -1;
 
     public IncomingListViewModel() { }
+
+    partial void OnSelectionIndexChanged(int value)
+    { 
+        if(value > 0) _lastSelectionIndex = value;
+    }
 
     public IncomingListViewModel(IMessageBus messageBus, IIncomingService incomingService)
     {
@@ -114,14 +121,14 @@ public partial class IncomingListViewModel : ObservableObject
     [RelayCommand]
     private async Task IncomingDeleteAsync()
     {
-        //if (SelectedIncoming != null)
-        //{
-        //    var result = await _incomingService.DeleteIncomingAsync(SelectedIncoming.Id);
-        //    if (result)
-        //    {
-        //        await LoadIncomingsAsync();
-        //    }
-        //}
+        if (SelectedIncomingItem != null)
+        {
+            var result = await _incomingService.DeleteIncomingAsync(SelectedIncomingItem.Id);
+            if (result)
+            {
+                await LoadIncomingsAsync();
+            }
+        }
     }
 
     [RelayCommand]
@@ -157,6 +164,7 @@ public partial class IncomingListViewModel : ObservableObject
         _incomings = await _incomingService.GetAllIncomingsAsync(SearchText, SelectedWarehouse.Id, FromDate.ToString(CultureInfo.CurrentCulture), ToDate.ToString(CultureInfo.CurrentCulture));
         IncomingsDocs = new ObservableCollection<Incoming>(_incomings.DistinctBy(x=>x.Code));
         IncomingsDocsViewSource.Source = IncomingsDocs;
+        if(_lastSelectionIndex != -1) SelectionIndex = _lastSelectionIndex;
         if (currentSortDescriptions.Any())
         {
             foreach (var sortDescription in currentSortDescriptions)

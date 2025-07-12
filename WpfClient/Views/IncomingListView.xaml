@@ -141,8 +141,15 @@
                 <RowDefinition Height="10" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <DataGrid Grid.Row="0" ItemsSource="{Binding IncomingsDocsViewSource.View}" SelectedItem="{Binding SelectedIncomingDoc}"
-                          AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow" >
+            <DataGrid Grid.Row="0" 
+                      ItemsSource="{Binding IncomingsDocsViewSource.View}" 
+                      SelectedItem="{Binding SelectedIncomingDoc, Mode=TwoWay}"
+                      AutoGenerateColumns="False" 
+                      CanUserAddRows="False" 
+                      Margin="10,10,0,0" 
+                      SelectionMode="Single" 
+                      SelectedIndex="{Binding SelectionIndex, Mode=TwoWay}"
+                      SelectionUnit="FullRow" >
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Отметить все" Command="{Binding SelectAllCommand}"/>
@@ -174,8 +181,15 @@
             </DataGrid>
             <GridSplitter Grid.Row="1" ShowsPreview="False" Height="6"
                           HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkBlue"/>
-            <DataGrid Grid.Row="2" ItemsSource="{Binding IncomingsItemsViewSource.View}" SelectedItem="{Binding SelectedIncomingItem}"
-              AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,0,0,0" SelectionMode="Single" SelectionUnit="FullRow" Name="IncomingListDataGrid">
+            <DataGrid Grid.Row="2" 
+                      ItemsSource="{Binding IncomingsItemsViewSource.View}" 
+                      SelectedItem="{Binding SelectedIncomingItem}"
+                      AutoGenerateColumns="False" 
+                      CanUserAddRows="False" 
+                      Margin="10,0,0,0" 
+                      SelectionMode="Single" 
+                      SelectionUnit="FullRow"
+                      Name="IncomingListDataGrid">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#0078d7"/>
                 </DataGrid.Resources>

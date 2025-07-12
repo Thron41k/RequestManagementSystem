@@ -167,7 +167,7 @@ public class ExcelReaderService : IExcelReaderService
                     var index = newMaterialIncoming.RegistratorType == "Перемещение" ? 4 : 2;
                     newMaterialIncoming.RegistratorNumber = registrator[index];
                     newMaterialIncoming.RegistratorDate = registrator[index + 2];
-                    var warehouseSenderNameCleared = worksheet.Cells[row, 5].Value?.ToString()?.Trim() ?? string.Empty;
+                    var warehouseSenderNameCleared = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
                     if (!string.IsNullOrEmpty(warehouseSenderNameCleared))
                     {
                         newMaterialIncoming.InWarehouseName = warehouseSenderNameCleared;

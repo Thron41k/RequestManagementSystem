@@ -7,9 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.Server", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.Common", "RequestManagement.Common\RequestManagement.Common.csproj", "{FFAAA82D-563D-4DFD-A01F-CD4604B9CF0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfClient", "WpfClient\WpfClient.csproj", "{956E5242-8E60-451A-A600-1F166726F487}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseClient", "WarehouseClient\WarehouseClient.csproj", "{BF425348-6C62-4E40-BD96-CBFEBF0192C3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.WpfClient", "WpfClient\RequestManagement.WpfClient.csproj", "{956E5242-8E60-451A-A600-1F166726F487}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +27,6 @@ Global
 		{956E5242-8E60-451A-A600-1F166726F487}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{956E5242-8E60-451A-A600-1F166726F487}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{956E5242-8E60-451A-A600-1F166726F487}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF425348-6C62-4E40-BD96-CBFEBF0192C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF425348-6C62-4E40-BD96-CBFEBF0192C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF425348-6C62-4E40-BD96-CBFEBF0192C3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{BF425348-6C62-4E40-BD96-CBFEBF0192C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF425348-6C62-4E40-BD96-CBFEBF0192C3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF425348-6C62-4E40-BD96-CBFEBF0192C3}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
