@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /RequestManagement.Server/appsettings.json
 /RequestManagement.Server/result.txt
 /WpfClient/result.txt
+/RequestManagement.Common/result.txt
