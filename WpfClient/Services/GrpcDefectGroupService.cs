@@ -2,6 +2,7 @@
 using RequestManagement.Server.Controllers;
 using DefectGroup = RequestManagement.Common.Models.DefectGroup;
 using Grpc.Core;
+using RequestManagement.WpfClient.Services;
 using WpfClient.Services.Interfaces;
 
 namespace WpfClient.Services;

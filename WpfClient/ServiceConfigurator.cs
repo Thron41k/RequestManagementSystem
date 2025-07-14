@@ -2,11 +2,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
+using RequestManagement.WpfClient.Services;
+using RequestManagement.WpfClient.Services.ExcelTemplate;
 using WpfClient.Services;
 using WpfClient.Services.ExcelTemplate;
 using WpfClient.Services.Interfaces;
 using WpfClient.ViewModels;
 using WpfClient.Views;
+using IncomingListViewModel = RequestManagement.WpfClient.ViewModels.IncomingListViewModel;
 
 namespace WpfClient;
 
@@ -44,6 +47,7 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<IExcelTemplateWriter, ConsumablesTemplate>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, OperationsTemplate>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, RequisitionInvoiceTemplate>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, MovingBetweenWarehousesTemplate>();
         serviceCollection.AddSingleton<IFileSaveDialogService, FileSaveDialogService>();
         serviceCollection.AddSingleton<IExcelPrintService, ExcelPrintService>();
 

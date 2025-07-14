@@ -9,6 +9,7 @@
              xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
              xmlns:validationRules="clr-namespace:WpfClient.ViewModels.ValidationRules"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewModels="clr-namespace:RequestManagement.WpfClient.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200" MinHeight="800" MinWidth="1200">
     <UserControl.Resources>
@@ -20,7 +21,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.DataContext>
-        <vm:IncomingListViewModel />
+        <viewModels:IncomingListViewModel />
     </UserControl.DataContext>
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -155,6 +156,7 @@
                         <MenuItem Header="Отметить все" Command="{Binding SelectAllCommand}"/>
                         <MenuItem Header="Снять отметки со всех" Command="{Binding DeselectAllCommand}"/>
                         <MenuItem Header="Инвертировать отметки" Command="{Binding InvertSelectedCommand}"/>
+                        <MenuItem Header="Удалить отмеченные" Command="{Binding IncomingsDeleteCommand}"/>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.InputBindings>

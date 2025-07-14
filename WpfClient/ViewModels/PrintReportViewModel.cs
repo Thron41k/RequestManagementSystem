@@ -43,7 +43,8 @@ public partial class PrintReportViewModel : ObservableObject
         IncomingMode = true;
         DocTypeList =
         [
-            "Требования-накладные"
+            "Требования-накладные",
+            "Перемещения между складами"
         ];
         PrinterList = new ObservableCollection<string>(PrinterSettings.InstalledPrinters);
         SelectedPrinter = _printerService.GetDefaultPrinterName();
@@ -111,14 +112,24 @@ public partial class PrintReportViewModel : ObservableObject
             switch (SelectedTypeDocumentForPrint)
             {
                 case 0:
-                    var actParts = new IncomingPrintModel
+                    var requisitionInvoices = new IncomingPrintModel
                     {
                         Commissions = SelectedCommissions,
                         StartDate = _startDate,
                         EndDate = _endDate,
                         Incomings = _listIncoming
                     };
-                    _excelWriterService.ExportAndSave(ExcelTemplateType.RequisitionInvoice, actParts, "Перемещения");
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.RequisitionInvoice, requisitionInvoices, "Перемещения");
+                    break;
+                case 1:
+                    var movingBetweenWarehouses = new IncomingPrintModel
+                    {
+                        Commissions = SelectedCommissions,
+                        StartDate = _startDate,
+                        EndDate = _endDate,
+                        Incomings = _listIncoming.Where(x=>x.DocType == "Перемещение").ToList()
+                    };
+                    _excelWriterService.ExportAndSave(ExcelTemplateType.MovingBetweenWarehouses, movingBetweenWarehouses, "Перемещения между складами");
                     break;
             }
         }

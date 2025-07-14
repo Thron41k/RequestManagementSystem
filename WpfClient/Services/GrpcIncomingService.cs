@@ -3,6 +3,7 @@ using RequestManagement.Common.Interfaces;
 using Grpc.Core;
 using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
+using RequestManagement.WpfClient.Services;
 using WpfClient.Services.Interfaces;
 using Incoming = RequestManagement.Common.Models.Incoming;
 using WpfClient.Converters;

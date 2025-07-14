@@ -5,6 +5,7 @@ using RequestManagement.Server.Controllers;
 using WpfClient.Services.Interfaces;
 using Warehouse = RequestManagement.Common.Models.Warehouse;
 using RequestManagement.Common.Models;
+using RequestManagement.WpfClient.Services;
 
 namespace WpfClient.Services;
 

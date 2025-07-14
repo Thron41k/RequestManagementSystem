@@ -36,6 +36,7 @@
     <EmbeddedResource Include="Resources\DefectPartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\LimitPartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\Mb7PartsTemplate.xlsx" />
+    <EmbeddedResource Include="Resources\MovingBetweenWarehousesTemplate.xlsx" />
     <EmbeddedResource Include="Resources\OperationsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\RequisitionInvoiceTemplate.xlsx" />
   </ItemGroup>

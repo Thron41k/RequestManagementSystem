@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.Common", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.WpfClient", "WpfClient\RequestManagement.WpfClient.csproj", "{956E5242-8E60-451A-A600-1F166726F487}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.WarehouseScan", "RequestManagement.WarehouseScan\RequestManagement.WarehouseScan.csproj", "{2A7B81CC-A376-465F-8ADC-98DDF49DDB78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,11 @@ Global
 		{956E5242-8E60-451A-A600-1F166726F487}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{956E5242-8E60-451A-A600-1F166726F487}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{956E5242-8E60-451A-A600-1F166726F487}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A7B81CC-A376-465F-8ADC-98DDF49DDB78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A7B81CC-A376-465F-8ADC-98DDF49DDB78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A7B81CC-A376-465F-8ADC-98DDF49DDB78}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{2A7B81CC-A376-465F-8ADC-98DDF49DDB78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A7B81CC-A376-465F-8ADC-98DDF49DDB78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

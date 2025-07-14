@@ -1,18 +1,19 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
-using WpfClient.Services.Interfaces;
-using RequestManagement.Common.Interfaces;
-using WpfClient.Messages;
-using Incoming = RequestManagement.Common.Models.Incoming;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Globalization;
-using Warehouse = RequestManagement.Common.Models.Warehouse;
-using System.Windows;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models.Extensions;
+using WpfClient;
+using WpfClient.Messages;
+using WpfClient.Services.Interfaces;
+using Incoming = RequestManagement.Common.Models.Incoming;
+using Warehouse = RequestManagement.Common.Models.Warehouse;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class IncomingListViewModel : ObservableObject
 {
@@ -22,9 +23,9 @@ public partial class IncomingListViewModel : ObservableObject
     private List<Incoming> _incomings = [];
     private int _lastSelectionIndex = -1;
     [ObservableProperty] private ObservableCollection<Incoming> _labelList = [];
-    [ObservableProperty] private CollectionViewSource _incomingsDocsViewSource;
+    [ObservableProperty] private CollectionViewSource _incomingsDocsViewSource = new();
     [ObservableProperty] private ObservableCollection<Incoming> _incomingsDocs = [];
-    [ObservableProperty] private CollectionViewSource _incomingsItemsViewSource;
+    [ObservableProperty] private CollectionViewSource _incomingsItemsViewSource = new();
     [ObservableProperty] private ObservableCollection<Incoming> _incomingsItems = [];
     [ObservableProperty] private ObservableCollection<Incoming> _incomingsLabels = [];
     [ObservableProperty] private Incoming? _selectedIncomingDoc = new();
@@ -40,8 +41,8 @@ public partial class IncomingListViewModel : ObservableObject
     public IncomingListViewModel() { }
 
     partial void OnSelectionIndexChanged(int value)
-    { 
-        if(value > 0) _lastSelectionIndex = value;
+    {
+        if (value > 0) _lastSelectionIndex = value;
     }
 
     public IncomingListViewModel(IMessageBus messageBus, IIncomingService incomingService)
@@ -50,7 +51,7 @@ public partial class IncomingListViewModel : ObservableObject
         _incomingService = incomingService;
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
         _messageBus.Subscribe<ShowResultMessage>(OnShow);
-        _incomingsDocsViewSource = new CollectionViewSource { Source = _incomingsDocs };
+        IncomingsDocsViewSource = new CollectionViewSource { Source = _incomingsDocs };
         IncomingsItemsViewSource = new CollectionViewSource { Source = _incomingsItems };
         var dispatcher = Dispatcher.CurrentDispatcher;
         _filterTimer = new System.Timers.Timer(Vars.SearchDelay) { AutoReset = false };
@@ -70,7 +71,7 @@ public partial class IncomingListViewModel : ObservableObject
                     {
                         LabelList.Add(incoming);
                     }
-                    NotificationCount = LabelList.Select(x=>(int)x.Quantity).Sum();
+                    NotificationCount = LabelList.Select(x => (int)x.Quantity).Sum();
                     break;
                 case MessagesEnum.UpdateLabelPrintList:
                     LabelList.Clear();
@@ -106,10 +107,10 @@ public partial class IncomingListViewModel : ObservableObject
     {
         var selectedDoc = IncomingsDocs.Where(x => x.IsSelected).ToList();
         await _messageBus.Publish(new ShowTaskPrintDialogMessageIncoming(
-            MessagesEnum.ShowPrintReportDialog, 
-            typeof(IncomingListViewModel), 
-            false, 
-            _incomings.Where(x => selectedDoc.Any(y=>y.Code == x.Code) && x.DocType == "Перемещение").ToList(), FromDate, ToDate));
+            MessagesEnum.ShowPrintReportDialog,
+            typeof(IncomingListViewModel),
+            false,
+            _incomings.Where(x => selectedDoc.Any(y => y.Code == x.Code) && x.DocType == "Перемещение").ToList(), FromDate, ToDate));
     }
 
     [RelayCommand]
@@ -124,6 +125,20 @@ public partial class IncomingListViewModel : ObservableObject
         if (SelectedIncomingItem != null)
         {
             var result = await _incomingService.DeleteIncomingAsync(SelectedIncomingItem.Id);
+            if (result)
+            {
+                await LoadIncomingsAsync();
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task IncomingsDeleteAsync()
+    {
+        var selected = IncomingsDocs.Where(x => x.IsSelected).Select(x => x.Code).ToList();
+        if (selected.Any())
+        {
+            var result = await _incomingService.DeleteIncomingsAsync(_incomings.Where(x => selected.Contains(x.Code)).Select(x => x.Id).ToList());
             if (result)
             {
                 await LoadIncomingsAsync();
@@ -147,7 +162,7 @@ public partial class IncomingListViewModel : ObservableObject
     [RelayCommand]
     private async Task DoubleClickItem()
     {
-        if(SelectedIncomingItem != null)
+        if (SelectedIncomingItem != null)
             await _messageBus.Publish(new ShowResultMessage(MessagesEnum.ShowLabelCountSelector, typeof(IncomingListViewModel), [SelectedIncomingItem.Clone()]));
     }
     [RelayCommand]
@@ -160,11 +175,11 @@ public partial class IncomingListViewModel : ObservableObject
             IncomingsDocsViewSource.Source = IncomingsDocs;
             return;
         }
-        var currentSortDescriptions = IncomingsDocsViewSource.View?.SortDescriptions.ToList() ?? [];
+        var currentSortDescriptions = (IncomingsDocsViewSource.View?.SortDescriptions!).ToList() ?? [];
         _incomings = await _incomingService.GetAllIncomingsAsync(SearchText, SelectedWarehouse.Id, FromDate.ToString(CultureInfo.CurrentCulture), ToDate.ToString(CultureInfo.CurrentCulture));
-        IncomingsDocs = new ObservableCollection<Incoming>(_incomings.DistinctBy(x=>x.Code));
+        IncomingsDocs = new ObservableCollection<Incoming>(_incomings.DistinctBy(x => x.Code));
         IncomingsDocsViewSource.Source = IncomingsDocs;
-        if(_lastSelectionIndex != -1) SelectionIndex = _lastSelectionIndex;
+        if (_lastSelectionIndex != -1) SelectionIndex = _lastSelectionIndex;
         if (currentSortDescriptions.Any())
         {
             foreach (var sortDescription in currentSortDescriptions)
@@ -229,7 +244,7 @@ public partial class IncomingListViewModel : ObservableObject
 
     partial void OnSelectedIncomingDocChanged(Incoming? value)
     {
-        _incomingsItems = new ObservableCollection<Incoming>(_incomings.Where(x=>x.Code == value?.Code));
+        _incomingsItems = new ObservableCollection<Incoming>(_incomings.Where(x => x.Code == value?.Code));
         IncomingsItemsViewSource.Source = _incomingsItems;
     }
     private bool ValidateDates()

@@ -1,4 +1,5 @@
 ﻿using WpfClient.ViewModels;
+using IncomingListViewModel = RequestManagement.WpfClient.ViewModels.IncomingListViewModel;
 
 namespace WpfClient.Views;
 

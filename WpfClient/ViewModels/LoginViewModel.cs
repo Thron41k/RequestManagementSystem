@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Models.Enums;
+using RequestManagement.WpfClient.Services;
 using WpfClient.Services;
 using WpfClient.Views;
 

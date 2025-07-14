@@ -1,6 +1,6 @@
 ﻿using RequestManagement.Common.Models.Enums;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 public class AuthTokenStore
 {

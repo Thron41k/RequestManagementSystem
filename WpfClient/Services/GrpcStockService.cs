@@ -4,6 +4,7 @@ using RequestManagement.Server.Controllers;
 using WpfClient.Models;
 using WpfClient.Services.Interfaces;
 using System.Globalization;
+using RequestManagement.WpfClient.Services;
 
 namespace WpfClient.Services;
 

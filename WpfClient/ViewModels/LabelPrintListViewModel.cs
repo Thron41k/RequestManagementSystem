@@ -222,7 +222,7 @@ public partial class LabelPrintListViewModel : ObservableObject
     {
         await _messageBus.Publish(
             new ShowResultMessage(
-                MessagesEnum.UpdateLabelPrintList, typeof(IncomingListViewModel), LabelList.ToList()));
+                MessagesEnum.UpdateLabelPrintList, typeof(RequestManagement.WpfClient.ViewModels.IncomingListViewModel), LabelList.ToList()));
         Images.Clear();
         if (!string.IsNullOrEmpty(FastSearchText))
         {

@@ -3,6 +3,7 @@ using RequestManagement.Common.Interfaces;
 using Grpc.Core;
 using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
+using RequestManagement.WpfClient.Services;
 using WpfClient.Services.Interfaces;
 using Expense = RequestManagement.Common.Models.Expense;
 using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;

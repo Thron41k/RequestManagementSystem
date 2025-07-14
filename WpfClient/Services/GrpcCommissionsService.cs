@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
+using RequestManagement.WpfClient.Services;
 using WpfClient.Services.Interfaces;
 using Commissions = RequestManagement.Common.Models.Commissions;
 using Driver = RequestManagement.Common.Models.Driver;

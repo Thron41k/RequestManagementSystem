@@ -21,7 +21,7 @@ public class MainMenuViewModel
     private readonly StockViewModel _stockViewModel;
     private readonly ExpenseViewModel _expenseViewModel;
     private readonly ExpenseListViewModel _expenseListViewModel;
-    private readonly IncomingListViewModel _incomingListViewModel;
+    private readonly RequestManagement.WpfClient.ViewModels.IncomingListViewModel _incomingListViewModel;
     private readonly StartDataLoadViewModel _startDataLoadViewModel;
     private readonly ExpenseDataLoadViewModel _expenseDataLoadViewModel;
     private readonly CommissionsViewModel _commissionsViewModel;
@@ -47,7 +47,7 @@ public class MainMenuViewModel
     public ICommand ShowNomenclatureAnalogCommand { get; }
     public ICommand ShowIncomingDataLoadingCommand { get; }
 
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel, LabelCountSelectorViewModel labelCountSelectorViewModel, LabelPrintListViewModel labelPrintListViewModel)
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, RequestManagement.WpfClient.ViewModels.IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel, LabelCountSelectorViewModel labelCountSelectorViewModel, LabelPrintListViewModel labelPrintListViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -92,12 +92,12 @@ public class MainMenuViewModel
 
     private Task OnShowResultMessageDialog(ShowResultMessage arg)
     {
-        if (arg.Message == MessagesEnum.ShowLabelCountSelector && arg.Caller == typeof(IncomingListViewModel))
+        if (arg.Message == MessagesEnum.ShowLabelCountSelector && arg.Caller == typeof(RequestManagement.WpfClient.ViewModels.IncomingListViewModel))
         {
             ShowLabelCountAccept(arg.Items, arg.Caller);
         }
 
-        if (arg.Message == MessagesEnum.ShowLabelPrintListViewDialog && arg.Caller == typeof(IncomingListViewModel))
+        if (arg.Message == MessagesEnum.ShowLabelPrintListViewDialog && arg.Caller == typeof(RequestManagement.WpfClient.ViewModels.IncomingListViewModel))
         {
             ShowLabelPrintListViewDialog(arg.Items, arg.Caller);
         }

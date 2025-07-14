@@ -8,5 +8,6 @@ public enum ExcelTemplateType
     Mb7Parts,
     Consumables,
     Operations,
-    RequisitionInvoice
+    RequisitionInvoice,
+    MovingBetweenWarehouses
 }

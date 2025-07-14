@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using RequestManagement.Server.Controllers;
+using RequestManagement.WpfClient.Services;
 using WpfClient.Services.Interfaces;
 
 namespace WpfClient.Services;
