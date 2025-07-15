@@ -4,8 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:vm="clr-namespace:WpfClient.ViewModels"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:helpers="clr-namespace:RequestManagement.WpfClient.ViewModels.Helpers"
              xmlns:viewModels="clr-namespace:RequestManagement.WpfClient.ViewModels"
              xmlns:behaviors="clr-namespace:RequestManagement.WpfClient.ViewModels.Behaviors"

@@ -28,8 +28,8 @@ namespace RequestManagement.WarehouseScan
 
             builder.Services.AddSingleton<MainViewModel>();
             builder.Services.AddSingleton<MainPage>();
-            builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(o => { o.Address = new Uri("http://192.168.20.191:5001"); });
-            builder.Services.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri("http://192.168.20.191:5001"); });
+            builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+            builder.Services.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
             builder.Services.AddSingleton<AuthTokenStore>();
             builder.Services.AddSingleton<IGrpcClientFactory, GrpcClientFactory>();
             builder.Services.AddScoped<GrpcAuthService>();

@@ -10,7 +10,7 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
         BindingContext = viewModel;
-        _ = viewModel.Login();
+        //_ = viewModel.Login();
         barcodeView.Options = new BarcodeReaderOptions
         {
             Formats = BarcodeFormats.All,

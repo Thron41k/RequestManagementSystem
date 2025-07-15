@@ -2,6 +2,6 @@
 
 public static class Vars
 {
-    public const string Server = "192.168.20.191";
+    public const string Server = "188.168.21.114";
     public const int SearchDelay = 500;
 }
