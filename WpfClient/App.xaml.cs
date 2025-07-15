@@ -1,10 +1,11 @@
 ﻿// App.xaml.cs
-using Microsoft.Extensions.DependencyInjection;
-using System.Windows;
-using WpfClient.ViewModels;
-using WpfClient.Views;
 
-namespace WpfClient;
+using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using RequestManagement.WpfClient.ViewModels;
+using RequestManagement.WpfClient.Views;
+
+namespace RequestManagement.WpfClient;
 
 public partial class App : Application
 {

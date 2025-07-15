@@ -3,9 +3,9 @@ using System.IO;
 using System.Reflection;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services.ExcelTemplate;
+namespace RequestManagement.WpfClient.Services.ExcelTemplate;
 
 public abstract class ExcelTemplateWriterBase<T> : IExcelTemplateWriter<T>
 {

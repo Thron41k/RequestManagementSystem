@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RequestManagement.Server.Controllers;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFactory
 {

@@ -1,6 +1,6 @@
-﻿using WpfClient.Services.ExcelTemplate;
+﻿using RequestManagement.WpfClient.Services.ExcelTemplate;
 
-namespace WpfClient.Services.Interfaces;
+namespace RequestManagement.WpfClient.Services.Interfaces;
 
 public interface IExcelWriterService
 {

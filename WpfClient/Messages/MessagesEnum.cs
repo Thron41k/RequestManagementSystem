@@ -1,4 +1,4 @@
-﻿namespace WpfClient.Messages;
+﻿namespace RequestManagement.WpfClient.Messages;
 
 public enum MessagesEnum
 {

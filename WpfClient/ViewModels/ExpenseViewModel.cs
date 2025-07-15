@@ -1,15 +1,15 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using RequestManagement.Common.Interfaces;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
 using static System.Int32;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class ExpenseViewModel : ObservableObject
 {
@@ -135,11 +135,11 @@ public partial class ExpenseViewModel : ObservableObject
     {
         if (SelectedEquipment != null && SelectedDriver != null && SelectedDefect != null && !string.IsNullOrEmpty(QuantityForExpense.Trim()))
         {
-            var convertResul = decimal.TryParse(QuantityForExpense.Replace(".", ","), out var quantityForExpense);
+            var convertResul = decimal.TryParse((string?)QuantityForExpense.Replace(".", ","), out var quantityForExpense);
             if (convertResul)
             {
                 var result = false;
-                TryParse(TermForOperations, out var term);
+                TryParse((string?)TermForOperations, out var term);
                 if (EditMode)
                 {
                     if (quantityForExpense <= _currentQuantity + ExpenseStock?.FinalQuantity)

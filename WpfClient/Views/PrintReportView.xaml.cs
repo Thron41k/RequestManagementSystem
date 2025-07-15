@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
-using WpfClient.ViewModels;
+using RequestManagement.WpfClient.ViewModels;
 
-namespace WpfClient.Views;
+namespace RequestManagement.WpfClient.Views;
 
 /// <summary>
 /// Логика взаимодействия для PrintReportView.xaml

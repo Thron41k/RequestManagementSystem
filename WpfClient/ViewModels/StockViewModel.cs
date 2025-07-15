@@ -1,17 +1,17 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using RequestManagement.Common.Interfaces;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
 using static System.Decimal;
 using Nomenclature = RequestManagement.Common.Models.Nomenclature;
 using Warehouse = RequestManagement.Common.Models.Warehouse;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class StockViewModel : ObservableObject
 {
@@ -155,7 +155,7 @@ public partial class StockViewModel : ObservableObject
             return;
         }
 
-        if (!TryParse(InitialQuantity, out var initialQuantity))
+        if (!TryParse((string?)InitialQuantity, out var initialQuantity))
         {
             MessageBox.Show("Некорректное значение начального количества.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
@@ -220,10 +220,10 @@ public partial class StockViewModel : ObservableObject
     {
         try
         {
-            TryParse(InitialQuantityFilter, out var initialQty);
-            TryParse(ReceivedQuantityFilter, out var receivedQty);
-            TryParse(ConsumedQuantityFilter, out var consumedQty);
-            TryParse(FinalQuantityFilter, out var finalQty);
+            TryParse((string?)InitialQuantityFilter, out var initialQty);
+            TryParse((string?)ReceivedQuantityFilter, out var receivedQty);
+            TryParse((string?)ConsumedQuantityFilter, out var consumedQty);
+            TryParse((string?)FinalQuantityFilter, out var finalQty);
 
             var stocks = await _stockService.GetAllStocksAsync(
                 WarehouseId,
@@ -239,8 +239,8 @@ public partial class StockViewModel : ObservableObject
 
             if (!string.IsNullOrWhiteSpace(NomenclatureFilter))
             {
-                var words = NomenclatureFilter.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(w => w.ToLower())
+                var words = Enumerable
+                    .Select<string, string>(NomenclatureFilter.Split(' ', StringSplitOptions.RemoveEmptyEntries), w => w.ToLower())
                     .ToList();
 
                 stocks = stocks.Where(s =>

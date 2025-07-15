@@ -1,12 +1,13 @@
-﻿<UserControl x:Class="WpfClient.Views.LabelPrintListView"
+﻿<UserControl x:Class="RequestManagement.WpfClient.Views.LabelPrintListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:WpfClient.ViewModels"
-             xmlns:helpers="clr-namespace:WpfClient.ViewModels.Helpers"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewModels1="clr-namespace:RequestManagement.WpfClient.ViewModels"
+             xmlns:helpers="clr-namespace:RequestManagement.WpfClient.ViewModels.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" MinHeight="780" MinWidth="1500">
     <UserControl.Resources>
@@ -17,7 +18,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.DataContext>
-        <viewModels:LabelPrintListViewModel />
+        <viewModels1:LabelPrintListViewModel />
     </UserControl.DataContext>
     <Grid Margin="0,0,20,0">
         <Grid.ColumnDefinitions>

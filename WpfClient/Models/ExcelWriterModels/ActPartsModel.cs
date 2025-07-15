@@ -1,6 +1,6 @@
 ﻿using RequestManagement.Common.Models;
 
-namespace WpfClient.Models.ExcelWriterModels;
+namespace RequestManagement.WpfClient.Models.ExcelWriterModels;
 
 public class ActPartsModel
 {

@@ -5,10 +5,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class SparePartsAnalogsViewModel : ObservableObject
 {

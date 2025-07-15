@@ -1,7 +1,7 @@
 ﻿using RequestManagement.Common.Models;
 using RequestManagement.Common.Models.Interfaces;
 
-namespace WpfClient.Messages;
+namespace RequestManagement.WpfClient.Messages;
 
 public class UpdatedMessage(MessagesEnum message, Type? caller = null)
 {

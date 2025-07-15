@@ -1,4 +1,4 @@
-﻿namespace WpfClient.Services.ExcelTemplate;
+﻿namespace RequestManagement.WpfClient.Services.ExcelTemplate;
 
 public enum ExcelTemplateType
 {

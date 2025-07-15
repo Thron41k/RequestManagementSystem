@@ -1,8 +1,8 @@
-﻿using Microsoft.Xaml.Behaviors;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows;
+using Microsoft.Xaml.Behaviors;
 
-namespace WpfClient.ViewModels.Behaviors;
+namespace RequestManagement.WpfClient.ViewModels.Behaviors;
 
 public class PlaceholderBehavior : Behavior<TextBox>
 {

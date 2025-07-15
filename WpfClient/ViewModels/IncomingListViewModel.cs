@@ -7,9 +7,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models.Extensions;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
 using WpfClient;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
 using Incoming = RequestManagement.Common.Models.Incoming;
 using Warehouse = RequestManagement.Common.Models.Warehouse;
 

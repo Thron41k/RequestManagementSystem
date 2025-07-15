@@ -1,15 +1,14 @@
 ﻿using System.Globalization;
-using RequestManagement.Common.Interfaces;
 using Grpc.Core;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
-using RequestManagement.WpfClient.Services;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Services.Interfaces;
 using Expense = RequestManagement.Common.Models.Expense;
 using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
 using Stock = RequestManagement.Common.Models.Stock;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IExpenseService
 {

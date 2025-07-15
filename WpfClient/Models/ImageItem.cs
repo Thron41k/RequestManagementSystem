@@ -1,7 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace WpfClient.Models;
+namespace RequestManagement.WpfClient.Models;
 
 public partial class ImageItem : ObservableObject
 {

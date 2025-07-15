@@ -1,14 +1,13 @@
 ﻿using System.Globalization;
-using RequestManagement.Common.Interfaces;
 using Grpc.Core;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
-using RequestManagement.WpfClient.Services;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Converters;
+using RequestManagement.WpfClient.Services.Interfaces;
 using Incoming = RequestManagement.Common.Models.Incoming;
-using WpfClient.Converters;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 internal class GrpcIncomingService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IIncomingService
 {

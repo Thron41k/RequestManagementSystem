@@ -1,7 +1,7 @@
 ﻿using RequestManagement.Common.Models;
 using WpfClient.Models;
 
-namespace WpfClient.Services.Interfaces;
+namespace RequestManagement.WpfClient.Services.Interfaces;
 
 public interface IExcelReaderService
 {

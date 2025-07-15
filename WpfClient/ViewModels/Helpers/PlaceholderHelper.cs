@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace WpfClient.ViewModels.Helpers;
+namespace RequestManagement.WpfClient.ViewModels.Helpers;
 
 public static class PlaceholderHelper
 {

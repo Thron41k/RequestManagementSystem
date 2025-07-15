@@ -1,17 +1,16 @@
 ﻿// ServiceConfigurator.cs
+
 using Microsoft.Extensions.DependencyInjection;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services;
 using RequestManagement.WpfClient.Services.ExcelTemplate;
-using WpfClient.Services;
-using WpfClient.Services.ExcelTemplate;
-using WpfClient.Services.Interfaces;
-using WpfClient.ViewModels;
-using WpfClient.Views;
+using RequestManagement.WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.ViewModels;
+using RequestManagement.WpfClient.Views;
 using IncomingListViewModel = RequestManagement.WpfClient.ViewModels.IncomingListViewModel;
 
-namespace WpfClient;
+namespace RequestManagement.WpfClient;
 
 public class ServiceConfigurator
 {
@@ -20,18 +19,18 @@ public class ServiceConfigurator
         var serviceCollection = new ServiceCollection();
 
         // gRPC клиенты
-        serviceCollection.AddGrpcClient<AuthService.AuthServiceClient>(o => {o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<NomenclatureService.NomenclatureServiceClient>(o => {o.Address = new Uri("http://localhost:5001");});
-        serviceCollection.AddGrpcClient<StockService.StockServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<WarehouseService.WarehouseServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<CommissionsService.CommissionsServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<NomenclatureAnalogService.NomenclatureAnalogServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<EquipmentService.EquipmentServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<DriverService.DriverServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<DefectService.DefectServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
-        serviceCollection.AddGrpcClient<DefectGroupService.DefectGroupServiceClient>(o => { o.Address = new Uri("http://localhost:5001"); });
+        serviceCollection.AddGrpcClient<AuthService.AuthServiceClient>(o => {o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<NomenclatureService.NomenclatureServiceClient>(o => {o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<StockService.StockServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<WarehouseService.WarehouseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<CommissionsService.CommissionsServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<NomenclatureAnalogService.NomenclatureAnalogServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<EquipmentService.EquipmentServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<DriverService.DriverServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<DefectService.DefectServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<DefectGroupService.DefectGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();

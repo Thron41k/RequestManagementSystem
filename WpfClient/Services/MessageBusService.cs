@@ -1,6 +1,6 @@
-﻿using WpfClient.Services.Interfaces;
+﻿using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 public class MessageBusService : IMessageBus
 {

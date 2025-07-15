@@ -1,13 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
-using WpfClient.Models;
 using Microsoft.Win32;
-using RequestManagement.Common.Models;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Models;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
+using WpfClient.Models;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class StartDataLoadViewModel : ObservableObject
 {

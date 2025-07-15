@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Data;
 
-namespace WpfClient.ViewModels.Helpers;
+namespace RequestManagement.WpfClient.ViewModels.Helpers;
 
 public class BoolToVisibilityConverter : IValueConverter
 {

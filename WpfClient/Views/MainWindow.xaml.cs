@@ -1,7 +1,7 @@
 ﻿using System.Windows;
-using WpfClient.ViewModels;
+using RequestManagement.WpfClient.ViewModels;
 
-namespace WpfClient.Views;
+namespace RequestManagement.WpfClient.Views;
 
 public partial class MainWindow : Window
 {

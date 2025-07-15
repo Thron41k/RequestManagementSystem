@@ -1,9 +1,9 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using RequestManagement.Common.Utilities;
-using WpfClient.Models.ExcelWriterModels;
+using RequestManagement.WpfClient.Models.ExcelWriterModels;
 
-namespace WpfClient.Services.ExcelTemplate;
+namespace RequestManagement.WpfClient.Services.ExcelTemplate;
 
 public class LimitPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
 {

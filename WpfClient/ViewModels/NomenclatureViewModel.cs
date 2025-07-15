@@ -1,15 +1,15 @@
-﻿using RequestManagement.Server.Controllers;
-using System.Windows.Threading;
-using System.Collections.ObjectModel;
-using Timer = System.Timers.Timer;
-using RequestManagement.Common.Interfaces;
-using WpfClient.Services.Interfaces;
-using WpfClient.Messages;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Data;
+using System.Windows.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using RequestManagement.Common.Interfaces;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
+using Timer = System.Timers.Timer;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class NomenclatureViewModel : ObservableObject
 {
@@ -67,7 +67,7 @@ public partial class NomenclatureViewModel : ObservableObject
         var nomenclatureList = await _nomenclatureService.GetAllNomenclaturesAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
-            var currentSortDescriptions = NomenclatureViewSource.View?.SortDescriptions.ToList() ?? [];
+            var currentSortDescriptions = Enumerable.ToList<SortDescription>(NomenclatureViewSource.View?.SortDescriptions) ?? [];
             NomenclatureList = new ObservableCollection<RequestManagement.Common.Models.Nomenclature>(nomenclatureList);
             NomenclatureViewSource.Source = NomenclatureList;
             NewNomenclatureName = string.Empty;

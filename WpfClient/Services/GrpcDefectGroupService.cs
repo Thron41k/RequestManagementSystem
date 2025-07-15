@@ -1,11 +1,10 @@
-﻿using RequestManagement.Common.Interfaces;
+﻿using Grpc.Core;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
+using RequestManagement.WpfClient.Services.Interfaces;
 using DefectGroup = RequestManagement.Common.Models.DefectGroup;
-using Grpc.Core;
-using RequestManagement.WpfClient.Services;
-using WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 public class GrpcDefectGroupService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IDefectGroupService
 {

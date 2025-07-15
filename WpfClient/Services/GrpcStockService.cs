@@ -1,12 +1,11 @@
-﻿using RequestManagement.Common.Interfaces;
+﻿using System.Globalization;
 using Grpc.Core;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
+using RequestManagement.WpfClient.Services.Interfaces;
 using WpfClient.Models;
-using WpfClient.Services.Interfaces;
-using System.Globalization;
-using RequestManagement.WpfClient.Services;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 internal class GrpcStockService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IStockService
 {

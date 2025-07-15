@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using Microsoft.Win32;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 public class FileSaveDialogService : IFileSaveDialogService
 {

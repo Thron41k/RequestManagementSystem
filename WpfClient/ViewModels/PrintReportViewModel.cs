@@ -1,14 +1,14 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.Drawing.Printing;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Models;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
-using System.Collections.ObjectModel;
-using System.Drawing.Printing;
-using WpfClient.Models.ExcelWriterModels;
-using WpfClient.Services.ExcelTemplate;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Models.ExcelWriterModels;
+using RequestManagement.WpfClient.Services.ExcelTemplate;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class PrintReportViewModel : ObservableObject
 {

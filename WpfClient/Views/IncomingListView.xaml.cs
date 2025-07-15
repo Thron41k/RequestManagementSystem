@@ -1,7 +1,6 @@
-﻿using WpfClient.ViewModels;
-using IncomingListViewModel = RequestManagement.WpfClient.ViewModels.IncomingListViewModel;
+﻿using IncomingListViewModel = RequestManagement.WpfClient.ViewModels.IncomingListViewModel;
 
-namespace WpfClient.Views;
+namespace RequestManagement.WpfClient.Views;
 
 /// <summary>
 /// Логика взаимодействия для IncomingListView.xaml

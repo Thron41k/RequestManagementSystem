@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows.Controls;
 
-namespace WpfClient.ViewModels.ValidationRules;
+namespace RequestManagement.WpfClient.ViewModels.ValidationRules;
 
 public class NotEmptyDriverNameValidationRule : ValidationRule
 {

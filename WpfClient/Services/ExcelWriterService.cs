@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Windows.Controls;
-using WpfClient.Services.ExcelTemplate;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Services.ExcelTemplate;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 public class ExcelWriterService : IExcelWriterService
 {

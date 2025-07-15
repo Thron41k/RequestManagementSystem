@@ -1,6 +1,6 @@
 ﻿using RequestManagement.Server.Controllers;
 
-namespace WpfClient.Services.Interfaces;
+namespace RequestManagement.WpfClient.Services.Interfaces;
 
 public interface IGrpcClientFactory
 {

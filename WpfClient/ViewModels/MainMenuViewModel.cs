@@ -1,14 +1,14 @@
 ﻿using System.Windows;
-using System.Windows.Input;
-using RequestManagement.Common.Models;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
-using WpfClient.Views;
 using System.Windows.Controls;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using RequestManagement.Common.Models;
 using RequestManagement.Common.Models.Interfaces;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Views;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public class MainMenuViewModel
 {
@@ -196,7 +196,7 @@ public class MainMenuViewModel
         {
             _messageBus.Publish(
                 new ShowResultMessage(
-                    MessagesEnum.ResultLabelCountSelector, argCaller, _labelCountSelectorViewModel.LabelList.ToList()));
+                    MessagesEnum.ResultLabelCountSelector, argCaller, Enumerable.ToList<Incoming>(_labelCountSelectorViewModel.LabelList)));
         }
     }
     private void ShowCommissions(bool editMode, Type? argCaller = null)

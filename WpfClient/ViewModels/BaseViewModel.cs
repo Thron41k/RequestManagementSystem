@@ -1,4 +1,4 @@
-﻿namespace WpfClient.ViewModels;
+﻿namespace RequestManagement.WpfClient.ViewModels;
 
 public class BaseViewModel : System.ComponentModel.INotifyPropertyChanged
 {

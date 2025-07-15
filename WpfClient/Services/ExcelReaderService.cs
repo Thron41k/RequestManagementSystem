@@ -1,10 +1,10 @@
-﻿using OfficeOpenXml;
-using System.IO;
+﻿using System.IO;
+using OfficeOpenXml;
 using RequestManagement.Common.Models;
+using RequestManagement.WpfClient.Services.Interfaces;
 using WpfClient.Models;
-using WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 public class ExcelReaderService : IExcelReaderService
 {

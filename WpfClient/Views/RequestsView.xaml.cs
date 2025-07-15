@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace WpfClient.Views;
+namespace RequestManagement.WpfClient.Views;
 
 /// <summary>
 /// Логика взаимодействия для RequestsView.xaml

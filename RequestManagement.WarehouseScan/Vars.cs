@@ -1,4 +1,4 @@
-﻿namespace RequestManagement.WpfClient;
+﻿namespace RequestManagement.WarehouseScan;
 
 public static class Vars
 {

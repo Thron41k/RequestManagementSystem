@@ -1,15 +1,15 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using RequestManagement.Common.Interfaces;
-using WpfClient.Services.Interfaces;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Data;
-using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WpfClient.Messages;
+using RequestManagement.Common.Interfaces;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
 using Commissions = RequestManagement.Common.Models.Commissions;
 using Driver = RequestManagement.Common.Models.Driver;
 
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class CommissionsViewModel : ObservableObject
 {

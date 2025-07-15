@@ -1,15 +1,16 @@
-﻿using System.Windows.Threading;
-using System.Collections.ObjectModel;
-using Timer = System.Timers.Timer;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
+using System.Windows.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
-using WpfClient.Services.Interfaces;
-using WpfClient.Messages;
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Windows.Data;
 using RequestManagement.Common.Models;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
+using Timer = System.Timers.Timer;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class WarehouseViewModel : ObservableObject
 {
@@ -81,7 +82,7 @@ public partial class WarehouseViewModel : ObservableObject
         var warehouseList = await _warehouseService.GetAllWarehousesAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
-            var currentSortDescriptions = WarehouseViewSource.View?.SortDescriptions.ToList() ?? [];
+            var currentSortDescriptions = Enumerable.ToList<SortDescription>(WarehouseViewSource.View?.SortDescriptions) ?? [];
             WarehouseList = new ObservableCollection<Warehouse>(warehouseList);
             WarehouseViewSource.Source = WarehouseList;
             SelectedWarehouse = null;

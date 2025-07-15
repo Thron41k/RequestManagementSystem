@@ -3,13 +3,13 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
 using Dispatcher = System.Windows.Threading.Dispatcher;
 using Equipment = RequestManagement.Common.Models.Equipment;
 using Timer = System.Timers.Timer;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class EquipmentViewModel : ObservableObject
 {

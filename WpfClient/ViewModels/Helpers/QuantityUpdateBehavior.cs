@@ -1,7 +1,7 @@
-﻿using Microsoft.Xaml.Behaviors;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
+using Microsoft.Xaml.Behaviors;
 
-namespace WpfClient.ViewModels.Helpers;
+namespace RequestManagement.WpfClient.ViewModels.Helpers;
 
 public class QuantityUpdateBehavior : Behavior<DataGrid>
 {

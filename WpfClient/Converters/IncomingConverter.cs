@@ -1,6 +1,6 @@
 ﻿using RequestManagement.Server.Controllers;
 
-namespace WpfClient.Converters;
+namespace RequestManagement.WpfClient.Converters;
 
 public static class IncomingConverter
 {

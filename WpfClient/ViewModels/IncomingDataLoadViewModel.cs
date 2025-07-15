@@ -1,12 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using RequestManagement.Common.Interfaces;
-using WpfClient.Services.Interfaces;
-using RequestManagement.Common.Models;
-using WpfClient.Messages;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Models;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class IncomingDataLoadViewModel : ObservableObject
 {

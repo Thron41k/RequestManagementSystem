@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace WpfClient.ViewModels.Helpers;
+namespace RequestManagement.WpfClient.ViewModels.Helpers;
 
 public static class ButtonExtensions
 {

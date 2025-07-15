@@ -1,15 +1,16 @@
 ﻿using System.Collections.ObjectModel;
-using Timer = System.Timers.Timer;
+using System.ComponentModel;
+using System.Windows.Data;
 using System.Windows.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
-using WpfClient.Services.Interfaces;
-using WpfClient.Messages;
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Windows.Data;
 using RequestManagement.Common.Models;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
+using Timer = System.Timers.Timer;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class DefectViewModel : ObservableObject
 {
@@ -85,9 +86,9 @@ public partial class DefectViewModel : ObservableObject
         var defectList = await _defectService.GetAllDefectsAsync(filter.ToLower());
         await _dispatcher.InvokeAsync(() =>
         {
-            var currentSortDescriptions = DefectViewSource.View?.SortDescriptions.ToList() ?? [];
+            var currentSortDescriptions = Enumerable.ToList<SortDescription>(DefectViewSource.View?.SortDescriptions) ?? [];
             var list = defectList.Select(x =>
-                new DefectViewItem(x, DefectGroupList.First(y => y.Id == x.DefectGroupId).Name));
+                new DefectViewItem(x, Enumerable.First<DefectGroup>(DefectGroupList, y => y.Id == x.DefectGroupId).Name));
             DefectViewItemList = new ObservableCollection<DefectViewItem>(list);
             DefectViewSource.Source = DefectViewItemList;
             SelectedDefect = null;

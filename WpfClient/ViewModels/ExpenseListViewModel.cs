@@ -1,16 +1,17 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using RequestManagement.Common.Interfaces;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
-using System.Windows;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class ExpenseListViewModel : ObservableObject
 {
@@ -76,7 +77,7 @@ public partial class ExpenseListViewModel : ObservableObject
     {
         if (!ValidateDates()) return;
         if (SelectedWarehouse.Id == 0) return;
-        var currentSortDescriptions = ExpensesViewSource.View?.SortDescriptions.ToList() ?? [];
+        var currentSortDescriptions = Enumerable.ToList<SortDescription>(ExpensesViewSource.View?.SortDescriptions) ?? [];
         var expenseList = await _expenseService.GetAllExpensesAsync(SearchText, SelectedWarehouse.Id, SelectedEquipment.Id, SelectedDriver.Id, SelectedDefect.Id, FromDate.ToString(CultureInfo.CurrentCulture), ToDate.ToString(CultureInfo.CurrentCulture));
         Expenses = new ObservableCollection<Expense>(expenseList);
         ExpensesViewSource.Source = Expenses;
@@ -104,7 +105,7 @@ public partial class ExpenseListViewModel : ObservableObject
     [RelayCommand]
     private void ExpenseListCheckedUpdate()
     {
-        MenuDeleteItemText = $"Удалить отмеченные({Expenses.Count(x => x.IsSelected)})";
+        MenuDeleteItemText = $"Удалить отмеченные({Enumerable.Count<Expense>(Expenses, x => x.IsSelected)})";
     }
 
     [RelayCommand]
@@ -116,7 +117,7 @@ public partial class ExpenseListViewModel : ObservableObject
         //    new()
         //};
         //_excelWriterService.ExportAndPrint(ExcelTemplateType.ActParts, data);
-        await _messageBus.Publish(new ShowTaskPrintDialogMessageExpense(MessagesEnum.ShowPrintReportDialog, typeof(ExpenseListViewModel), false, Expenses.Where(x => x is { IsSelected: true}).ToList(),FromDate, ToDate));
+        await _messageBus.Publish(new ShowTaskPrintDialogMessageExpense(MessagesEnum.ShowPrintReportDialog, typeof(ExpenseListViewModel), false, Enumerable.Where<Expense>(Expenses, x => x is { IsSelected: true}).ToList(),FromDate, ToDate));
     }
 
     [RelayCommand]
@@ -134,7 +135,7 @@ public partial class ExpenseListViewModel : ObservableObject
     [RelayCommand]
     private async Task ExpenseDeleteRangeAsync()
     {
-        var list = Expenses.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        var list = Enumerable.Where<Expense>(Expenses, x => x.IsSelected).Select(x => x.Id).ToList();
         if (list.Count > 0)
         {
             var result = await _expenseService.DeleteExpensesAsync(list);

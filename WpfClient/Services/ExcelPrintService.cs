@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
+using RequestManagement.WpfClient.Services.Interfaces;
 using Excel = Microsoft.Office.Interop.Excel;
-using WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 public class ExcelPrintService : IExcelPrintService
 {

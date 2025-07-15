@@ -1,5 +1,5 @@
 ﻿// IMessageBus.cs
-namespace WpfClient.Services.Interfaces;
+namespace RequestManagement.WpfClient.Services.Interfaces;
 
 public interface IMessageBus
 {

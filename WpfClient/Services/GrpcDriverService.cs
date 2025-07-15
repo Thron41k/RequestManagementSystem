@@ -1,10 +1,9 @@
-﻿using RequestManagement.Common.Interfaces;
-using Grpc.Core;
+﻿using Grpc.Core;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
-using RequestManagement.WpfClient.Services;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IDriverService
 {

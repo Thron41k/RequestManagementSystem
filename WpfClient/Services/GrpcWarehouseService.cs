@@ -1,13 +1,11 @@
 ﻿using System.Globalization;
-using RequestManagement.Common.Interfaces;
 using Grpc.Core;
+using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
-using WpfClient.Services.Interfaces;
+using RequestManagement.WpfClient.Services.Interfaces;
 using Warehouse = RequestManagement.Common.Models.Warehouse;
-using RequestManagement.Common.Models;
-using RequestManagement.WpfClient.Services;
 
-namespace WpfClient.Services;
+namespace RequestManagement.WpfClient.Services;
 
 internal class GrpcWarehouseService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IWarehouseService
 {

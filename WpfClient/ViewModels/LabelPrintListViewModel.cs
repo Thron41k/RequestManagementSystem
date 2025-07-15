@@ -1,31 +1,31 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Drawing.Drawing2D;
+﻿using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Windows;
-using QRCoder;
-using RequestManagement.Common.Models;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Collections.ObjectModel;
-using System.Windows.Media.Imaging;
 using System.IO;
-using WpfClient.Models;
-using Font = System.Drawing.Font;
-using Rectangle = System.Drawing.Rectangle;
-using System.Windows.Controls.Primitives;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using QRCoder;
+using RequestManagement.Common.Models;
+using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Models;
+using RequestManagement.WpfClient.Services.Interfaces;
+using Font = System.Drawing.Font;
+using Rectangle = System.Drawing.Rectangle;
 using Brushes = System.Drawing.Brushes;
 using Color = System.Drawing.Color;
 using Pen = System.Drawing.Pen;
 using Size = System.Windows.Size;
-using System.Windows.Data;
-using WpfClient.Messages;
-using WpfClient.Services.Interfaces;
 
-namespace WpfClient.ViewModels;
+namespace RequestManagement.WpfClient.ViewModels;
 
 public partial class LabelPrintListViewModel : ObservableObject
 {
@@ -113,7 +113,7 @@ public partial class LabelPrintListViewModel : ObservableObject
             // Разбиваем изображения на группы по 8 этикеток
             for (var i = 0; i < Images.Count; i += labelsPerPage)
             {
-                var pageImages = Images.Skip(i).Take(labelsPerPage).ToList();
+                var pageImages = Enumerable.Skip<ImageItem>(Images, i).Take(labelsPerPage).ToList();
 
                 var pageContent = new PageContent();
                 var fixedPage = new FixedPage
@@ -222,12 +222,12 @@ public partial class LabelPrintListViewModel : ObservableObject
     {
         await _messageBus.Publish(
             new ShowResultMessage(
-                MessagesEnum.UpdateLabelPrintList, typeof(RequestManagement.WpfClient.ViewModels.IncomingListViewModel), LabelList.ToList()));
+                MessagesEnum.UpdateLabelPrintList, typeof(RequestManagement.WpfClient.ViewModels.IncomingListViewModel), Enumerable.ToList<Incoming>(LabelList)));
         Images.Clear();
         if (!string.IsNullOrEmpty(FastSearchText))
         {
-            LabelListForShow = new ObservableCollection<Incoming>(LabelList.Where(x => x.Stock.Nomenclature.Name.ToLower().Contains(FastSearchText.ToLower())
-                || x.Stock.Nomenclature.Article!.ToLower().Contains(FastSearchText.ToLower())));
+            LabelListForShow = new ObservableCollection<Incoming>(Enumerable.Where<Incoming>(LabelList, x => x.Stock.Nomenclature.Name.ToLower().Contains(FastSearchText.ToLower())
+                                                                                                            || x.Stock.Nomenclature.Article!.ToLower().Contains(FastSearchText.ToLower())));
         }
         else
         {
