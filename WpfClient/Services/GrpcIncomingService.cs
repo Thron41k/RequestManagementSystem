@@ -77,6 +77,11 @@ internal class GrpcIncomingService(IGrpcClientFactory clientFactory, AuthTokenSt
         return result.Success;
     }
 
+    public Task<Incoming> FindIncomingByIdAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Incoming> CreateIncomingAsync(Incoming incoming)
     {
         var headers = new Metadata();

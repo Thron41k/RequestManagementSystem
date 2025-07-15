@@ -60,7 +60,12 @@ public partial class MainViewModel(
     {
         if (CurrentMode == ScanMode.Qr)
         {
-            var result = await _incomingService.GetAllIncomingsAsync();
+            var parseResult = int.TryParse(value, out var id);
+            if (parseResult)
+            {
+                var result = await _incomingService.FindIncomingByIdAsync(id);
+                ResultText = result.Stock.Nomenclature.Name;
+            }
         }
     }
 }
