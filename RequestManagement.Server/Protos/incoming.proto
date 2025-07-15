@@ -9,8 +9,13 @@ service IncomingService {
   rpc DeleteIncoming (DeleteIncomingRequest) returns (DeleteIncomingResponse);
   rpc DeleteIncomings (DeleteIncomingsRequest) returns (DeleteIncomingResponse);
   rpc UploadMaterialIncoming(UploadMaterialIncomingRequest) returns (UploadMaterialIncomingResponse);
+  rpc FindIncomingById (FindIncomingByIdRequest) returns (GetAllIncomingsResponse);
 }
 
+message FindIncomingByIdRequest {
+    int32 id = 1;
+}
+    
 message UploadMaterialIncomingRequest {
     string warehouse_name= 1;
     repeated IncomingMaterialItem items = 2;

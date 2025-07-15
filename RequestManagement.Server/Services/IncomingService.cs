@@ -581,4 +581,22 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
         var deletedCount = await dbContext.SaveChangesAsync();
         return deletedCount > 0;
     }
+
+    public async Task<Incoming> FindIncomingByIdAsync(int id)
+    {
+        var query = dbContext.Incomings
+            .Include(e => e.InWarehouse)
+            .ThenInclude(s => s!.FinanciallyResponsiblePerson)
+            .Include(e => e.Stock)
+            .ThenInclude(s => s.Nomenclature)
+            .Include(e => e.Stock)
+            .ThenInclude(s => s.Warehouse)
+            .ThenInclude(d => d.FinanciallyResponsiblePerson)
+            .Include(e => e.Application)
+            .ThenInclude(s => s!.Responsible)
+            .Include(e => e.Application)
+            .ThenInclude(s => s!.Equipment)
+            .AsQueryable();
+        return await query.FirstOrDefaultAsync(e => e.Id == id) ?? new Incoming();
+    }
 }

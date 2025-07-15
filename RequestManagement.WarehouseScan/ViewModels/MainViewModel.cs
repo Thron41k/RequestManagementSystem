@@ -55,4 +55,12 @@ public partial class MainViewModel(
         ResultText = string.Empty;
         IsDetecting = true;
     }
+
+    internal async Task DetectionResult(string value)
+    {
+        if (CurrentMode == ScanMode.Qr)
+        {
+            var result = await _incomingService.GetAllIncomingsAsync();
+        }
+    }
 }

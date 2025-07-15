@@ -37,6 +37,20 @@ namespace RequestManagement.WarehouseScan.Services
             throw new NotImplementedException();
         }
 
+        public async Task<Common.Models.Incoming> FindIncomingByIdAsync(int id)
+        {
+            var headers = new Metadata();
+            if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+            {
+                headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+            }
+
+            var client = clientFactory.CreateIncomingClient();
+            var response = await client.FindIncomingByIdAsync(new FindIncomingByIdRequest { Id = id }, headers);
+            var incoming = IncomingConverter.FromGrpc(response).ToList();
+            return incoming.Count != 0 ? incoming.First() : new Common.Models.Incoming();
+        }
+
         public async Task<Common.Models.Incoming> CreateIncomingAsync(Common.Models.Incoming incoming)
         {
             var headers = new Metadata();

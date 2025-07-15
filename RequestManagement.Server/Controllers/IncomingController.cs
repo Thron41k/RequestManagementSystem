@@ -1,4 +1,5 @@
-﻿using Grpc.Core;
+﻿using Azure;
+using Grpc.Core;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using WpfClient.Models;
@@ -105,5 +106,12 @@ public class IncomingController(IIncomingService incomingService, ILogger<Incomi
 
         var success = await _incomingService.DeleteIncomingsAsync(request.Id.ToList());
         return new DeleteIncomingResponse { Success = success };
+    }
+
+    public override async Task<GetAllIncomingsResponse> FindIncomingById(FindIncomingByIdRequest request, ServerCallContext context)
+    {
+        _logger.LogInformation("Finding incoming with ID: {Id}", request.Id);
+        var incoming = await _incomingService.FindIncomingByIdAsync(request.Id);
+        return Converters.IncomingConverter.ToGrpc([incoming]);
     }
 }

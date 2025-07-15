@@ -6,11 +6,13 @@ namespace RequestManagement.WarehouseScan.Views;
 
 public partial class MainPage : ContentPage
 {
+    private MainViewModel _viewModel;
     public MainPage(MainViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = viewModel;
-        //_ = viewModel.Login();
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
+        _ = _viewModel.Login();
         barcodeView.Options = new BarcodeReaderOptions
         {
             Formats = BarcodeFormats.All,
@@ -30,7 +32,7 @@ public partial class MainPage : ContentPage
             barcodeView.IsDetecting = false;
             Dispatcher.Dispatch(() =>
             {
-                ResultLabel.Text = $"Barcodes: {first.Format} -> {first.Value}";
+                _viewModel.DetectionResult(first.Value);
             });
         }
     }
