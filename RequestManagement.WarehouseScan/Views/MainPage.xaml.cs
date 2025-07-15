@@ -21,7 +21,7 @@ public partial class MainPage : ContentPage
         };
     }
 
-    private void OnDetected(object sender, BarcodeDetectionEventArgs e)
+    private async void OnDetected(object sender, BarcodeDetectionEventArgs e)
     {
         foreach (var barcode in e.Results)
             Console.WriteLine($"Barcodes: {barcode.Format} -> {barcode.Value}");
@@ -30,10 +30,11 @@ public partial class MainPage : ContentPage
         if (first is not null)
         {
             barcodeView.IsDetecting = false;
-            Dispatcher.Dispatch(() =>
+            async void Action()
             {
-                _viewModel.DetectionResult(first.Value);
-            });
+                await _viewModel.DetectionResult(first.Value);
+            }
+            Dispatcher.Dispatch(Action);
         }
     }
 
