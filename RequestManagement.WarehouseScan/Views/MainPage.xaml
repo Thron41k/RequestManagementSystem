@@ -17,22 +17,24 @@
                 BarcodesDetected="OnDetected"
                 IsDetecting="{Binding IsDetecting, Mode=TwoWay}"
             />
-
-            <Grid
-                Grid.Row="0"
-                BackgroundColor="#aa000000">
-                <Label x:Name="ResultLabel" Grid.RowSpan="2" Text="{Binding ResultText}" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
+            
+            <Grid RowDefinitions="1*,1*,1*,2*"
+                  Grid.Row="0"
+                  BackgroundColor="#dd000000">
+                <Label Grid.Row="0" FontSize="20" Text="{Binding ResultName}" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
+                <Label Grid.Row="1" FontSize="20" Text="{Binding ResultArticle}" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
+                <Label Grid.Row="2" FontSize="20" Text="{Binding ResultTotalCount}" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
             </Grid>
 
             <Grid
                 Grid.Row="3"
-                BackgroundColor="#aa000000"
+                BackgroundColor="#dd000000"
                 Padding="10"
                 RowDefinitions="1*,1*"
                 ColumnDefinitions="1*,1*">
-                <Button Text="💡" Margin="0,5,0,10" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" WidthRequest="150" BackgroundColor="#aa000000" CornerRadius="8" BorderColor="Black" Clicked="OnToggleTorchClicked" />
-                <Button Margin="5,5,5,10" Text="{Binding ModeName}" Grid.Column="0" Grid.Row="1" BackgroundColor="#aa000000" CornerRadius="8" BorderColor="Black" Command="{Binding SwitchModeCommand}" />
-                <Button Margin="5,5,5,10" Text="Rescan" Grid.Column="1" Grid.Row="1" BackgroundColor="#aa000000" CornerRadius="8" BorderColor="Black" Command="{Binding RescanCommand}" />
+                <Button Background="DarkBlue" Text="💡" Margin="0,5,0,10" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" WidthRequest="150" BackgroundColor="#aa000000" CornerRadius="8" BorderColor="Black" Clicked="OnToggleTorchClicked" />
+                <Button Background="DarkBlue" Margin="5,5,5,10" Text="{Binding ModeName}" Grid.Column="0" Grid.Row="1" BackgroundColor="#aa000000" CornerRadius="8" BorderColor="Black" Command="{Binding SwitchModeCommand}" />
+                <Button Background="DarkBlue" Margin="5,5,5,10" Text="Rescan" Grid.Column="1" Grid.Row="1" BackgroundColor="#aa000000" CornerRadius="8" BorderColor="Black" Command="{Binding RescanCommand}" />
             </Grid>
 
         </Grid>

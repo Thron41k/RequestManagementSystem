@@ -20,7 +20,9 @@ public partial class MainViewModel(
     private readonly IIncomingService _incomingService = incomingService;
     [ObservableProperty] private string _modeName = "QR код";
     [ObservableProperty] private bool _isDetecting;
-    [ObservableProperty] private string _resultText = "";
+    [ObservableProperty] private string _resultName = "";
+    [ObservableProperty] private string _resultArticle = "";
+    [ObservableProperty] private string _resultTotalCount = "";
     [ObservableProperty] private bool _isTorchOn;
     [ObservableProperty] private double _frameHeight = 200;
 
@@ -43,7 +45,7 @@ public partial class MainViewModel(
     {
         var mode = CurrentMode == ScanMode.Qr ? ScanMode.Label : ScanMode.Qr;
         CurrentMode = mode;
-        ResultText = string.Empty;
+        ResultName = ResultArticle = ResultTotalCount = string.Empty;
         FrameHeight = mode == ScanMode.Qr ? 200 : 120;
         ModeName = mode == ScanMode.Qr ? "QR код" : "Этикетка";
     }
@@ -52,7 +54,7 @@ public partial class MainViewModel(
     [RelayCommand]
     private void Rescan()
     {
-        ResultText = string.Empty;
+        ResultName = ResultArticle = ResultTotalCount = string.Empty;
         IsDetecting = true;
     }
 
@@ -64,7 +66,14 @@ public partial class MainViewModel(
             if (parseResult)
             {
                 var result = await _incomingService.FindIncomingByIdAsync(id);
-                ResultText = result.Stock.Nomenclature.Name;
+                if (result.Id != 0)
+                {
+                    ResultName = result.Stock.Nomenclature.Name;
+                    ResultArticle = result.Stock.Nomenclature.Article!;
+                    ResultTotalCount = result.Stock.FinalQuantity.ToString("0.000");
+                }
+                else
+                    ResultName = "Номенклатура не найдена!";
             }
         }
     }

@@ -59,7 +59,7 @@ public partial class LabelPrintListViewModel : ObservableObject
         var g = Graphics.FromImage(bmp);
         var pen = new Pen(Brushes.Black, 2);
         g.Clear(Color.White);
-        var q = GetQr(i.Id.ToString());
+        var q = GetQr(i.Stock.Nomenclature.Id.ToString());
         g.DrawImage(q, 410, 147);
         //g.FillRectangle(Brushes.Aqua, rectF);
         g.DrawLine(pen, 15, 116, 575, 116);

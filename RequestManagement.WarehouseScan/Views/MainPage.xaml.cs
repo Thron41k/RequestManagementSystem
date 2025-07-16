@@ -19,6 +19,7 @@ public partial class MainPage : ContentPage
             AutoRotate = true,
             Multiple = false
         };
+        barcodeView.IsDetecting = true;
     }
 
     private async void OnDetected(object sender, BarcodeDetectionEventArgs e)
