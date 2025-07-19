@@ -120,14 +120,12 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
 
             var nomenclatureKeys = incoming.Items
                 .SelectMany(i => i.Items)
-                .Select(m => (m.Code, m.Article, m.ItemName, m.Unit))
+                .Select(m => (Code: m.Code ?? string.Empty,
+                    Article: m.Article ?? string.Empty,
+                    Name: m.ItemName ?? string.Empty,
+                    Unit: m.Unit ?? string.Empty))
                 .Distinct()
                 .ToList();
-
-            var codes = nomenclatureKeys.Select(k => k.Code).ToHashSet();
-            var articles = nomenclatureKeys.Select(k => k.Article).ToHashSet();
-            var names = nomenclatureKeys.Select(k => k.ItemName).ToHashSet();
-            var units = nomenclatureKeys.Select(k => k.Unit).ToHashSet();
 
             //logger.LogInformation("Подготовлены списки: Drivers={DriverCount}, Equipments={EquipmentCount}, Nomenclatures={NomenclatureCount}",
             //   driverNames.Count, equipmentCodes.Count, nomenclatureKeys.Count);
@@ -143,9 +141,11 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                 .ToDictionaryAsync(i => (i.StockId, i.ApplicationId, i.Code));
 
             var existingDrivers = driverNames.Any()
-                ? await dbContext.Drivers
+                ? (await dbContext.Drivers
                     .Where(d => driverNames.Contains(d.FullName))
-                    .ToDictionaryAsync(d => d.FullName)
+                    .ToListAsync())
+                .GroupBy(d => d.FullName)
+                .ToDictionary(g => g.Key, g => g.First())
                 : new Dictionary<string, Driver>();
 
             var existingEquipments = equipmentCodes.Any()
@@ -154,35 +154,20 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                     .ToDictionaryAsync(e => e.Code)
                 : new Dictionary<string, Equipment>();
 
-            Dictionary<(string, string, string, string), Nomenclature> existingNomenclatures;
-            if (!codes.Any() || !names.Any() || !units.Any())
-            {
-                //logger.LogWarning("Один из списков (codes, names, units) пуст. Пропускаем загрузку Nomenclatures.");
-                existingNomenclatures = new Dictionary<(string, string, string, string), Nomenclature>();
-            }
-            else
-            {
-                const int batchSize = 1000;
-                var existingNomenclaturesList = new List<Nomenclature>();
-                for (var i = 0; i < codes.Count; i += batchSize)
-                {
-                    var batchCodes = codes.Skip(i).Take(batchSize).ToList();
-                    var batchArticles = articles.Skip(i).Take(batchSize).ToList();
-                    var batchNames = names.Skip(i).Take(batchSize).ToList();
-                    var batchUnits = units.Skip(i).Take(batchSize).ToList();
+            var allNomenclatures = await dbContext.Nomenclatures.ToListAsync();
 
-                    var batchNomenclatures = await dbContext.Nomenclatures
-                        .Where(n => batchCodes.Contains(n.Code) &&
-                                    (n.Article == null ? batchArticles.Contains(null) : batchArticles.Contains(n.Article)) &&
-                                    batchNames.Contains(n.Name) &&
-                                    batchUnits.Contains(n.UnitOfMeasure))
-                        .ToListAsync();
-
-                    existingNomenclaturesList.AddRange(batchNomenclatures);
-                }
-                existingNomenclatures = existingNomenclaturesList
-                    .ToDictionary(n => (n.Code, n.Article ?? string.Empty, n.Name, n.UnitOfMeasure), n => n);
-            }
+            var existingNomenclatures = allNomenclatures
+                .Where(n => nomenclatureKeys.Any(k =>
+                    k.Code == n.Code &&
+                    k.Article == (n.Article ?? string.Empty) &&
+                    k.Name == n.Name &&
+                    k.Unit == n.UnitOfMeasure))
+                .ToDictionary(n => (
+                    Code: n.Code,
+                    Article: n.Article ?? string.Empty,
+                    Name: n.Name,
+                    Unit: n.UnitOfMeasure
+                ));
 
             var newWarehouses = new List<Warehouse>();
             foreach (var item in inWarehouses)
@@ -259,7 +244,7 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                     var nomenclature = new Nomenclature
                     {
                         Code = key.Code,
-                        Name = key.ItemName,
+                        Name = key.Name,
                         Article = key.Article,
                         UnitOfMeasure = key.Unit
                     };
@@ -471,6 +456,63 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
             return false;
         }
     }
+
+    private async Task<Nomenclature> GetOrAddNomenclatureAsync(
+        string code,
+        string? article,
+        string name,
+        string unit,
+        Dictionary<(string Code, string Article, string Name, string Unit), Nomenclature> cache,
+        List<Nomenclature> newNomenclatures)
+    {
+        var key = (code.Trim(), article?.Trim() ?? "", name.Trim(), unit.Trim());
+
+        // Проверка в локальном кэше
+        if (cache.TryGetValue(key, out var existing))
+            return existing;
+
+        // Проверка в БД
+        var dbNomenclature = await dbContext.Nomenclatures
+            .FirstOrDefaultAsync(n =>
+                n.Code == key.Item1 &&
+                (n.Article ?? "") == key.Item2 &&
+                n.Name == key.Item3 &&
+                n.UnitOfMeasure == key.Item4);
+
+        if (dbNomenclature != null)
+        {
+            cache[key] = dbNomenclature;
+            return dbNomenclature;
+        }
+
+        // Проверка среди новых, еще не добавленных
+        var inMemory = newNomenclatures.FirstOrDefault(n =>
+            n.Code == key.Item1 &&
+            (n.Article ?? "") == key.Item2 &&
+            n.Name == key.Item3 &&
+            n.UnitOfMeasure == key.Item4);
+
+        if (inMemory != null)
+        {
+            cache[key] = inMemory;
+            return inMemory;
+        }
+
+        // Создание новой номенклатуры
+        var newNomenclature = new Nomenclature
+        {
+            Code = key.Item1,
+            Article = string.IsNullOrWhiteSpace(key.Item2) ? null : key.Item2,
+            Name = key.Item3,
+            UnitOfMeasure = key.Item4
+        };
+
+        newNomenclatures.Add(newNomenclature);
+        cache[key] = newNomenclature;
+
+        return newNomenclature;
+    }
+
 
     public async Task<Incoming> CreateIncomingAsync(Incoming incoming)
     {

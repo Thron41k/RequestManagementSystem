@@ -131,7 +131,8 @@ public static class IncomingConverter
                     Id = inc.Application.Equipment.Id,
                     Name = inc.Application.Equipment.Name,
                     LicensePlate = inc.Application.Equipment.StateNumber ?? string.Empty,
-                    Code = inc.Application.Equipment.Code
+                    Code = inc.Application.Equipment.Code,
+                    ShortName = inc.Application.Equipment.ShortName ?? string.Empty
                 };
             }
         }

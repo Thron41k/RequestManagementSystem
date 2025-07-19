@@ -131,6 +131,7 @@ message IncomingEquipment {
     string name = 2;
     string license_plate = 3;
     string code = 4;
+    string short_name = 5;
 }
 
 message IncomingDriver {
@@ -138,7 +139,7 @@ message IncomingDriver {
     string full_name = 2;  
     string short_name = 3; 
     string position = 4;   
-    string Code = 5;
+    string code = 5;
 }
 
 message IncomingStock {

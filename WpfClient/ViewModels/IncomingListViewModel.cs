@@ -33,8 +33,8 @@ public partial class IncomingListViewModel : ObservableObject
     [ObservableProperty] private Warehouse _selectedWarehouse = new();
     [ObservableProperty] private string _menuDeleteItemText = "Удалить отмеченные";
     [ObservableProperty] private string _searchText = "";
-    [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.04.2025");
-    [ObservableProperty] private DateTime _toDate = DateTime.Parse("30.04.2025");
+    [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.07.2025");
+    [ObservableProperty] private DateTime _toDate = DateTime.Parse("15.07.2025");
     [ObservableProperty] private int _notificationCount = 0;
     [ObservableProperty] private int _selectionIndex = -1;
 

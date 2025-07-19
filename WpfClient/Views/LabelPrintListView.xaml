@@ -33,8 +33,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="13,0,0,0">
-                    <Label FontSize="16" Margin="0,9,1,0" Content="Масштаб при печати:"/>
-                    <materialDesign:NumericUpDown
+                <Label FontSize="16" Margin="0,9,1,0" Content="Масштаб при печати:"/>
+                <materialDesign:NumericUpDown
                     Value="{Binding PrintScale, UpdateSourceTrigger=PropertyChanged}"
                     Minimum="0"
                     Maximum="100"
@@ -47,7 +47,7 @@
                     HorizontalContentAlignment="Right"
                     Style="{StaticResource MaterialDesignFloatingHintNumericUpDown}"
                     Foreground="Black"/>
-                    <Button Content="Печать" Margin="15,7,0,0" Command="{Binding PrintCommand}"/>
+                <Button Content="Печать" Margin="15,7,0,0" Command="{Binding PrintCommand}"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Margin="10,24,0,0">
                 <TextBox
@@ -62,7 +62,7 @@
                     materialDesign:TextFieldAssist.HasClearButton="True"
                     VerticalScrollBarVisibility="Auto" />
             </StackPanel>
-                    <DataGrid Grid.Row="2" ItemsSource="{Binding IncomingsViewSource.View}"
+            <DataGrid Grid.Row="2" ItemsSource="{Binding IncomingsViewSource.View}"
                       AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,0,0" SelectionMode="Single" SelectionUnit="FullRow">
                 <b:Interaction.Behaviors>
                     <helpers:QuantityUpdateBehavior/>
@@ -79,7 +79,7 @@
                                 </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -124,7 +124,9 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Width="356" Height="203">
-                                    <Image Source="{Binding Image}" Stretch="Fill"/>
+                                    <Viewbox Stretch="Fill">
+                                        <ContentPresenter Content="{Binding Image}" />
+                                    </Viewbox>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

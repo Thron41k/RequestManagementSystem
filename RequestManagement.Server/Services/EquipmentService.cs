@@ -28,6 +28,7 @@ public class EquipmentService(ApplicationDbContext dbContext) : IEquipmentServic
         existingEquipment.Name = equipment.Name;
         existingEquipment.StateNumber = equipment.StateNumber;
         existingEquipment.Code = equipment.Code;
+        existingEquipment.ShortName = equipment.ShortName;
 
         await _dbContext.SaveChangesAsync();
         return true;
@@ -69,7 +70,8 @@ public class EquipmentService(ApplicationDbContext dbContext) : IEquipmentServic
                 Id = e.Id,
                 Name = e.Name,
                 StateNumber = e.StateNumber ?? "",
-                Code = e.Code
+                Code = e.Code,
+                ShortName = e.ShortName ?? ""
             })
             .ToListAsync();
     }

@@ -13,6 +13,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -30,6 +31,36 @@
                 <TextBox.Text>
                     <Binding
                         Path="NewEquipmentName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validationRules:NotEmptyValidationRule
+                                ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <Button Content="Добавить" Command="{Binding AddEquipmentCommand}" Margin="5"/>
+            <Button Content="Сохранить" Command="{Binding UpdateEquipmentCommand}" Margin="5"/>
+            <Button Content="Удалить" Command="{Binding DeleteEquipmentCommand}" Margin="5"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBox materialDesign:HintAssist.Hint="Короткое наименование техники" 
+                     Width="400" 
+                     FontSize="14"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     Margin="5"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Tag="{Binding ClearEquipmentShortNameCommand}" 
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="NewEquipmentShortName"
                         Mode="TwoWay"
                         UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
@@ -81,14 +112,12 @@
                     <behaviors:MouseClickCommandBehavior/>
                 </b:Interaction.Behaviors>
             </TextBox>
-            <Button Content="Добавить" Command="{Binding AddEquipmentCommand}" Margin="5"/>
-            <Button Content="Сохранить" Command="{Binding UpdateEquipmentCommand}" Margin="5"/>
-            <Button Content="Удалить" Command="{Binding DeleteEquipmentCommand}" Margin="5"/>
         </StackPanel>
 
-        <DataGrid Grid.Row="2" ItemsSource="{Binding EquipmentViewSource.View}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="5,0,5,15" CanUserResizeRows="False" CanUserAddRows="False">
+        <DataGrid Grid.Row="3" ItemsSource="{Binding EquipmentViewSource.View}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="5,0,5,15" CanUserResizeRows="False" CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Короткое название" Binding="{Binding ShortName}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Гос.номер" Binding="{Binding StateNumber}" IsReadOnly="True" Width="120"/>
                 <DataGridTextColumn Header="Код" Binding="{Binding Code}" IsReadOnly="True" Width="120"/>
             </DataGrid.Columns>
@@ -97,7 +126,7 @@
                 <MouseBinding Gesture="LeftClick" Command="{Binding UpdateSelectedItemCommand}" />
             </DataGrid.InputBindings>
         </DataGrid>
-        <TextBox Grid.Row="1" materialDesign:HintAssist.Hint="Фильтр" 
+        <TextBox Grid.Row="2" materialDesign:HintAssist.Hint="Фильтр" 
                  FontSize="14"
                  materialDesign:HintAssist.FloatingScale="1"
                  Margin="5,5,5,15" 

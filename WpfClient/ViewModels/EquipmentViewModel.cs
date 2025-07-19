@@ -18,6 +18,7 @@ public partial class EquipmentViewModel : ObservableObject
     [ObservableProperty] private Equipment? _selectedEquipment;
     [ObservableProperty] private string _newEquipmentLicensePlate;
     [ObservableProperty] private string _newEquipmentName;
+    [ObservableProperty] private string _newEquipmentShortName;
     [ObservableProperty] private string _newEquipmentCode;
     [ObservableProperty] private string _filterText;
     [ObservableProperty] private ObservableCollection<Equipment> _equipmentList = [];
@@ -63,6 +64,7 @@ public partial class EquipmentViewModel : ObservableObject
             EquipmentList = new ObservableCollection<Equipment>(equipmentList);
             EquipmentViewSource.Source = EquipmentList;
             NewEquipmentName = string.Empty;
+            NewEquipmentShortName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
             NewEquipmentCode = string.Empty;
             return Task.CompletedTask;
@@ -74,6 +76,7 @@ public partial class EquipmentViewModel : ObservableObject
         if (SelectedEquipment == null) return;
         NewEquipmentName = SelectedEquipment.Name;
         if (SelectedEquipment.StateNumber != null) NewEquipmentLicensePlate = SelectedEquipment.StateNumber;
+        if (SelectedEquipment.ShortName != null) NewEquipmentShortName = SelectedEquipment.ShortName;
         NewEquipmentCode = SelectedEquipment.Code;
     }
 
@@ -96,11 +99,21 @@ public partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private async Task AddEquipment()
     {
-        if (!string.IsNullOrWhiteSpace(NewEquipmentName) && !string.IsNullOrWhiteSpace(NewEquipmentCode))
+        if (!string.IsNullOrWhiteSpace(NewEquipmentName) && 
+            !string.IsNullOrWhiteSpace(NewEquipmentCode) &&
+            !string.IsNullOrEmpty(NewEquipmentShortName.Trim()))
         {
-            await _requestService.CreateEquipmentAsync(new Equipment { Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate, Code = NewEquipmentCode });
+            await _requestService.CreateEquipmentAsync(new Equipment
+            {
+                Name = NewEquipmentName, 
+                StateNumber = NewEquipmentLicensePlate, 
+                Code = NewEquipmentCode,
+                ShortName = NewEquipmentShortName,
+
+            });
             await LoadEquipmentAsync();
             NewEquipmentName = string.Empty;
+            NewEquipmentShortName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
             NewEquipmentCode = string.Empty;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
@@ -110,9 +123,19 @@ public partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private async Task UpdateEquipment()
     {
-        if (SelectedEquipment != null && !string.IsNullOrEmpty(NewEquipmentName.Trim()) && !string.IsNullOrEmpty(NewEquipmentCode.Trim()))
+        if (SelectedEquipment != null && 
+            !string.IsNullOrEmpty(NewEquipmentName.Trim()) && 
+            !string.IsNullOrEmpty(NewEquipmentCode.Trim()) &&
+            !string.IsNullOrEmpty(NewEquipmentShortName.Trim()))
         {
-            await _requestService.UpdateEquipmentAsync(new Equipment { Id = SelectedEquipment.Id, Name = NewEquipmentName, StateNumber = NewEquipmentLicensePlate, Code = NewEquipmentCode });
+            await _requestService.UpdateEquipmentAsync(new Equipment
+            {
+                Id = SelectedEquipment.Id, 
+                Name = NewEquipmentName, 
+                ShortName = NewEquipmentShortName,
+                StateNumber = NewEquipmentLicensePlate, 
+                Code = NewEquipmentCode
+            });
             await LoadEquipmentAsync();
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
@@ -126,6 +149,7 @@ public partial class EquipmentViewModel : ObservableObject
             await _requestService.DeleteEquipmentAsync(SelectedEquipment.Id);
             await LoadEquipmentAsync();
             NewEquipmentName = string.Empty;
+            NewEquipmentShortName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
             NewEquipmentCode = string.Empty;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
@@ -137,16 +161,25 @@ public partial class EquipmentViewModel : ObservableObject
     {
         NewEquipmentName = string.Empty;
     }
+
+    [RelayCommand]
+    private void ClearEquipmentShortName()
+    {
+        NewEquipmentShortName = string.Empty;
+    }
+
     [RelayCommand]
     private void ClearEquipmentLicensePlate()
     {
         NewEquipmentLicensePlate = string.Empty;
     }
+
     [RelayCommand]
     private void ClearEquipmentCode()
     {
         NewEquipmentCode = string.Empty;
     }
+
     [RelayCommand]
     private void ClearFilterText()
     {

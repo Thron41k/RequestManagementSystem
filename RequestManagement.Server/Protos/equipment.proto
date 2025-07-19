@@ -21,6 +21,7 @@ message CreateEquipmentRequest {
     string name = 1;
     string license_plate = 2;
     string code = 3;
+    string short_name = 4;
 }
 
 message CreateEquipmentResponse {
@@ -32,6 +33,7 @@ message UpdateEquipmentRequest {
     string name = 2;
     string license_plate = 3;
     string code = 4;
+    string short_name = 5;
 }
 
 message UpdateEquipmentResponse {
@@ -51,4 +53,5 @@ message Equipment {
     string name = 2;
     string license_plate = 3;
     string code = 4;
+    string short_name = 5;
 }

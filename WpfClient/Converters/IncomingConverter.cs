@@ -119,7 +119,8 @@ public static class IncomingConverter
                         Id = equipmentProto.Id,
                         Name = equipmentProto.Name,
                         StateNumber = equipmentProto.LicensePlate,
-                        Code = equipmentProto.Code
+                        Code = equipmentProto.Code,
+                        ShortName = equipmentProto.ShortName
                     };
                 }
             }

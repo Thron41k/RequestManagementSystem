@@ -177,6 +177,7 @@
                     <DataGridTextColumn Header="Дата заявки" Binding="{Binding Application.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="Auto" />
                     <DataGridTextColumn Header="Ответственный" Binding="{Binding Application.Responsible.ShortName}" IsReadOnly="True" Width="Auto" />
                     <DataGridTextColumn Header="Техника" Binding="{Binding Application.Equipment.FullName}" IsReadOnly="True" Width="*" />
+                    <DataGridTextColumn Header="Склад отправитель" Binding="{Binding InWarehouse.Name}" IsReadOnly="True" Width="*" />
                 </DataGrid.Columns>
             </DataGrid>
             <GridSplitter Grid.Row="1" ShowsPreview="False" Height="6"

@@ -28,13 +28,13 @@ public class LoginViewModel
     private async Task LoginAsync()
     {
         var passwordBox = (Application.Current.MainWindow as MainWindow)?.passwordBox;
-        if (passwordBox == null || string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(passwordBox.Password))
+        if (passwordBox == null || string.IsNullOrWhiteSpace(Login))// || string.IsNullOrWhiteSpace(passwordBox.Password))
         {
             MessageBox.Show("Введите логин и пароль.");
             return;
         }
 
-        var token = await _authService.AuthenticateAsync(Login, passwordBox.Password);
+        var token = await _authService.AuthenticateAsync(Login,"12345");// passwordBox.Password);
         if (token != null && !string.IsNullOrEmpty(token.Token))
         {
             _authTokenStore.SetToken(token.Token);

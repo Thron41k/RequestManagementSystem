@@ -452,7 +452,8 @@ public class ApplicationDbContext : DbContext
                 Id = 1,
                 Name = "",
                 StateNumber = "",
-                Code = ""
+                Code = "",
+                ShortName = ""
             }
         );
 

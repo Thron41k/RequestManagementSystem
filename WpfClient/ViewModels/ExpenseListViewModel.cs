@@ -26,8 +26,8 @@ public partial class ExpenseListViewModel : ObservableObject
     [ObservableProperty] private Equipment _selectedEquipment = new();
     [ObservableProperty] private Driver _selectedDriver = new();
     [ObservableProperty] private string _searchText = "";
-    [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.04.2025");
-    [ObservableProperty] private DateTime _toDate = DateTime.Parse("30.04.2025");
+    [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.07.2025");
+    [ObservableProperty] private DateTime _toDate = DateTime.Parse("15.07.2025");
     [ObservableProperty] private CollectionViewSource _expensesViewSource;
     private readonly System.Timers.Timer _filterTimer;
 

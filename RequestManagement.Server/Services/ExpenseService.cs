@@ -120,7 +120,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
             var nomenclatureIds = stockMap.Values.Select(s => s.NomenclatureId).Distinct().ToList();
             var defectMappings = await dbContext.NomenclatureDefectMappings
                 .Where(m => nomenclatureIds.Contains(m.NomenclatureId))
-                .ToDictionaryAsync(m => m.NomenclatureId, m => m.DefectId);
+                .ToDictionaryAsync(m => m.NomenclatureId, m => m);
 
             // Подготовка к вставке/обновлению
             var newDrivers = new List<RequestManagement.Common.Models.Driver>();
@@ -191,9 +191,9 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                 }
 
                 // Создаем новый Expense
-                var defectId = defectMappings.TryGetValue(stock.NomenclatureId, out var id) ? id : 1;
+                var defectData = defectMappings.TryGetValue(stock.NomenclatureId, out var defect) ? defect : new();
 
-                var expense = new RequestManagement.Common.Models.Expense
+                var expense = new Common.Models.Expense
                 {
                     Code = material.Number,
                     Date = material.Date,
@@ -201,7 +201,8 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                     StockId = stock.Id,
                     Driver = driver,
                     Equipment = equipment,
-                    DefectId = defectId
+                    DefectId = defectData.DefectId,
+                    Term = defectData.Term
                 };
                 stock.ConsumedQuantity += expense.Quantity;
                 newExpenses.Add(expense);

@@ -17,6 +17,7 @@ public class Equipment : IEntity
     /// Название единицы техники
     /// </summary>
     public string Name { get; set; } = string.Empty;
+    public string? ShortName { get; set; } = string.Empty;
 
     /// <summary>
     /// Государственный номер (может отсутствовать)
@@ -42,4 +43,23 @@ public class Equipment : IEntity
         }
     }
     public string Code { get; set; } = string.Empty;
+
+    [NotMapped]
+    public string FullNameFromShortName
+    {
+        get
+        {
+            if (ShortName != "" && !string.IsNullOrEmpty(StateNumber))
+            {
+                return $"{ShortName}({StateNumber})";
+            }
+
+            if (Name != "" && string.IsNullOrEmpty(StateNumber))
+            {
+                return Name;
+            }
+
+            return "";
+        }
+    }
 }

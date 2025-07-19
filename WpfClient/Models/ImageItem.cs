@@ -1,4 +1,5 @@
-﻿using System.Windows.Media.Imaging;
+﻿using System.Windows;
+using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace RequestManagement.WpfClient.Models;
@@ -6,5 +7,5 @@ namespace RequestManagement.WpfClient.Models;
 public partial class ImageItem : ObservableObject
 {
     [ObservableProperty]
-    private BitmapImage _image;
+    private FrameworkElement _image;
 }

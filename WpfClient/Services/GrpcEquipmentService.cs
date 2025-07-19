@@ -15,7 +15,13 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var request = new CreateEquipmentRequest { Name = equipment.Name, LicensePlate = equipment.StateNumber, Code = equipment.Code };
+        var request = new CreateEquipmentRequest
+        {
+            Name = equipment.Name, 
+            LicensePlate = equipment.StateNumber, 
+            Code = equipment.Code,
+            ShortName = equipment.ShortName
+        };
         var client = clientFactory.CreateEquipmentClient();
         var result = await client.CreateEquipmentAsync(request, headers);
         return result.Id;
@@ -28,7 +34,14 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         {
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
-        var request = new UpdateEquipmentRequest { Id = equipment.Id, Name = equipment.Name, LicensePlate = equipment.StateNumber, Code = equipment.Code };
+        var request = new UpdateEquipmentRequest
+        {
+            Id = equipment.Id, 
+            Name = equipment.Name, 
+            LicensePlate = equipment.StateNumber, 
+            Code = equipment.Code,
+            ShortName = equipment.ShortName
+        };
         var client = clientFactory.CreateEquipmentClient();
         var result = await client.UpdateEquipmentAsync(request, headers);
         return result.Success;
@@ -56,6 +69,13 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         }
         var client = clientFactory.CreateEquipmentClient();
         var response = await client.GetAllEquipmentAsync(new GetAllEquipmentRequest { Filter = filter }, headers);
-        return response.Equipment.Select(equipment => new RequestManagement.Common.Models.Equipment { Id = equipment.Id, Name = equipment.Name, StateNumber = equipment.LicensePlate, Code = equipment.Code}).ToList();
+        return response.Equipment.Select(equipment => new RequestManagement.Common.Models.Equipment
+        {
+            Id = equipment.Id, 
+            Name = equipment.Name, 
+            StateNumber = equipment.LicensePlate, 
+            Code = equipment.Code,
+            ShortName = equipment.ShortName
+        }).ToList();
     }
 }
