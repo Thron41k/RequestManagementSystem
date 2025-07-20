@@ -7,6 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:viewModels1="clr-namespace:RequestManagement.WpfClient.ViewModels"
              xmlns:helpers="clr-namespace:RequestManagement.WpfClient.ViewModels.Helpers"
+             xmlns:views="clr-namespace:RequestManagement.WpfClient.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" MinHeight="780" MinWidth="1500">
     <UserControl.Resources>
@@ -80,21 +81,21 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*">
+                    <DataGridTextColumn Header="Наименование" Binding="{Binding Incoming.Stock.Nomenclature.Name}" IsReadOnly="True" Width="*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="250">
+                    <DataGridTextColumn Header="Артикул" Binding="{Binding Incoming.Stock.Nomenclature.Article}" IsReadOnly="True" Width="250">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="80">
+                    <DataGridTextColumn Header="Кол-во" Binding="{Binding Incoming.Quantity, UpdateSourceTrigger=PropertyChanged}" Width="80">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -108,30 +109,27 @@
 
         <!-- Правая панель с содержимым и скроллом -->
         <Grid Grid.Column="1" Margin="10,0,0,0">
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
-                          VerticalScrollBarVisibility="Auto"
-                          VerticalAlignment="Top"
-                          HorizontalAlignment="Left" Margin="0,20,0,20">
-                <Border Background="White" BorderBrush="Black" BorderThickness="1"
-                        Width="714">
-                    <!-- A4 при 96 DPI -->
-                    <ItemsControl ItemsSource="{Binding Images}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="{Binding Columns}" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Width="356" Height="203">
-                                    <Viewbox Stretch="Fill">
-                                        <ContentPresenter Content="{Binding Image}" />
-                                    </Viewbox>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                          HorizontalScrollBarVisibility="Disabled"
+                          CanContentScroll="True">
+                <ItemsControl ItemsSource="{Binding LabelListForShow}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical"
+                                                    IsVirtualizing="True"
+                                                    VirtualizationMode="Recycling"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="356" Height="203" Margin="2">
+                                <Viewbox Stretch="Fill">
+                                    <views:LabelTemplateView DataContext="{Binding}" />
+                                </Viewbox>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
         </Grid>
     </Grid>
