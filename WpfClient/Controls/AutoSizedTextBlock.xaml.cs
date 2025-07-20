@@ -22,6 +22,8 @@ namespace RequestManagement.WpfClient.Controls
 
         public AutoSizedTextBlock()
         {
+            SizeChanged += (_, _) => AdjustFontSize();
+            DataContextChanged += (_, _) => AdjustFontSize();
             InitializeComponent();
         }
 
@@ -33,9 +35,9 @@ namespace RequestManagement.WpfClient.Controls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Text.Text = TextValue;
             AdjustFontSize();
         }
+
 
         private void AdjustFontSize()
         {
@@ -47,8 +49,7 @@ namespace RequestManagement.WpfClient.Controls
             {
                 var mid = (low + high) / 2;
                 Text.FontSize = mid;
-                Text.Measure(new Size(Width, double.PositiveInfinity));
-
+                Text.Measure(new Size(ActualWidth, double.PositiveInfinity));
                 if (Text.DesiredSize.Height <= Height)
                 {
                     bestSize = mid;
