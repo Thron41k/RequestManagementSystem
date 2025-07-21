@@ -33,6 +33,11 @@ namespace RequestManagement.WpfClient.Controls
                 control.AdjustFontSize();
         }
 
+        public void Adjust()
+        {
+            AdjustFontSize();
+        }
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             AdjustFontSize();

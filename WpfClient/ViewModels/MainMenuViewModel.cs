@@ -14,6 +14,7 @@ public class MainMenuViewModel
 {
     private readonly EquipmentViewModel _equipmentViewModel;
     private readonly DriverViewModel _driverViewModel;
+    private readonly EquipmentGroupViewModel _equipmentGroupViewModel;
     private readonly DefectGroupViewModel _defectGroupViewModel;
     private readonly DefectViewModel _defectViewModel;
     private readonly WarehouseViewModel _warehouseViewModel;
@@ -35,6 +36,7 @@ public class MainMenuViewModel
     public ICommand ShowEquipmentCommand { get; }
     public ICommand ShowDriverCommand { get; }
     public ICommand ShowDefectGroupCommand { get; }
+    public ICommand ShowEquipmentGroupCommand { get; }
     public ICommand ShowDefectCommand { get; }
     public ICommand ShowWarehouseCommand { get; }
     public ICommand ShowNomenclatureCommand { get; }
@@ -47,7 +49,7 @@ public class MainMenuViewModel
     public ICommand ShowNomenclatureAnalogCommand { get; }
     public ICommand ShowIncomingDataLoadingCommand { get; }
 
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, RequestManagement.WpfClient.ViewModels.IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel, LabelCountSelectorViewModel labelCountSelectorViewModel, LabelPrintListViewModel labelPrintListViewModel)
+    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, RequestManagement.WpfClient.ViewModels.IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel, LabelCountSelectorViewModel labelCountSelectorViewModel, LabelPrintListViewModel labelPrintListViewModel, EquipmentGroupViewModel equipmentGroupViewModel)
     {
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
@@ -68,6 +70,7 @@ public class MainMenuViewModel
         _incomingDataLoadViewModel = incomingDataLoadViewModel;
         _labelCountSelectorViewModel = labelCountSelectorViewModel;
         _labelPrintListViewModel = labelPrintListViewModel;
+        _equipmentGroupViewModel = equipmentGroupViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
@@ -77,6 +80,7 @@ public class MainMenuViewModel
         ShowEquipmentCommand = new RelayCommand(ShowEquipment);
         ShowDriverCommand = new RelayCommand(ShowDriver);
         ShowDefectGroupCommand = new RelayCommand(ShowDefectGroup);
+        ShowEquipmentGroupCommand = new RelayCommand(ShowEquipmentGroup);
         ShowDefectCommand = new RelayCommand(ShowDefect);
         ShowWarehouseCommand = new RelayCommand(ShowWarehouse);
         ShowNomenclatureCommand = new RelayCommand(ShowNomenclature);
@@ -295,6 +299,11 @@ public class MainMenuViewModel
     {
         ShowDefectGroup(true);
     }
+
+    private void ShowEquipmentGroup()
+    {
+        ShowEquipmentGroup(true);
+    }
     private void ShowDriver()
     {
         ShowDriver(true);
@@ -318,6 +327,9 @@ public class MainMenuViewModel
                 break;
             case MessagesEnum.SelectDefectGroup:
                 ShowDefectGroup(false, arg.Caller);
+                break;
+            case MessagesEnum.SelectEquipmentGroup:
+                ShowEquipmentGroup(false, arg.Caller);
                 break;
             case MessagesEnum.SelectDriver:
                 ShowDriver(false, arg.Caller);
@@ -485,6 +497,29 @@ public class MainMenuViewModel
                     {
                         Id = _defectGroupViewModel.SelectedDefectGroup.Id,
                         Name = _defectGroupViewModel.SelectedDefectGroup.Name
+                    }));
+    }
+
+    private void ShowEquipmentGroup(bool editMode, Type? argCaller = null)
+    {
+        var equipmentGroupView = new EquipmentGroupView(_equipmentGroupViewModel, editMode);
+        var window = new Window
+        {
+            Content = equipmentGroupView,
+            Title = "Группы техники",
+            Width = 770,
+            Height = 600
+        };
+        _ = _equipmentGroupViewModel.Load();
+        _equipmentGroupViewModel.EditMode = editMode;
+        window.ShowDialog();
+        if (_equipmentGroupViewModel.SelectedEquipmentGroup != null && argCaller != null && _equipmentGroupViewModel.DialogResult)
+            _messageBus.Publish(
+                new SelectResultMessage(
+                    MessagesEnum.SelectEquipmentGroup, argCaller, new EquipmentGroup
+                    {
+                        Id = _equipmentGroupViewModel.SelectedEquipmentGroup.Id,
+                        Name = _equipmentGroupViewModel.SelectedEquipmentGroup.Name
                     }));
     }
     private void ShowDefect(bool editMode, Type? argCaller = null)

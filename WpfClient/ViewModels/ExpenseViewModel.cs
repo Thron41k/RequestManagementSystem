@@ -37,7 +37,7 @@ public partial class ExpenseViewModel : ObservableObject
 
     private Task OnShowDialog(SelectResultMessage arg)
     {
-        if (arg.Caller == typeof(IExpenseService) && arg.Item != null)
+        if (arg.Caller == typeof(ExpenseViewModel) && arg.Item != null)
         {
             switch (arg.Message)
             {
@@ -64,17 +64,17 @@ public partial class ExpenseViewModel : ObservableObject
     [RelayCommand]
     private async Task SelectEquipment()
     {
-        await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectEquipment, typeof(IExpenseService)));
+        await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectEquipment, typeof(ExpenseViewModel)));
     }
     [RelayCommand]
     private async Task SelectDriver()
     {
-        await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDriver, typeof(IExpenseService)));
+        await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDriver, typeof(ExpenseViewModel)));
     }
     [RelayCommand]
     private async Task SelectDefect()
     {
-        await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDefect, typeof(IExpenseService)));
+        await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDefect, typeof(ExpenseViewModel)));
     }
 
     [RelayCommand]

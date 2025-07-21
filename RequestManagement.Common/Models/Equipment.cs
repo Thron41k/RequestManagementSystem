@@ -12,18 +12,15 @@ public class Equipment : IEntity
     /// Уникальный идентификатор единицы техники
     /// </summary>
     public int Id { get; set; }
-
     /// <summary>
     /// Название единицы техники
     /// </summary>
     public string Name { get; set; } = string.Empty;
     public string? ShortName { get; set; } = string.Empty;
-
     /// <summary>
     /// Государственный номер (может отсутствовать)
     /// </summary>
     public string? StateNumber { get; set; } = string.Empty;
-
     [NotMapped]
     public string FullName
     {
@@ -43,7 +40,6 @@ public class Equipment : IEntity
         }
     }
     public string Code { get; set; } = string.Empty;
-
     [NotMapped]
     public string FullNameFromShortName
     {
@@ -62,4 +58,6 @@ public class Equipment : IEntity
             return "";
         }
     }
+    public int? EquipmentGroupId { get; set; }
+    public EquipmentGroup? EquipmentGroup { get; set; }
 }

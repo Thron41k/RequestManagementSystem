@@ -18,7 +18,8 @@
                     <MenuItem Header="Создать заявку" Command="{Binding CreateRequestCommand}"/>
                 </MenuItem>
                 <MenuItem Header="Справочники" Visibility="{Binding IsAdminVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <MenuItem Header="Машины" Command="{Binding ShowEquipmentCommand}"/>
+                    <MenuItem Header="Техника" Command="{Binding ShowEquipmentCommand}"/>
+                    <MenuItem Header="Группы техники" Command="{Binding ShowEquipmentGroupCommand}"/>
                     <MenuItem Header="Сотрудники" Command="{Binding ShowDriverCommand}"/>
                     <MenuItem Header="Группы дефектов" Command="{Binding ShowDefectGroupCommand}"/>
                     <MenuItem Header="Дефекты" Command="{Binding ShowDefectCommand}"/>

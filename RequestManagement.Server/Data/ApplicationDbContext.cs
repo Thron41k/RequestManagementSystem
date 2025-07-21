@@ -4,19 +4,15 @@ using RequestManagement.Common.Models.Enums;
 
 namespace RequestManagement.Server.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
-    {
-    }
-
     // DbSets с правильным именованием (множественное число)
     public DbSet<User> Users { get; set; }
     public DbSet<Equipment> Equipments { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
     public DbSet<Nomenclature> Nomenclatures { get; set; }
     public DbSet<DefectGroup> DefectGroups { get; set; }
+    public DbSet<EquipmentGroup> EquipmentGroups { get; set; }
     public DbSet<Defect> Defects { get; set; }
     public DbSet<Driver> Drivers { get; set; }
     public DbSet<Stock> Stocks { get; set; }
@@ -45,6 +41,7 @@ public class ApplicationDbContext : DbContext
         ConfigureCommissions(modelBuilder);
         ConfigureNomenclatureAnalog(modelBuilder);
         ConfigureApplication(modelBuilder);
+        ConfigureEquipmentGroup(modelBuilder);
         SeedInitialData(modelBuilder);
     }
 
@@ -81,6 +78,21 @@ public class ApplicationDbContext : DbContext
         });
     }
 
+    private void ConfigureEquipmentGroup(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<EquipmentGroup>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.HasMany(e => e.Equipments)
+                .WithOne(d => d.EquipmentGroup)
+                .HasForeignKey(d => d.EquipmentGroupId)
+                .IsRequired(false) 
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+    }
     private void ConfigureWarehouse(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Warehouse>(entity =>

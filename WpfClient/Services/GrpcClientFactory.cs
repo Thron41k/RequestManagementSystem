@@ -64,4 +64,9 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     {
         return serviceProvider.GetRequiredService<DefectGroupService.DefectGroupServiceClient>();
     }
+
+    public EquipmentGroupService.EquipmentGroupServiceClient CreateEquipmentGroupClient()
+    {
+        return serviceProvider.GetRequiredService<EquipmentGroupService.EquipmentGroupServiceClient>();
+    }
 }

@@ -21,5 +21,7 @@ public enum MessagesEnum
     ResultLabelCountSelector,
     ShowLabelCountSelector,
     ShowLabelPrintListViewDialog,
-    UpdateLabelPrintList
+    UpdateLabelPrintList,
+    EquipmentGroupUpdated,
+    SelectEquipmentGroup
 }

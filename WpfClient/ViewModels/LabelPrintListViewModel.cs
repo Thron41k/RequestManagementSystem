@@ -14,6 +14,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using QRCoder;
 using RequestManagement.Common.Models;
+using RequestManagement.WpfClient.Controls;
 using RequestManagement.WpfClient.Messages;
 using RequestManagement.WpfClient.Models;
 using RequestManagement.WpfClient.Services.Interfaces;
@@ -96,27 +97,53 @@ public partial class LabelPrintListViewModel : ObservableObject
                 };
 
                 foreach (var viewBox in pageLabels.Select(label => new LabelTemplateView
-                         {
-                             DataContext = label
-                         }).Select(view => new Viewbox
-                         {
-                             Width = labelWidthScaled,
-                             Height = labelHeightScaled,
-                             Stretch = Stretch.Fill,
-                             Child = view
-                         }))
                 {
+                    DataContext = label
+                }).Select(view => new Viewbox
+                {
+                    Width = labelWidthScaled,
+                    Height = labelHeightScaled,
+                    Stretch = Stretch.Fill,
+                    Child = view
+                }))
+                {
+                    var labelView = (LabelTemplateView)viewBox.Child;
+                    labelView.Measure(new Size(labelWidthScaled, labelHeightScaled));
+                    labelView.Arrange(new Rect(0, 0, labelWidthScaled, labelHeightScaled));
+                    labelView.UpdateLayout();
+                    foreach (var autoSize in FindVisualChildren<AutoSizedTextBlock>(labelView))
+                    {
+                        autoSize.Adjust();
+                    }
                     grid.Children.Add(viewBox);
                 }
 
                 FixedPage.SetLeft(grid, 0);
                 FixedPage.SetTop(grid, 0);
                 fixedPage.Children.Add(grid);
+                fixedPage.Measure(new Size(pageWidth, pageHeight));
+                fixedPage.Arrange(new Rect(0, 0, pageWidth, pageHeight));
+                fixedPage.UpdateLayout();
                 ((IAddChild)pageContent).AddChild(fixedPage);
                 doc.Pages.Add(pageContent);
             }
 
             printDialog.PrintDocument(doc.DocumentPaginator, "Печать этикеток");
+        }
+    }
+
+    private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+    {
+        if (depObj == null) yield break;
+
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+        {
+            var child = VisualTreeHelper.GetChild(depObj, i);
+            if (child is T t)
+                yield return t;
+
+            foreach (var childOfChild in FindVisualChildren<T>(child))
+                yield return childOfChild;
         }
     }
 

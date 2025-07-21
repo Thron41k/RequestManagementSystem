@@ -42,6 +42,7 @@
     <Protobuf Include="Protos\commissions.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\nomenclatureanalog.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\equipment.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\equipmentgroups.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\driver.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\defect.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\defectgroup.proto" GrpcServices="Server" />

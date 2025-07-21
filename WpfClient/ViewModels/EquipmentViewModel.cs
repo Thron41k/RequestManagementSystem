@@ -3,6 +3,7 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Models;
 using RequestManagement.WpfClient.Messages;
 using RequestManagement.WpfClient.Services.Interfaces;
 using Dispatcher = System.Windows.Threading.Dispatcher;
@@ -16,7 +17,8 @@ public partial class EquipmentViewModel : ObservableObject
     private readonly IMessageBus _messageBus;
     private readonly IEquipmentService _requestService;
     [ObservableProperty] private Equipment? _selectedEquipment;
-    [ObservableProperty] private string _newEquipmentLicensePlate;
+    [ObservableProperty] private EquipmentGroup? _selectedEquipmentGroup;
+    [ObservableProperty] private string _newEquipmentLicensePlate = string.Empty;
     [ObservableProperty] private string _newEquipmentName;
     [ObservableProperty] private string _newEquipmentShortName;
     [ObservableProperty] private string _newEquipmentCode;
@@ -45,12 +47,26 @@ public partial class EquipmentViewModel : ObservableObject
     {
         _requestService = requestService;
         _messageBus = messageBus;
+        _messageBus.Subscribe<SelectResultMessage>(OnShowDialog);
         EquipmentViewSource = new CollectionViewSource { Source = EquipmentList };
         _dispatcher = Dispatcher.CurrentDispatcher;
         _filterTimer = new Timer(Vars.SearchDelay) { AutoReset = false };
         _filterTimer.Elapsed += async (s, e) => await LoadEquipmentAsync();
     }
 
+    private Task OnShowDialog(SelectResultMessage arg)
+    {
+        if (arg.Caller == typeof(EquipmentViewModel) && arg.Item != null)
+        {
+            switch (arg.Message)
+            {
+                case MessagesEnum.SelectEquipmentGroup:
+                    SelectedEquipmentGroup = (EquipmentGroup)arg.Item;
+                    break;
+            }
+        }
+        return Task.CompletedTask;
+    }
     public async Task Load()
     {
         await LoadEquipmentAsync();
@@ -184,5 +200,17 @@ public partial class EquipmentViewModel : ObservableObject
     private void ClearFilterText()
     {
         FilterText = string.Empty;
+    }
+
+    [RelayCommand]
+    private void ClearSelectedEquipmentGroup()
+    {
+        SelectedEquipmentGroup = new EquipmentGroup {Id = 1};
+    }
+
+    [RelayCommand]
+    private async Task SelectEquipmentGroup()
+    {
+        await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectEquipmentGroup, typeof(EquipmentViewModel)));
     }
 }

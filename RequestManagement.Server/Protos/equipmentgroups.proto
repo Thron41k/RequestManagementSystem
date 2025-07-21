@@ -1,0 +1,47 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service EquipmentGroupService {
+    rpc GetAllEquipmentGroups (GetAllEquipmentGroupsRequest) returns (GetAllEquipmentGroupsResponse);
+    rpc CreateEquipmentGroup (CreateEquipmentGroupRequest) returns (CreateEquipmentGroupResponse);
+    rpc UpdateEquipmentGroup (UpdateEquipmentGroupRequest) returns (UpdateEquipmentGroupResponse);
+    rpc DeleteEquipmentGroup (DeleteEquipmentGroupRequest) returns (DeleteEquipmentGroupResponse);
+}
+
+message GetAllEquipmentGroupsRequest {
+    string filter = 1;
+}
+
+message GetAllEquipmentGroupsResponse {
+    repeated EquipmentGroup equipmentGroup = 1;
+}
+
+message CreateEquipmentGroupRequest {
+    EquipmentGroup equipmentGroup = 1;
+}
+
+message CreateEquipmentGroupResponse {
+    int32 id = 1;
+}
+
+message UpdateEquipmentGroupRequest {
+    EquipmentGroup equipmentGroup = 1;
+}
+
+message UpdateEquipmentGroupResponse {
+    bool success = 1;
+}
+
+message DeleteEquipmentGroupRequest {
+    int32 id = 1;
+}
+
+message DeleteEquipmentGroupResponse {
+    bool success = 1;
+}
+
+message EquipmentGroup {
+    int32 id = 1;
+    string name = 2;   
+}

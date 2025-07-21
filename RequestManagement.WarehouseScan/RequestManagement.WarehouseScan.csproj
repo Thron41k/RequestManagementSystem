@@ -90,6 +90,7 @@
     <Protobuf Include="..\RequestManagement.Server\Protos\driver.proto" GrpcServices="Client" Link="Protos\driver.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\defect.proto" GrpcServices="Client" Link="Protos\defect.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\defectgroup.proto" GrpcServices="Client" Link="Protos\defectgroup.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\equipmentgroups.proto" GrpcServices="Client" Link="Protos\equipmentgroups.proto" />
   </ItemGroup>
 	<ItemGroup>
 	  <MauiXaml Update="Views\MainPage.xaml">

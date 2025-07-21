@@ -16,4 +16,5 @@ public interface IGrpcClientFactory
     DriverService.DriverServiceClient CreateDriverClient();
     DefectService.DefectServiceClient CreateDefectClient();
     DefectGroupService.DefectGroupServiceClient CreateDefectGroupClient();
+    EquipmentGroupService.EquipmentGroupServiceClient CreateEquipmentGroupClient();
 }

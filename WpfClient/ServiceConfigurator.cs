@@ -31,6 +31,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<DriverService.DriverServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
         serviceCollection.AddGrpcClient<DefectService.DefectServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
         serviceCollection.AddGrpcClient<DefectGroupService.DefectGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<EquipmentGroupService.EquipmentGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();
@@ -56,6 +57,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<MainMenuViewModel>();
         serviceCollection.AddScoped<DriverViewModel>();
         serviceCollection.AddScoped<DefectGroupViewModel>();
+        serviceCollection.AddScoped<EquipmentGroupViewModel>();
         serviceCollection.AddScoped<DefectViewModel>();
         serviceCollection.AddScoped<WarehouseViewModel>();
         serviceCollection.AddScoped<NomenclatureViewModel>();
@@ -82,6 +84,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<IIncomingService, GrpcIncomingService>();
         serviceCollection.AddScoped<IWarehouseService, GrpcWarehouseService>();
         serviceCollection.AddScoped<ICommissionsService, GrpcCommissionsService>();
+        serviceCollection.AddScoped<IEquipmentGroupService, GrpcEquipmentGroupService>();
         serviceCollection.AddScoped<INomenclatureAnalogService, GrpcNomenclatureAnalogService>();
 
         // Представления
@@ -89,6 +92,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<DriverView>();
         serviceCollection.AddTransient<MainMenu>();
         serviceCollection.AddTransient<EquipmentView>();
+        serviceCollection.AddTransient<EquipmentGroupView>();
         serviceCollection.AddTransient<DefectGroupView>();
         serviceCollection.AddTransient<DefectView>();
         serviceCollection.AddTransient<WarehouseView>();

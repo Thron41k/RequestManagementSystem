@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RequestManagement.Server.Data;
@@ -11,9 +12,11 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250721110909_EquipUpdate2")]
+    partial class EquipUpdate2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -348,9 +351,6 @@ namespace RequestManagement.Server.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int?>("EquipmentGroupId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -366,8 +366,6 @@ namespace RequestManagement.Server.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
-
-                    b.HasIndex("EquipmentGroupId");
 
                     b.ToTable("Equipments");
 
@@ -858,16 +856,6 @@ namespace RequestManagement.Server.Migrations
                     b.Navigation("DefectGroup");
                 });
 
-            modelBuilder.Entity("RequestManagement.Common.Models.Equipment", b =>
-                {
-                    b.HasOne("RequestManagement.Common.Models.EquipmentGroup", "EquipmentGroup")
-                        .WithMany("Equipments")
-                        .HasForeignKey("EquipmentGroupId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("EquipmentGroup");
-                });
-
             modelBuilder.Entity("RequestManagement.Common.Models.Expense", b =>
                 {
                     b.HasOne("RequestManagement.Common.Models.Defect", "Defect")
@@ -1046,11 +1034,6 @@ namespace RequestManagement.Server.Migrations
             modelBuilder.Entity("RequestManagement.Common.Models.DefectGroup", b =>
                 {
                     b.Navigation("Defects");
-                });
-
-            modelBuilder.Entity("RequestManagement.Common.Models.EquipmentGroup", b =>
-                {
-                    b.Navigation("Equipments");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>
