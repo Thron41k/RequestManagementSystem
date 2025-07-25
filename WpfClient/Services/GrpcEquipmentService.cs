@@ -20,7 +20,8 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
             Name = equipment.Name, 
             LicensePlate = equipment.StateNumber, 
             Code = equipment.Code,
-            ShortName = equipment.ShortName
+            ShortName = equipment.ShortName,
+            EquipmentGroupId = equipment.EquipmentGroup!.Id
         };
         var client = clientFactory.CreateEquipmentClient();
         var result = await client.CreateEquipmentAsync(request, headers);
@@ -40,7 +41,8 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
             Name = equipment.Name, 
             LicensePlate = equipment.StateNumber, 
             Code = equipment.Code,
-            ShortName = equipment.ShortName
+            ShortName = equipment.ShortName,
+            EquipmentGroupId = equipment.EquipmentGroupId ?? 1
         };
         var client = clientFactory.CreateEquipmentClient();
         var result = await client.UpdateEquipmentAsync(request, headers);
@@ -75,7 +77,8 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
             Name = equipment.Name, 
             StateNumber = equipment.LicensePlate, 
             Code = equipment.Code,
-            ShortName = equipment.ShortName
+            ShortName = equipment.ShortName,
+            EquipmentGroup = new RequestManagement.Common.Models.EquipmentGroup { Id = equipment.EquipmentGroup.Id, Name = equipment.EquipmentGroup.Name }
         }).ToList();
     }
 }

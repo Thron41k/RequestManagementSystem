@@ -22,6 +22,7 @@ message CreateEquipmentRequest {
     string license_plate = 2;
     string code = 3;
     string short_name = 4;
+	int32 equipment_group_id = 5;
 }
 
 message CreateEquipmentResponse {
@@ -34,6 +35,7 @@ message UpdateEquipmentRequest {
     string license_plate = 3;
     string code = 4;
     string short_name = 5;
+    int32 equipment_group_id = 6;
 }
 
 message UpdateEquipmentResponse {
@@ -54,4 +56,10 @@ message Equipment {
     string license_plate = 3;
     string code = 4;
     string short_name = 5;
+    EquipmentEquipmentGroup equipment_group = 6;
+}
+
+message EquipmentEquipmentGroup {
+    int32 id = 1;
+    string name = 2;   
 }

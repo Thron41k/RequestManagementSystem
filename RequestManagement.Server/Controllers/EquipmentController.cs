@@ -32,7 +32,8 @@ public class EquipmentController(IEquipmentService equipmentService, ILogger<Equ
             Name = e.Name,
             LicensePlate = e.StateNumber ?? "",
             Code = e.Code,
-            ShortName = e.ShortName ?? ""
+            ShortName = e.ShortName ?? "",
+            EquipmentGroup = new EquipmentEquipmentGroup { Id = e.EquipmentGroup!.Id, Name = e.EquipmentGroup.Name },
         }));
 
         return response;
@@ -50,7 +51,8 @@ public class EquipmentController(IEquipmentService equipmentService, ILogger<Equ
             Name = request.Name,
             StateNumber = request.LicensePlate,
             Code = request.Code,
-            ShortName = request.ShortName
+            ShortName = request.ShortName,
+            EquipmentGroupId = request.EquipmentGroupId
         };
 
         var id = await _requestService.CreateEquipmentAsync(equipment);
@@ -70,7 +72,8 @@ public class EquipmentController(IEquipmentService equipmentService, ILogger<Equ
             Name = request.Name,
             StateNumber = request.LicensePlate,
             Code = request.Code,
-            ShortName = request.ShortName
+            ShortName = request.ShortName,
+            EquipmentGroupId = request.EquipmentGroupId
         };
 
         var success = await _requestService.UpdateEquipmentAsync(equipment);

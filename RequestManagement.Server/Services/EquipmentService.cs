@@ -29,6 +29,7 @@ public class EquipmentService(ApplicationDbContext dbContext) : IEquipmentServic
         existingEquipment.StateNumber = equipment.StateNumber;
         existingEquipment.Code = equipment.Code;
         existingEquipment.ShortName = equipment.ShortName;
+        existingEquipment.EquipmentGroupId = equipment.EquipmentGroupId;
 
         await _dbContext.SaveChangesAsync();
         return true;
@@ -57,7 +58,9 @@ public class EquipmentService(ApplicationDbContext dbContext) : IEquipmentServic
 
     public async Task<List<Equipment>> GetAllEquipmentAsync(string filter = "")
     {
-        var query = _dbContext.Equipments.AsQueryable();
+        var query = _dbContext.Equipments
+            .Include(e => e.EquipmentGroup)
+            .AsQueryable();
         if (!string.IsNullOrWhiteSpace(filter))
         {
             var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -71,7 +74,8 @@ public class EquipmentService(ApplicationDbContext dbContext) : IEquipmentServic
                 Name = e.Name,
                 StateNumber = e.StateNumber ?? "",
                 Code = e.Code,
-                ShortName = e.ShortName ?? ""
+                ShortName = e.ShortName ?? "",
+                EquipmentGroup = e.EquipmentGroup ?? new EquipmentGroup{Id = 1}
             })
             .ToListAsync();
     }

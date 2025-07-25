@@ -77,7 +77,7 @@ public partial class ExpenseListViewModel : ObservableObject
     {
         if (!ValidateDates()) return;
         if (SelectedWarehouse.Id == 0) return;
-        var currentSortDescriptions = Enumerable.ToList<SortDescription>(ExpensesViewSource.View?.SortDescriptions) ?? [];
+        var currentSortDescriptions = (ExpensesViewSource.View?.SortDescriptions!).ToList();
         var expenseList = await _expenseService.GetAllExpensesAsync(SearchText, SelectedWarehouse.Id, SelectedEquipment.Id, SelectedDriver.Id, SelectedDefect.Id, FromDate.ToString(CultureInfo.CurrentCulture), ToDate.ToString(CultureInfo.CurrentCulture));
         Expenses = new ObservableCollection<Expense>(expenseList);
         ExpensesViewSource.Source = Expenses;

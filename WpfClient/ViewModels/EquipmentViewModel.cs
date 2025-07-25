@@ -83,6 +83,7 @@ public partial class EquipmentViewModel : ObservableObject
             NewEquipmentShortName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
             NewEquipmentCode = string.Empty;
+            SelectedEquipmentGroup = null;
             return Task.CompletedTask;
         });
     }
@@ -94,6 +95,7 @@ public partial class EquipmentViewModel : ObservableObject
         if (SelectedEquipment.StateNumber != null) NewEquipmentLicensePlate = SelectedEquipment.StateNumber;
         if (SelectedEquipment.ShortName != null) NewEquipmentShortName = SelectedEquipment.ShortName;
         NewEquipmentCode = SelectedEquipment.Code;
+        SelectedEquipmentGroup = SelectedEquipment.EquipmentGroup;
     }
 
     [RelayCommand]
@@ -125,6 +127,7 @@ public partial class EquipmentViewModel : ObservableObject
                 StateNumber = NewEquipmentLicensePlate, 
                 Code = NewEquipmentCode,
                 ShortName = NewEquipmentShortName,
+                EquipmentGroupId = SelectedEquipmentGroup?.Id
 
             });
             await LoadEquipmentAsync();
@@ -132,6 +135,7 @@ public partial class EquipmentViewModel : ObservableObject
             NewEquipmentShortName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
             NewEquipmentCode = string.Empty;
+            SelectedEquipmentGroup = null;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
     }
@@ -150,7 +154,9 @@ public partial class EquipmentViewModel : ObservableObject
                 Name = NewEquipmentName, 
                 ShortName = NewEquipmentShortName,
                 StateNumber = NewEquipmentLicensePlate, 
-                Code = NewEquipmentCode
+                Code = NewEquipmentCode,
+                EquipmentGroupId = SelectedEquipmentGroup?.Id
+
             });
             await LoadEquipmentAsync();
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
@@ -168,6 +174,7 @@ public partial class EquipmentViewModel : ObservableObject
             NewEquipmentShortName = string.Empty;
             NewEquipmentLicensePlate = string.Empty;
             NewEquipmentCode = string.Empty;
+            SelectedEquipmentGroup = null;
             await _messageBus.Publish(new UpdatedMessage(MessagesEnum.EquipmentUpdated));
         }
     }
