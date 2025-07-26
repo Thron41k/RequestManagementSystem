@@ -12,6 +12,7 @@ namespace RequestManagement.Common.Models
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public List<Equipment> Equipments { get; set; } = [];
+        public List<SparePartsOwnership> SparePartsOwnerships { get; set; } = [];
         public override bool Equals(object obj) => obj is EquipmentGroup equipmentGroup && Id == equipmentGroup.Id;
     }
 }

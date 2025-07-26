@@ -22,11 +22,66 @@
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         <DataGrid Grid.Row="0" ItemsSource="{Binding LabelListViewSource.View}"
-                  AutoGenerateColumns="False" CanUserAddRows="False" Margin="10,10,10,10" SelectionMode="Single" SelectionUnit="FullRow">
+                  AutoGenerateColumns="False" 
+                  CanUserAddRows="False" 
+                  Margin="10,10,10,10" 
+                  SelectedItem="{Binding SelectedIncoming}"
+                  SelectionMode="Single" 
+                  SelectionUnit="FullRow">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="300" />
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*" />
                 <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="200" />
-                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="50" />
+                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="90" />
+                <DataGridTemplateColumn Header="Техника" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <TextBlock x:Name="NormalText"
+                           Text="{Binding Application.Equipment.FullNameFromShortName, TargetNullValue=...}" 
+                           VerticalAlignment="Center"/>
+                                <TextBlock x:Name="LinkText"
+                           Text="{Binding Application.Equipment.FullNameFromShortName, TargetNullValue=...}" 
+                           Foreground="Blue"
+                           TextDecorations="Underline"
+                           Cursor="Hand"
+                           Visibility="Collapsed"
+                           VerticalAlignment="Center">
+                                    <TextBlock.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick"
+                                      Command="{Binding DataContext.SelectEquipmentCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                      CommandParameter="{Binding}" />
+                                    </TextBlock.InputBindings>
+                                </TextBlock>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.SelectedIncomingDoc, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="{x:Null}">
+                                    <Setter TargetName="NormalText" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="LinkText" Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGridRow}, Path=IsSelected}" Value="True">
+                                    <Setter TargetName="NormalText" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="LinkText" Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Дата" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <TextBlock 
+                           Text="{Binding Date, StringFormat='Дата поступления: {0:dd.MM.yyyy}'}" 
+                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <DatePicker SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">

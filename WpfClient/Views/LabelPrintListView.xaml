@@ -23,7 +23,7 @@
     <Grid Margin="0,0,20,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="741" />
+            <ColumnDefinition Width="411" />
         </Grid.ColumnDefinitions>
 
         <!-- Левая панель с кнопкой -->

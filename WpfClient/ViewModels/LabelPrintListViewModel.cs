@@ -189,7 +189,7 @@ public partial class LabelPrintListViewModel : ObservableObject
     {
         await _messageBus.Publish(
             new ShowResultMessage(
-                MessagesEnum.UpdateLabelPrintList, typeof(IncomingListViewModel), LabelList.Select(x => x.Incoming).ToList()));
+                MessagesEnum.UpdateLabelPrintList, typeof(IncomingListViewModel), LabelList.Count == 0 ? [] : LabelList.Select(x => x.Incoming).ToList()));
         var filtered = !string.IsNullOrWhiteSpace(FastSearchText)
             ? LabelList.Where(x =>
                 x.Incoming.Stock.Nomenclature.Name.Contains(FastSearchText, StringComparison.OrdinalIgnoreCase) ||
@@ -197,7 +197,6 @@ public partial class LabelPrintListViewModel : ObservableObject
                  false)).ToList()
             : LabelList.ToList();
         LabelListForShow = new ObservableCollection<IncomingForPrint>(filtered);
-
         IncomingsViewSource = new CollectionViewSource { Source = new ObservableCollection<IncomingForPrint>(filtered) };
     }
 

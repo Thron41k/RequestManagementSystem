@@ -49,13 +49,11 @@ public class Equipment : IEntity
             {
                 return $"{ShortName}({StateNumber})";
             }
-
-            if (Name != "" && string.IsNullOrEmpty(StateNumber))
+            if (!string.IsNullOrEmpty(StateNumber))
             {
-                return Name;
+                return $"{Name}({StateNumber})";
             }
-
-            return "";
+            return Name;
         }
     }
     public int? EquipmentGroupId { get; set; }

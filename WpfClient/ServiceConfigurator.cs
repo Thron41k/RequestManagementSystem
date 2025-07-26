@@ -73,6 +73,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<IncomingDataLoadViewModel>();
         serviceCollection.AddScoped<LabelCountSelectorViewModel>();
         serviceCollection.AddScoped<LabelPrintListViewModel>();
+        serviceCollection.AddScoped<SparePartsOwnershipViewModel>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -109,6 +110,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<IncomingDataLoadView>();
         serviceCollection.AddTransient<LabelCountSelectorView>();
         serviceCollection.AddTransient<LabelPrintListView>();
+        serviceCollection.AddTransient<SparePartsOwnershipView>();
 
         return serviceCollection.BuildServiceProvider();
     }

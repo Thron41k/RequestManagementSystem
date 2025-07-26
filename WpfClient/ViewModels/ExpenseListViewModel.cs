@@ -48,7 +48,6 @@ public partial class ExpenseListViewModel : ObservableObject
             await dispatcher.InvokeAsync(async () => { await LoadExpensesAsync(); });
         };
     }
-
     private async Task OnSelect(SelectResultMessage arg)
     {
         if (arg.Caller != typeof(ExpenseListViewModel) || arg.Item == null) return;
@@ -72,6 +71,7 @@ public partial class ExpenseListViewModel : ObservableObject
                 break;
         }
     }
+
     [RelayCommand]
     private async Task LoadExpensesAsync()
     {
@@ -190,16 +190,19 @@ public partial class ExpenseListViewModel : ObservableObject
     {
         await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDefect, typeof(ExpenseListViewModel)));
     }
+
     [RelayCommand]
     private async Task SelectEquipment()
     {
         await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectEquipment, typeof(ExpenseListViewModel)));
     }
+
     [RelayCommand]
     private async Task SelectDriver()
     {
         await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDriver, typeof(ExpenseListViewModel)));
     }
+
     [RelayCommand]
     private async Task ClearSelectedWarehouse()
     {

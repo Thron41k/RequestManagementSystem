@@ -63,7 +63,7 @@ public partial class IncomingListViewModel : ObservableObject
 
     private Task OnShow(ShowResultMessage arg)
     {
-        if (arg.Caller == typeof(IncomingListViewModel) && arg.Items.Count != 0)
+        if (arg.Caller == typeof(IncomingListViewModel))
             switch (arg.Message)
             {
                 case MessagesEnum.ResultLabelCountSelector:

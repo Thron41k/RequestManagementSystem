@@ -12,6 +12,7 @@ namespace RequestManagement.WpfClient.ViewModels;
 
 public class MainMenuViewModel
 {
+    private readonly SparePartsOwnershipViewModel _sparePartsOwnershipViewModel;
     private readonly EquipmentViewModel _equipmentViewModel;
     private readonly DriverViewModel _driverViewModel;
     private readonly EquipmentGroupViewModel _equipmentGroupViewModel;
@@ -22,7 +23,7 @@ public class MainMenuViewModel
     private readonly StockViewModel _stockViewModel;
     private readonly ExpenseViewModel _expenseViewModel;
     private readonly ExpenseListViewModel _expenseListViewModel;
-    private readonly RequestManagement.WpfClient.ViewModels.IncomingListViewModel _incomingListViewModel;
+    private readonly IncomingListViewModel _incomingListViewModel;
     private readonly StartDataLoadViewModel _startDataLoadViewModel;
     private readonly ExpenseDataLoadViewModel _expenseDataLoadViewModel;
     private readonly CommissionsViewModel _commissionsViewModel;
@@ -48,9 +49,11 @@ public class MainMenuViewModel
     public ICommand ShowExpensesDataLoadingCommand { get; }
     public ICommand ShowNomenclatureAnalogCommand { get; }
     public ICommand ShowIncomingDataLoadingCommand { get; }
+    public ICommand ShowSparePartsOwnershipCommand { get; }
 
-    public MainMenuViewModel(EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, RequestManagement.WpfClient.ViewModels.IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel, LabelCountSelectorViewModel labelCountSelectorViewModel, LabelPrintListViewModel labelPrintListViewModel, EquipmentGroupViewModel equipmentGroupViewModel)
+    public MainMenuViewModel(SparePartsOwnershipViewModel sparePartsOwnershipViewModel, EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, RequestManagement.WpfClient.ViewModels.IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel, LabelCountSelectorViewModel labelCountSelectorViewModel, LabelPrintListViewModel labelPrintListViewModel, EquipmentGroupViewModel equipmentGroupViewModel)
     {
+        _sparePartsOwnershipViewModel = sparePartsOwnershipViewModel;
         _equipmentViewModel = equipmentViewModel;
         _driverViewModel = driverViewModel;
         _defectGroupViewModel = defectGroupViewModel;
@@ -92,6 +95,20 @@ public class MainMenuViewModel
         ShowExpensesDataLoadingCommand = new RelayCommand(ShowExpensesDataLoading);
         ShowNomenclatureAnalogCommand = new RelayCommand(ShowNomenclatureAnalog);
         ShowIncomingDataLoadingCommand = new RelayCommand(ShowIncomingDataLoading);
+        ShowSparePartsOwnershipCommand = new RelayCommand(ShowSparePartsOwnership);
+    }
+
+    private void ShowSparePartsOwnership()
+    {
+        var sparePartsOwnershipView = new SparePartsOwnershipView(_sparePartsOwnershipViewModel);
+        var window = new Window
+        {
+            Content = sparePartsOwnershipView,
+            Title = "Принадлежность номенклатуры",
+            Width = 1000,
+            Height = 1200
+        };
+        window.ShowDialog();
     }
 
     private Task OnShowResultMessageDialog(ShowResultMessage arg)
@@ -190,7 +207,7 @@ public class MainMenuViewModel
         {
             Content = labelCountSelectorView,
             Title = "Выбор количества этикеток для печати",
-            Width = 600,
+            Width = 1200,
             Height = 400,
             ResizeMode = ResizeMode.NoResize
         };
@@ -200,7 +217,7 @@ public class MainMenuViewModel
         {
             _messageBus.Publish(
                 new ShowResultMessage(
-                    MessagesEnum.ResultLabelCountSelector, argCaller, Enumerable.ToList<Incoming>(_labelCountSelectorViewModel.LabelList)));
+                    MessagesEnum.ResultLabelCountSelector, argCaller, _labelCountSelectorViewModel.LabelList.ToList()));
         }
     }
     private void ShowCommissions(bool editMode, Type? argCaller = null)
@@ -449,7 +466,10 @@ public class MainMenuViewModel
                         Id = _equipmentViewModel.SelectedEquipment.Id,
                         Name = _equipmentViewModel.SelectedEquipment.Name,
                         StateNumber = _equipmentViewModel.SelectedEquipment.StateNumber,
-                        Code = _equipmentViewModel.SelectedEquipment.Code
+                        Code = _equipmentViewModel.SelectedEquipment.Code,
+                        ShortName = _equipmentViewModel.SelectedEquipment.ShortName,
+                        EquipmentGroup = _equipmentViewModel.SelectedEquipment.EquipmentGroup,
+                        EquipmentGroupId = _equipmentViewModel.SelectedEquipment.EquipmentGroupId
                     }));
     }
     private void ShowDriver(bool editMode, Type? argCaller = null)

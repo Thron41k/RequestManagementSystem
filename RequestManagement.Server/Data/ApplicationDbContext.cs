@@ -23,6 +23,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Commissions> Commissions { get; set; }
     public DbSet<NomenclatureAnalog> NomenclatureAnalogs { get; set; }
     public DbSet<Application> Applications { get; set; }
+    public DbSet<SparePartsOwnership> SparePartsOwnerships { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,6 +43,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         ConfigureNomenclatureAnalog(modelBuilder);
         ConfigureApplication(modelBuilder);
         ConfigureEquipmentGroup(modelBuilder);
+        ConfigureEquipmentGroupNomenclature(modelBuilder);
         SeedInitialData(modelBuilder);
     }
 
@@ -413,6 +415,25 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         });
     }
 
+    private void ConfigureEquipmentGroupNomenclature(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<SparePartsOwnership>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.EquipmentGroup)
+                .WithMany(g => g.SparePartsOwnerships)
+                .HasForeignKey(e => e.EquipmentGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Nomenclature)
+                .WithMany(n => n.SparePartsOwnerships)
+                .HasForeignKey(e => e.NomenclatureId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.EquipmentGroupId, e.NomenclatureId }).IsUnique(); // предотвращает дубликаты
+        });
+    }
     private void SeedInitialData(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasData(
