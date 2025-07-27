@@ -11,21 +11,53 @@ public class EquipmentGroupService(ApplicationDbContext dbContext) : IEquipmentG
 
     public async Task<List<EquipmentGroup>> GetAllEquipmentGroupsAsync(string filter = "")
     {
-        var query = _dbContext.EquipmentGroups.AsQueryable();
-        if (!string.IsNullOrWhiteSpace(filter))
+        try
         {
-            var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase)));
-        }
-        return await query
-            .Where(x => x.Id != 1)
-            .Select(e => new EquipmentGroup
+            var query = _dbContext.EquipmentGroups
+                .Where(g => g.Id != 1);
+
+            if (!string.IsNullOrWhiteSpace(filter))
             {
-                Id = e.Id,
-                Name = e.Name,
-            })
-            .ToListAsync();
+                var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var phrase in phrases)
+                {
+                    var localPhrase = $"%{phrase}%";
+
+                    query = query.Where(g =>
+                        EF.Functions.ILike(g.Name, localPhrase) ||
+                        g.Equipments.Any(e =>
+                            EF.Functions.ILike(e.Name, localPhrase) ||
+                            (e.StateNumber != null && EF.Functions.ILike(e.StateNumber, localPhrase))
+                        ));
+                }
+            }
+
+            return await query
+                .Select(g => new EquipmentGroup
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    Equipments = g.Equipments
+                        .Select(e => new Equipment
+                        {
+                            Id = e.Id,
+                            Name = e.Name,
+                            ShortName = e.ShortName,
+                            StateNumber = e.StateNumber,
+                            Code = e.Code
+                        })
+                        .ToList()
+                })
+                .ToListAsync();
+
+        }
+        catch(Exception ex){
+            Console.WriteLine(ex.Message);
+        }
+        return new List<EquipmentGroup>();
     }
+
     public async Task<int> CreateEquipmentGroupAsync(EquipmentGroup equipmentGroup)
     {
         _dbContext.EquipmentGroups.Add(equipmentGroup);

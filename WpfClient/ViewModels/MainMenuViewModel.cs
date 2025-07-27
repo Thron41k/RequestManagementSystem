@@ -108,6 +108,7 @@ public class MainMenuViewModel
             Width = 1000,
             Height = 1200
         };
+        _ = _sparePartsOwnershipViewModel.InitializeAsync();
         window.ShowDialog();
     }
 

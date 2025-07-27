@@ -17,7 +17,19 @@ public class GrpcEquipmentGroupService(IGrpcClientFactory clientFactory, AuthTok
         }
         var client = clientFactory.CreateEquipmentGroupClient();
         var response = await client.GetAllEquipmentGroupsAsync(new GetAllEquipmentGroupsRequest { Filter = filter }, headers);
-        return response.EquipmentGroup.Select(equipmentGroup => new EquipmentGroup { Id = equipmentGroup.Id, Name = equipmentGroup.Name }).ToList();
+        return response.EquipmentGroups.Select(equipmentGroup => new EquipmentGroup
+        {
+            Id = equipmentGroup.Id, 
+            Name = equipmentGroup.Name,
+            Equipments = equipmentGroup.Equipments.Select(equipment => new RequestManagement.Common.Models.Equipment
+            {
+                Id = equipment.Id, 
+                Name = equipment.Name,
+                ShortName = equipment.ShortName,
+                StateNumber = equipment.LicensePlate,
+                Code = equipment.Code
+            }).ToList()
+        }).ToList();
     }
 
     public async Task<int> CreateEquipmentGroupAsync(EquipmentGroup equipmentGroup)

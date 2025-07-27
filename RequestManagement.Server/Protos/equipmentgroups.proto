@@ -14,7 +14,7 @@ message GetAllEquipmentGroupsRequest {
 }
 
 message GetAllEquipmentGroupsResponse {
-    repeated EquipmentGroup equipmentGroup = 1;
+    repeated EquipmentGroup equipmentGroups = 1;
 }
 
 message CreateEquipmentGroupRequest {
@@ -43,5 +43,15 @@ message DeleteEquipmentGroupResponse {
 
 message EquipmentGroup {
     int32 id = 1;
-    string name = 2;   
+    string name = 2;  
+    repeated EquipmentGroupEquipment equipments = 3;
+}
+
+
+message EquipmentGroupEquipment {
+    int32 id = 1;
+    string name = 2;
+    string license_plate = 3;
+    string code = 4;
+    string short_name = 5; 
 }

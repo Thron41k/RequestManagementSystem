@@ -21,10 +21,21 @@ public class EquipmentGroupController(IEquipmentGroupService equipmentGroupServi
 
         var equipmentGroupList = await _equipmentGroupService.GetAllEquipmentGroupsAsync(request.Filter);
         var response = new GetAllEquipmentGroupsResponse();
-        response.EquipmentGroup.AddRange(equipmentGroupList.Select(e => new EquipmentGroup
+        response.EquipmentGroups.AddRange(equipmentGroupList.Select(e => new EquipmentGroup
         {
             Id = e.Id,
             Name = e.Name,
+            Equipments =
+            {
+                e.Equipments.Select(equipment => new EquipmentGroupEquipment
+                {
+                    Id = equipment.Id, 
+                    Name = equipment.Name,
+                    ShortName = equipment.ShortName,
+                    Code = equipment.Code,
+                    LicensePlate = equipment.StateNumber
+                }).ToList()
+            },
         }));
 
         return response;
