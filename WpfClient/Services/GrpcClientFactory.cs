@@ -69,4 +69,9 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     {
         return serviceProvider.GetRequiredService<EquipmentGroupService.EquipmentGroupServiceClient>();
     }
+
+    public SparePartsOwnershipService.SparePartsOwnershipServiceClient CreateSparePartsOwnershipClient()
+    {
+        return serviceProvider.GetRequiredService<SparePartsOwnershipService.SparePartsOwnershipServiceClient>();
+    }
 }

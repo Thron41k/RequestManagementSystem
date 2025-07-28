@@ -5,6 +5,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:RequestManagement.WpfClient.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:RequestManagement.WpfClient.ViewModels.Behaviors"
+             xmlns:validationRules="clr-namespace:RequestManagement.WpfClient.ViewModels.ValidationRules"
              mc:Ignorable="d">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -42,25 +45,117 @@
                           HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkBlue"/>
             <Grid Grid.Row="3">
                 <DataGrid ItemsSource="{Binding Equipments}"  AutoGenerateColumns="False" Margin="10,10,10,10" CanUserResizeRows="False" CanUserAddRows="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
         </Grid>
         <GridSplitter Grid.Column="1" ShowsPreview="False" Width="6"
                           HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkBlue"/>
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="10" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Background="Crimson">
+            <StackPanel Grid.Row ="0" Orientation="Horizontal">
+                <TextBox materialDesign:HintAssist.Hint="Склад" 
+                         Margin="10,10,10,0"
+                         Tag="{Binding ClearSelectedNomenclatureCommand}"
+                         IsReadOnly="True" 
+                         Width="300"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         materialDesign:ValidationAssist.UsePopup="True"
+                         materialDesign:HintAssist.HintPaddingBrush="White"
+                         materialDesign:HintAssist.FloatingScale="1"
+                         FontSize="14"
+                         AcceptsReturn="True"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                    <TextBox.Text>
+                        <Binding
+                            Path="SelectedNomenclature.Name"
+                            Mode="OneWay"
+                            UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <validationRules:NotEmptyValidationRule
+                                    ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                    <b:Interaction.Behaviors>
+                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
+                    </b:Interaction.Behaviors>
+                </TextBox>
+                <TextBox materialDesign:HintAssist.Hint="Номенклатура" 
+                         Margin="10,10,10,0"
+                         Tag="{Binding ClearSelectedNomenclatureCommand}"
+                         IsReadOnly="True" 
+                         MinWidth="550"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         materialDesign:ValidationAssist.UsePopup="True"
+                         materialDesign:HintAssist.HintPaddingBrush="White"
+                         materialDesign:HintAssist.FloatingScale="1"
+                         FontSize="14"
+                         AcceptsReturn="True"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                            Path="SelectedNomenclature.Name"
+                            Mode="OneWay"
+                            UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validationRules:NotEmptyValidationRule
+                                    ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
+                </b:Interaction.Behaviors>
+            </TextBox>
+            </StackPanel>
+            <StackPanel Grid.Row ="1" Orientation="Horizontal">
+                <TextBox materialDesign:HintAssist.Hint="Комментарий" 
+                         FontSize="14"
+                         Width="350"
+                         materialDesign:HintAssist.FloatingScale="1"
+                         Margin="10" 
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         materialDesign:HintAssist.HintPaddingBrush="White"
+                         Text="{Binding FilterEquipmentText, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                </TextBox>
+                <Label FontSize="16" Margin="0,0,0,0" Content="Кол-во:" VerticalAlignment="Center"/>
+                <materialDesign:NumericUpDown
+                    Value="{Binding PrintScale, UpdateSourceTrigger=PropertyChanged}"
+                    Minimum="1"
+                    Maximum="9999"
+                    Margin="0,0,15,0"
+                    ValueStep="1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    BorderBrush="Black"
+                    FontSize="16"
+                    HorizontalContentAlignment="Right"
+                    Style="{StaticResource MaterialDesignFloatingHintNumericUpDown}"
+                    Foreground="Black"/>
+                <Button Content="Добавить" Command="{Binding AddDriverCommand}" Margin="5" />
+                <Button Content="Сохранить" Command="{Binding UpdateDriverCommand}" Margin="5"/>
+                <Button Content="Удалить" Command="{Binding DeleteDriverCommand}" Margin="5"/>
+            </StackPanel>
+            <Grid Grid.Row="2">
+                <DataGrid ItemsSource="{Binding NomenclaturesViewSource.View}"  AutoGenerateColumns="False" Margin="10,10,10,10" CanUserResizeRows="False" CanUserAddRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
-            <GridSplitter Grid.Row="1" ShowsPreview="False" Height="6"
+            <GridSplitter Grid.Row="3" ShowsPreview="False" Height="6"
                           HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkBlue"/>
-            <Grid Grid.Row="2" Background="DarkGoldenrod">
+            <Grid Grid.Row="4" Background="DarkGoldenrod">
             </Grid>
         </Grid>
     </Grid>

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service SparePartsOwnershipService {
+    rpc GetAllSparePartsOwnerships (GetAllSparePartsOwnershipsRequest) returns (GetAllSparePartsOwnershipsResponse);
+    rpc CreateSparePartsOwnership(CreateSparePartsOwnershipRequest) returns (CreateSparePartsOwnershipResponse);
+    rpc UpdateSparePartsOwnership (UpdateSparePartsOwnershipRequest) returns (UpdateSparePartsOwnershipResponse);
+    rpc DeleteSparePartsOwnership (DeleteSparePartsOwnershipRequest) returns (DeleteSparePartsOwnershipResponse);
+}
+
+message GetAllSparePartsOwnershipsRequest {
+    int32 eqipment_group_id = 1;
+    int32 warehouse_id = 2;
+}
+
+message GetAllSparePartsOwnershipsResponse {
+    repeated SparePartsOwnership spare_parts_ownership = 1;
+    repeated SparePartsOwnershipNomenclature nomenclature = 2;
+}
+
+message CreateSparePartsOwnershipRequest{
+	int32 eqipment_group_id = 1;
+	int32 nomenclature_id = 2;
+	int32 required_quantity = 3;
+    string comment = 4;
+}
+
+message CreateSparePartsOwnershipResponse {
+    int32 spare_parts_ownership_id = 1;
+}
+
+message UpdateSparePartsOwnershipRequest{
+    int32 spare_parts_ownership_id = 1;
+	int32 eqipment_group_id = 2;
+	int32 nomenclature_id = 3;
+	int32 required_quantity = 4;
+    string comment = 5;
+}
+
+message UpdateSparePartsOwnershipResponse {
+    bool success = 1;
+}
+
+message DeleteSparePartsOwnershipRequest {
+    int32 id = 1;
+}
+
+message DeleteSparePartsOwnershipResponse {
+    bool success = 1;
+}
+
+message SparePartsOwnership {
+    int32 spare_parts_ownership_id = 1;
+	int32 eqipment_group_id = 2;
+	int32 nomenclature_id = 3;
+	int32 required_quantity = 4;
+	int32 current_quantity = 5;
+    string comment = 6;
+}
+
+message SparePartsOwnershipNomenclature {
+    int32 id = 1;
+    string code = 2;
+    string name = 3;
+    string article = 4;
+    string unit_of_measure = 5;
+}

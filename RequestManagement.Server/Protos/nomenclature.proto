@@ -46,5 +46,5 @@ message Nomenclature {
     string code = 2;
     string name = 3;
     string article = 4;
-    string unitOfMeasure = 5;
+    string unit_of_measure = 5;
 }

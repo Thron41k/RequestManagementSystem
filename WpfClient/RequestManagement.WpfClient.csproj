@@ -78,6 +78,7 @@
     <Protobuf Include="..\RequestManagement.Server\Protos\defect.proto" GrpcServices="Client" Link="Protos\defect.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\defectgroup.proto" GrpcServices="Client" Link="Protos\defectgroup.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\equipmentgroups.proto" GrpcServices="Client" Link="Protos\equipmentgroups.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\sparepartsownership.proto" GrpcServices="Client" Link="Protos\sparepartsownership.proto" />
   </ItemGroup>
 
   <ItemGroup>

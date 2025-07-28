@@ -87,6 +87,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<ICommissionsService, GrpcCommissionsService>();
         serviceCollection.AddScoped<IEquipmentGroupService, GrpcEquipmentGroupService>();
         serviceCollection.AddScoped<INomenclatureAnalogService, GrpcNomenclatureAnalogService>();
+        serviceCollection.AddScoped<ISparePartsOwnershipService, GrpcSparePartsOwnershipService>();
 
         // Представления
         serviceCollection.AddTransient<MainWindow>();

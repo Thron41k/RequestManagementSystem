@@ -46,6 +46,7 @@
     <Protobuf Include="Protos\driver.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\defect.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\defectgroup.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\sparepartsownership.proto" GrpcServices="Server" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\" />

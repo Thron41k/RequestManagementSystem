@@ -14,11 +14,16 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
 {
     private readonly IMessageBus _messageBus;
     private readonly IEquipmentGroupService _equipmentGroupService;
+    private readonly ISparePartsOwnershipService _sparePartsOwnershipService;
     private readonly Timer _filterTimer;
     private readonly Dispatcher _dispatcher;
     [ObservableProperty] private string _filterEquipmentText;
+    [ObservableProperty] private Nomenclature? _selectedNomenclature;
+    [ObservableProperty] private Warehouse? _selectedWarehouse;
     [ObservableProperty] private ObservableCollection<EquipmentGroup> _equipmentGroups = [];
+    [ObservableProperty] private ObservableCollection<Nomenclature> _nomenclatures = [];
     [ObservableProperty] private CollectionViewSource _equipmentGroupsViewSource;
+    [ObservableProperty] private CollectionViewSource _nomenclaturesViewSource;
     [ObservableProperty] private EquipmentGroup? _selectedEquipmentGroup;
     [ObservableProperty] private ObservableCollection<Equipment> _equipments = [];
     public SparePartsOwnershipViewModel()
@@ -26,11 +31,13 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
 
     }
 
-    public SparePartsOwnershipViewModel(IMessageBus messageBus, IEquipmentGroupService equipmentGroupService)
+    public SparePartsOwnershipViewModel(IMessageBus messageBus, IEquipmentGroupService equipmentGroupService, ISparePartsOwnershipService sparePartsOwnershipService)
     {
         _messageBus = messageBus;
         _equipmentGroupService = equipmentGroupService;
+        _sparePartsOwnershipService = sparePartsOwnershipService;
         EquipmentGroupsViewSource = new CollectionViewSource { Source = EquipmentGroups };
+        NomenclaturesViewSource = new CollectionViewSource { Source = Nomenclatures };
         _dispatcher = Dispatcher.CurrentDispatcher;
         _filterTimer = new Timer(Vars.SearchDelay) { AutoReset = false };
         _filterTimer.Elapsed += async (_, _) =>
@@ -73,6 +80,13 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
         {
             Equipments = new ObservableCollection<Equipment>(SelectedEquipmentGroup.Equipments);
         }
+    }
+
+    private async Task NomenclatureListUpdate()
+    {
+        Nomenclatures.Clear();
+        var currentSortDescriptions = (NomenclaturesViewSource.View?.SortDescriptions!).ToList() ?? [];
+        var nomenclatureList = await _sparePartsOwnershipService.GetAllSparePartsOwnershipsAsync(FilterEquipmentText);
     }
 
     [RelayCommand]
