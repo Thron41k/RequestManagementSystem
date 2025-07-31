@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
+using RequestManagement.Server.Converters;
 
 namespace RequestManagement.Server.Controllers;
 
@@ -24,12 +25,7 @@ public class SparePartsOwnershipController(ISparePartsOwnershipService sparePart
         _logger.LogInformation("Getting all sparePartsOwnerships by filter");
 
         var sparePartsOwnershipList = await _requestService.GetAllSparePartsOwnershipsAsync(request.EqipmentGroupId,request.WarehouseId);
-        var response = new GetAllSparePartsOwnershipsResponse();
-        response.SparePartsOwnership.AddRange(sparePartsOwnershipList.Select(e => new SparePartsOwnership
-        {
-            
-        }));
-
+        var response = SparePartsOwnershipConverter.MapToGrpcResponse(sparePartsOwnershipList);
         return response;
     }
 
@@ -55,7 +51,11 @@ public class SparePartsOwnershipController(ISparePartsOwnershipService sparePart
 
         var sparePartsOwnership = new RequestManagement.Common.Models.SparePartsOwnership
         {
-            
+            Id = request.SparePartsOwnershipId,
+            RequiredQuantity = request.RequiredQuantity,
+            Comment = request.Comment,
+            EquipmentGroupId = request.EqipmentGroupId,
+            NomenclatureId = request.NomenclatureId
         };
 
         var success = await _requestService.UpdateSparePartsOwnershipAsync(sparePartsOwnership);

@@ -60,6 +60,7 @@ public partial class SparePartsAnalogsViewModel : ObservableObject
         _filterTimer.Stop();
         _filterTimer.Start();
     }
+
     private async Task OnSelect(SelectResultMessage arg)
     {
         if (arg.Caller == typeof(SparePartsAnalogsViewModel) && arg is { Item: not null, Message: MessagesEnum.SelectNomenclature })

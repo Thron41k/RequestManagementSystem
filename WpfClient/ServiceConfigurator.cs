@@ -32,6 +32,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<DefectService.DefectServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
         serviceCollection.AddGrpcClient<DefectGroupService.DefectGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
         serviceCollection.AddGrpcClient<EquipmentGroupService.EquipmentGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<SparePartsOwnershipService.SparePartsOwnershipServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();

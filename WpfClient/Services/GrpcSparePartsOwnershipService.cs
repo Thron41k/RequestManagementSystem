@@ -3,6 +3,7 @@ using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 using SparePartsOwnership = RequestManagement.Common.Models.SparePartsOwnership;
+using SparePartsOwnershipConverter = RequestManagement.WpfClient.Converters.SparePartsOwnershipConverter;
 
 namespace RequestManagement.WpfClient.Services;
 
@@ -19,17 +20,10 @@ internal class GrpcSparePartsOwnershipService(IGrpcClientFactory clientFactory, 
         var response = await client.GetAllSparePartsOwnershipsAsync(new GetAllSparePartsOwnershipsRequest
         {
             EqipmentGroupId = equipmentId, 
-            WarehouseId = warehouseId
+            WarehouseId = warehouseId,
+            
         }, headers);
-        return response.SparePartsOwnership.Select(sparePartsOwnership => new SparePartsOwnership
-        {
-            Id = sparePartsOwnership.SparePartsOwnershipId,
-            RequiredQuantity = sparePartsOwnership.RequiredQuantity,
-            CurrentQuantity = sparePartsOwnership.CurrentQuantity,
-            EquipmentGroupId = sparePartsOwnership.EqipmentGroupId,
-            NomenclatureId = sparePartsOwnership.NomenclatureId,
-            Comment = sparePartsOwnership.Comment
-        }).ToList();
+        return SparePartsOwnershipConverter.MapFromGrpcResponse(response);
     }
 
     public async Task<int> CreateSparePartsOwnershipAsync(SparePartsOwnership sparePartsOwnership)

@@ -64,7 +64,7 @@
             <StackPanel Grid.Row ="0" Orientation="Horizontal">
                 <TextBox materialDesign:HintAssist.Hint="Склад" 
                          Margin="10,10,10,0"
-                         Tag="{Binding ClearSelectedNomenclatureCommand}"
+                         Tag="{Binding ClearSelectedWarehouseCommand}"
                          IsReadOnly="True" 
                          Width="300"
                          materialDesign:TextFieldAssist.HasClearButton="True"
@@ -76,7 +76,7 @@
                          Style="{StaticResource MaterialDesignOutlinedTextBox}">
                     <TextBox.Text>
                         <Binding
-                            Path="SelectedNomenclature.Name"
+                            Path="SelectedWarehouse.Name"
                             Mode="OneWay"
                             UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -104,7 +104,7 @@
                 <TextBox.Text>
                     <Binding
                             Path="SelectedNomenclature.Name"
-                            Mode="OneWay"
+                            Mode="TwoWay"
                             UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
                             <validationRules:NotEmptyValidationRule
@@ -113,7 +113,7 @@
                     </Binding>
                 </TextBox.Text>
                 <b:Interaction.Behaviors>
-                    <behaviors:MouseClickCommandBehavior Command="{Binding SelectWarehouseCommand}" />
+                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectNomenclatureCommand}" />
                 </b:Interaction.Behaviors>
             </TextBox>
             </StackPanel>
@@ -125,12 +125,12 @@
                          Margin="10" 
                          materialDesign:TextFieldAssist.HasClearButton="True"
                          materialDesign:HintAssist.HintPaddingBrush="White"
-                         Text="{Binding FilterEquipmentText, UpdateSourceTrigger=PropertyChanged}" 
+                         Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" 
                          Style="{StaticResource MaterialDesignOutlinedTextBox}">
                 </TextBox>
                 <Label FontSize="16" Margin="0,0,0,0" Content="Кол-во:" VerticalAlignment="Center"/>
                 <materialDesign:NumericUpDown
-                    Value="{Binding PrintScale, UpdateSourceTrigger=PropertyChanged}"
+                    Value="{Binding RequiredQuantity, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     Minimum="1"
                     Maximum="9999"
                     Margin="0,0,15,0"
@@ -142,15 +142,24 @@
                     HorizontalContentAlignment="Right"
                     Style="{StaticResource MaterialDesignFloatingHintNumericUpDown}"
                     Foreground="Black"/>
-                <Button Content="Добавить" Command="{Binding AddDriverCommand}" Margin="5" />
-                <Button Content="Сохранить" Command="{Binding UpdateDriverCommand}" Margin="5"/>
-                <Button Content="Удалить" Command="{Binding DeleteDriverCommand}" Margin="5"/>
+                <Button Content="Добавить" Command="{Binding CreateSparePartsOwnershipCommand}" Margin="5" />
+                <Button Content="Сохранить" Command="{Binding UpdateSparePartsOwnershipCommand}" Margin="5"/>
+                <Button Content="Удалить" Command="{Binding DeleteSparePartsOwnershipCommand}" Margin="5"/>
             </StackPanel>
             <Grid Grid.Row="2">
-                <DataGrid ItemsSource="{Binding NomenclaturesViewSource.View}"  AutoGenerateColumns="False" Margin="10,10,10,10" CanUserResizeRows="False" CanUserAddRows="False">
+                <DataGrid ItemsSource="{Binding NomenclaturesViewSource.View}"  SelectedItem="{Binding SelectedSparePartsOwnership}" AutoGenerateColumns="False" Margin="10,10,10,10" CanUserResizeRows="False" CanUserAddRows="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Наименование" Binding="{Binding Nomenclature.Name}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Артикул" Binding="{Binding Nomenclature.Article}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Потребность" Binding="{Binding RequiredQuantity}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="На складе" Binding="{Binding CurrentQuantity}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" IsReadOnly="True"/>
                     </DataGrid.Columns>
+                    <DataGrid.InputBindings>
+                        <MouseBinding
+                            MouseAction="LeftClick"
+                            Command="{Binding FieldUpdateCommand}"/>
+                    </DataGrid.InputBindings>
                 </DataGrid>
             </Grid>
             <GridSplitter Grid.Row="3" ShowsPreview="False" Height="6"
