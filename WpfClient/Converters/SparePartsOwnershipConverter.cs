@@ -26,7 +26,8 @@ public static class SparePartsOwnershipConverter
             RequiredQuantity = o.RequiredQuantity,
             CurrentQuantity = o.CurrentQuantity,
             Comment = string.IsNullOrWhiteSpace(o.Comment) ? null : o.Comment,
-            Nomenclature = nomenclatureMap.TryGetValue(o.NomenclatureId, out var nomenclature) ? nomenclature : null!
+            Nomenclature = nomenclatureMap.TryGetValue(o.NomenclatureId, out var nomenclature) ? nomenclature : null!,
+            AnalogId = o.AnalogId
         }).ToList();
 
         return ownerships;

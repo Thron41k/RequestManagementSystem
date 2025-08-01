@@ -11,7 +11,8 @@ public class SparePartsOwnership : IEntity
     public int RequiredQuantity { get; set; }
     public int CurrentQuantity { get; set; }
     public string? Comment { get; set; }
-
+    [NotMapped]
+    public int? AnalogId { get; set; }
     public int EquipmentGroupId { get; set; }
     public EquipmentGroup EquipmentGroup { get; set; } = null!;
 

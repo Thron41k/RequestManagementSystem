@@ -65,6 +65,17 @@ public class SparePartsOwnershipService(ApplicationDbContext dbContext) : ISpare
                 .Where(n => missingNomenclatureIds.Contains(n.Id))
                 .ToListAsync();
 
+            // Карта: аналогId -> оригиналId
+            var analogToOriginal = new Dictionary<int, int>();
+            foreach (var analog in analogs)
+            {
+                if (ownershipByNomenclatureId.ContainsKey(analog.OriginalId))
+                    analogToOriginal[analog.AnalogId] = analog.OriginalId;
+
+                if (ownershipByNomenclatureId.ContainsKey(analog.AnalogId))
+                    analogToOriginal[analog.OriginalId] = analog.AnalogId;
+            }
+
             foreach (var nomenclature in missingNomenclatures)
             {
                 var newSpo = new SparePartsOwnership
@@ -73,7 +84,11 @@ public class SparePartsOwnershipService(ApplicationDbContext dbContext) : ISpare
                     NomenclatureId = nomenclature.Id,
                     Nomenclature = nomenclature,
                     RequiredQuantity = 0,
-                    CurrentQuantity = 0
+                    CurrentQuantity = 0,
+                    AnalogId = analogToOriginal.TryGetValue(nomenclature.Id, out var originalId) &&
+                               allOwnershipByNomenclatureId.TryGetValue(originalId, out var originalSpo)
+                               ? originalSpo.Id
+                               : null
                 };
 
                 if (warehouseId != 0 && stocks.TryGetValue(nomenclature.Id, out var quantity))
@@ -97,6 +112,7 @@ public class SparePartsOwnershipService(ApplicationDbContext dbContext) : ISpare
 
         return allOwnerships;
     }
+
 
 
 

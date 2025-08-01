@@ -164,7 +164,14 @@
             </Grid>
             <GridSplitter Grid.Row="3" ShowsPreview="False" Height="6"
                           HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkBlue"/>
-            <Grid Grid.Row="4" Background="DarkGoldenrod">
+            <Grid Grid.Row="4">
+                <DataGrid ItemsSource="{Binding NomenclatureAnalogsViewSource.View}"  AutoGenerateColumns="False" Margin="10,10,10,10" CanUserResizeRows="False" CanUserAddRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Наименование" Binding="{Binding Nomenclature.Name}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Артикул" Binding="{Binding Nomenclature.Article}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="На складе" Binding="{Binding CurrentQuantity}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
         </Grid>
     </Grid>

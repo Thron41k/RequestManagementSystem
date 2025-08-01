@@ -27,8 +27,10 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
     [ObservableProperty] private Warehouse? _selectedWarehouse;
     [ObservableProperty] private ObservableCollection<EquipmentGroup> _equipmentGroups = [];
     [ObservableProperty] private ObservableCollection<SparePartsOwnership> _nomenclatures = [];
+    [ObservableProperty] private ObservableCollection<SparePartsOwnership> _nomenclatureAnalogs = [];
     [ObservableProperty] private CollectionViewSource _equipmentGroupsViewSource;
     [ObservableProperty] private CollectionViewSource _nomenclaturesViewSource;
+    [ObservableProperty] private CollectionViewSource _nomenclatureAnalogsViewSource;
     [ObservableProperty] private EquipmentGroup? _selectedEquipmentGroup;
     [ObservableProperty] private ObservableCollection<Equipment> _equipments = [];
     public SparePartsOwnershipViewModel()
@@ -43,6 +45,7 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
         _sparePartsOwnershipService = sparePartsOwnershipService;
         EquipmentGroupsViewSource = new CollectionViewSource { Source = EquipmentGroups };
         NomenclaturesViewSource = new CollectionViewSource { Source = Nomenclatures };
+        NomenclatureAnalogsViewSource = new CollectionViewSource { Source = NomenclatureAnalogs };
         _dispatcher = Dispatcher.CurrentDispatcher;
         _filterTimer = new Timer(Vars.SearchDelay) { AutoReset = false };
         _filterTimer.Elapsed += async (_, _) =>
@@ -68,7 +71,7 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
         }
         return Task.CompletedTask;
     }
-    partial void OnFilterEquipmentTextChanged(string value) 
+    partial void OnFilterEquipmentTextChanged(string value)
     {
         _filterTimer.Stop();
         _filterTimer.Start();
@@ -126,8 +129,10 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
         if (SelectedEquipmentGroup == null) return;
         var currentSortDescriptions = (NomenclaturesViewSource.View?.SortDescriptions!).ToList() ?? [];
         var nomenclatureList = await _sparePartsOwnershipService.GetAllSparePartsOwnershipsAsync(SelectedEquipmentGroup.Id, SelectedWarehouse?.Id ?? 0);
-        Nomenclatures = new ObservableCollection<SparePartsOwnership>(nomenclatureList);
+        Nomenclatures = new ObservableCollection<SparePartsOwnership>(nomenclatureList.Where(x => x.AnalogId == 0));
         NomenclaturesViewSource.Source = Nomenclatures;
+        NomenclatureAnalogs = new ObservableCollection<SparePartsOwnership>(nomenclatureList.Where(x => x.AnalogId != 0));
+        NomenclatureAnalogsViewSource.Source = NomenclatureAnalogs;
         Comment = string.Empty;
         RequiredQuantity = 1;
         SelectedNomenclature = null;

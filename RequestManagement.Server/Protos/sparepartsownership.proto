@@ -57,6 +57,7 @@ message SparePartsOwnership {
 	int32 required_quantity = 4;
 	int32 current_quantity = 5;
     string comment = 6;
+    int32 analog_id = 7;
 }
 
 message SparePartsOwnershipNomenclature {
