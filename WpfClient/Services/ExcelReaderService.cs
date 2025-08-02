@@ -25,7 +25,7 @@ public class ExcelReaderService : IExcelReaderService
             var worksheet = package.Workbook.Worksheets[0];
             var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
             const int startRow = 13;
-            if(worksheet.Cells[startRow - 1, 1].Value == null) return (materialExpenses, warehouse);
+            if (worksheet.Cells[startRow - 1, 1].Value == null) return (materialExpenses, warehouse);
             warehouse = worksheet.Cells[startRow - 1, 1].Value.ToString()?.Trim();
             var expenseNumber = "";
             var expenseDate = DateTime.Now;
@@ -43,8 +43,9 @@ public class ExcelReaderService : IExcelReaderService
                 if (code == string.Empty && article == string.Empty && unit == string.Empty)
                 {
                     var numberAndDate = name.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    expenseNumber = numberAndDate[2];
-                    expenseDate = DateTime.Parse(numberAndDate[4]);
+                    var index = numberAndDate[0] == "Расходный" ? 2 : 4;
+                    expenseNumber = numberAndDate[index];
+                    expenseDate = DateTime.Parse(numberAndDate[index + 2]);
                     driverName = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
                     driverCode = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
                     equipmentName = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
@@ -140,7 +141,7 @@ public class ExcelReaderService : IExcelReaderService
             var worksheet = package.Workbook.Worksheets[0];
             var rowCount = worksheet.Dimension?.Rows + 2 ?? 0;
             const int startRow = 13;
-            if(worksheet.Cells[startRow - 1, 1].Value == null)return new MaterialIncoming();
+            if (worksheet.Cells[startRow - 1, 1].Value == null) return new MaterialIncoming();
             materialIncoming.WarehouseName = worksheet.Cells[startRow - 1, 1].Value.ToString()?.Trim();
             MaterialIncomingItem? newMaterialIncoming = null;
             for (var row = startRow; row < rowCount; row++)
@@ -168,8 +169,8 @@ public class ExcelReaderService : IExcelReaderService
                     newMaterialIncoming.RegistratorNumber = registrator[index];
                     newMaterialIncoming.RegistratorDate = registrator[index + 2];
                     var warehouseSenderNameCleared = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
-                    if(string.IsNullOrEmpty(warehouseSenderNameCleared))
-                    { 
+                    if (string.IsNullOrEmpty(warehouseSenderNameCleared))
+                    {
                         warehouseSenderNameCleared = worksheet.Cells[row, 5].Value?.ToString()?.Trim() ?? string.Empty;
                     }
                     if (!string.IsNullOrEmpty(warehouseSenderNameCleared))
@@ -213,8 +214,8 @@ public class ExcelReaderService : IExcelReaderService
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(newMaterialIncoming?.RegistratorType) && 
-                        string.IsNullOrEmpty(newMaterialIncoming?.RegistratorNumber) && 
+                    if (string.IsNullOrEmpty(newMaterialIncoming?.RegistratorType) &&
+                        string.IsNullOrEmpty(newMaterialIncoming?.RegistratorNumber) &&
                         string.IsNullOrEmpty(newMaterialIncoming?.RegistratorDate)) continue;
                     newMaterialIncoming.Items ??= [];
                     newMaterialIncoming.Items.Add(new MaterialStock

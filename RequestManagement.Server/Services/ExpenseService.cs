@@ -15,14 +15,14 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
     private readonly record struct NomenclatureKey(string Name, string Code, string Article, string UnitOfMeasure);
 
     public async Task<List<RequestManagement.Common.Models.Expense>> GetAllExpensesAsync(string filter, int requestWarehouseId, int requestEquipmentId, int requestDriverId,
-        int requestDefectId, string requestFromDate, string requestToDate)
+    int requestDefectId, string requestFromDate, string requestToDate)
     {
         var query = dbContext.Expenses
             .Include(e => e.Stock)
             .ThenInclude(s => s.Nomenclature)
             .Include(e => e.Stock)
             .ThenInclude(s => s.Warehouse)
-            .ThenInclude(d=>d.FinanciallyResponsiblePerson)
+            .ThenInclude(d => d.FinanciallyResponsiblePerson)
             .Include(e => e.Equipment)
             .Include(e => e.Driver)
             .Include(e => e.Defect)
@@ -71,6 +71,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
         return await query.ToListAsync();
     }
 
+
     public async Task<(bool, List<MaterialExpense>)> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId)
     {
         if (materials == null || materials.Count == 0)
@@ -105,7 +106,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
 
             var existingExpenses = await dbContext.Expenses
                 .Where(ex => expenseCodes.Contains(ex.Code) &&
-                             existingStocks.Select(s => s.Id).Contains(ex.StockId)).ToDictionaryAsync(x=>(x.Code,x.StockId));
+                             existingStocks.Select(s => s.Id).Contains(ex.StockId)).ToDictionaryAsync(x => (x.Code, x.StockId));
 
 
             var stockMap = existingStocks
@@ -168,10 +169,15 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                     error.Add(material);
                     continue;
                 }
-                if(stock.FinalQuantity < material.Quantity)
+                if (stock.FinalQuantity < material.Quantity)
                 {
+                    stock.ConsumedQuantity -= material.Quantity;
+                    if (stock.ConsumedQuantity < 0)
+                    {
+                        stock.ReceivedQuantity += material.Quantity - stock.ConsumedQuantity;
+                    }
                     error.Add(material);
-                    continue;
+                    //continue;
                 }
 
                 // Проверка существующего Expense
@@ -191,7 +197,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                 }
 
                 // Создаем новый Expense
-                var defectData = defectMappings.TryGetValue(stock.NomenclatureId, out var defect) ? defect : new();
+                var defectData = defectMappings.TryGetValue(stock.NomenclatureId, out var defect) ? defect : new NomenclatureDefectMapping {DefectId = 1};
 
                 var expense = new Common.Models.Expense
                 {

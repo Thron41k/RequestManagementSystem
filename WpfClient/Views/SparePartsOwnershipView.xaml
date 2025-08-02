@@ -28,7 +28,7 @@
                      Margin="10" 
                      materialDesign:TextFieldAssist.HasClearButton="True"
                      materialDesign:HintAssist.HintPaddingBrush="White"
-                     Text="{Binding FilterEquipmentText, UpdateSourceTrigger=PropertyChanged}" 
+                     Text="{Binding FilterEquipmentText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                      Style="{StaticResource MaterialDesignOutlinedTextBox}">
             </TextBox>
             <Grid Grid.Row="1">

@@ -19,7 +19,7 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
     private readonly ISparePartsOwnershipService _sparePartsOwnershipService;
     private readonly Timer _filterTimer;
     private readonly Dispatcher _dispatcher;
-    [ObservableProperty] private string _filterEquipmentText;
+    [ObservableProperty] private string _filterEquipmentText = "";
     [ObservableProperty] private string _comment;
     [ObservableProperty] private int _requiredQuantity = 1;
     [ObservableProperty] private SparePartsOwnership? _selectedSparePartsOwnership;
@@ -55,7 +55,7 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
         _messageBus.Subscribe<SelectResultMessage>(OnShowDialog);
     }
 
-    private Task OnShowDialog(SelectResultMessage arg)
+    private async Task OnShowDialog(SelectResultMessage arg)
     {
         if (arg.Caller == typeof(SparePartsOwnershipViewModel) && arg.Item != null)
         {
@@ -63,13 +63,13 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
             {
                 case MessagesEnum.SelectWarehouse:
                     SelectedWarehouse = (Warehouse)arg.Item;
+                    await NomenclatureListUpdate();
                     break;
                 case MessagesEnum.SelectNomenclature:
                     SelectedNomenclature = (Nomenclature)arg.Item;
                     break;
             }
         }
-        return Task.CompletedTask;
     }
     partial void OnFilterEquipmentTextChanged(string value)
     {
@@ -89,6 +89,7 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
         Comment = SelectedSparePartsOwnership.Comment ?? "";
         RequiredQuantity = SelectedSparePartsOwnership.RequiredQuantity;
         SelectedNomenclature = SelectedSparePartsOwnership.Nomenclature;
+        NomenclatureAnalogsViewSource.Source = NomenclatureAnalogs.Where(x => x.AnalogId == SelectedSparePartsOwnership?.Id);
     }
 
     partial void OnSelectedEquipmentGroupChanged(EquipmentGroup? value) => _ = EquipmentListUpdate();
@@ -132,10 +133,10 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
         Nomenclatures = new ObservableCollection<SparePartsOwnership>(nomenclatureList.Where(x => x.AnalogId == 0));
         NomenclaturesViewSource.Source = Nomenclatures;
         NomenclatureAnalogs = new ObservableCollection<SparePartsOwnership>(nomenclatureList.Where(x => x.AnalogId != 0));
-        NomenclatureAnalogsViewSource.Source = NomenclatureAnalogs;
         Comment = string.Empty;
         RequiredQuantity = 1;
         SelectedNomenclature = null;
+        NomenclatureAnalogsViewSource.Source = new ObservableCollection<SparePartsOwnership>();
         if (currentSortDescriptions.Any())
         {
             foreach (var sortDescription in currentSortDescriptions)
@@ -207,11 +208,11 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
     [RelayCommand]
     private async Task UpdateSparePartsOwnershipAsync()
     {
-        if (SelectedNomenclature != null && SelectedEquipmentGroup != null && RequiredQuantity > 0)
+        if (SelectedSparePartsOwnership != null && SelectedNomenclature != null && SelectedEquipmentGroup != null && RequiredQuantity > 0)
         {
             await _sparePartsOwnershipService.UpdateSparePartsOwnershipAsync(new SparePartsOwnership
             {
-                Id = SelectedNomenclature.Id,
+                Id = SelectedSparePartsOwnership.Id,
                 NomenclatureId = SelectedNomenclature.Id,
                 EquipmentGroupId = SelectedEquipmentGroup.Id,
                 Comment = Comment,
