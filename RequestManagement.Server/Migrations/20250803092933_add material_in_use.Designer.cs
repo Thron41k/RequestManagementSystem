@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RequestManagement.Server.Data;
@@ -11,9 +12,11 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250803092933_add material_in_use")]
+    partial class addmaterial_in_use
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -494,45 +497,6 @@ namespace RequestManagement.Server.Migrations
                     b.ToTable("Incomings");
                 });
 
-            modelBuilder.Entity("RequestManagement.Common.Models.MaterialsInUse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DocumentNumber")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("EquipmentId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("FinanciallyResponsiblePersonId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("NomenclatureId")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EquipmentId");
-
-                    b.HasIndex("FinanciallyResponsiblePersonId");
-
-                    b.HasIndex("NomenclatureId");
-
-                    b.ToTable("MaterialsInUse");
-                });
-
             modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>
                 {
                     b.Property<int>("Id")
@@ -999,32 +963,6 @@ namespace RequestManagement.Server.Migrations
                     b.Navigation("InWarehouse");
 
                     b.Navigation("Stock");
-                });
-
-            modelBuilder.Entity("RequestManagement.Common.Models.MaterialsInUse", b =>
-                {
-                    b.HasOne("RequestManagement.Common.Models.Equipment", "Equipment")
-                        .WithMany()
-                        .HasForeignKey("EquipmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("RequestManagement.Common.Models.Driver", "FinanciallyResponsiblePerson")
-                        .WithMany()
-                        .HasForeignKey("FinanciallyResponsiblePersonId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("RequestManagement.Common.Models.Nomenclature", "Nomenclature")
-                        .WithMany()
-                        .HasForeignKey("NomenclatureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Equipment");
-
-                    b.Navigation("FinanciallyResponsiblePerson");
-
-                    b.Navigation("Nomenclature");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.NomenclatureAnalog", b =>

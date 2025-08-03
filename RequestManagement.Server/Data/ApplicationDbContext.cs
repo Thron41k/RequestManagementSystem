@@ -24,6 +24,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<NomenclatureAnalog> NomenclatureAnalogs { get; set; }
     public DbSet<Application> Applications { get; set; }
     public DbSet<SparePartsOwnership> SparePartsOwnerships { get; set; }
+    public DbSet<MaterialsInUse> MaterialsInUse { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,7 +45,53 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         ConfigureApplication(modelBuilder);
         ConfigureEquipmentGroup(modelBuilder);
         ConfigureEquipmentGroupNomenclature(modelBuilder);
+        ConfigureMaterialsInUse(modelBuilder);
         SeedInitialData(modelBuilder);
+    }
+
+    private void ConfigureMaterialsInUse(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MaterialsInUse>(entity =>
+        {
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.DocumentNumber)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.Date)
+                .IsRequired();
+
+            entity.Property(e => e.Quantity)
+                .HasColumnType("numeric(18,2)")
+                .IsRequired();
+
+            entity.Property(e => e.NomenclatureId)
+                .IsRequired();
+
+            entity.Property(e => e.EquipmentId)
+                .IsRequired();
+
+            entity.HasOne(e => e.Nomenclature)
+                .WithMany()
+                .HasForeignKey(e => e.NomenclatureId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired();
+
+            entity.HasOne(e => e.Equipment)
+                .WithMany() 
+                .HasForeignKey(e => e.EquipmentId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired();
+
+            entity.HasOne(e => e.FinanciallyResponsiblePerson)
+                .WithMany() 
+                .HasForeignKey(e => e.FinanciallyResponsiblePersonId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
     }
 
     private void ConfigureUser(ModelBuilder modelBuilder)

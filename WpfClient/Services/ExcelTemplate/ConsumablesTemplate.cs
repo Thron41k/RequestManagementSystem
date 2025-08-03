@@ -29,7 +29,7 @@ public class ConsumablesTemplate : ExcelTemplateWriterBase<ActPartsModel>
         templateSheet.Cells[16, 3].Value = data.Frp?.Position;
         templateSheet.Cells[16, 6].Value = data.Frp?.ShortName;
         var grouped = data.Expenses
-            .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.DefectGroupId == 15)
+            .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.DefectGroupId == 15 && e.Defect.DefectGroupId != 19)
             .GroupBy(e => e.Code!)
             .ToList();
         foreach (var group in grouped)

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RequestManagement.Server.Data;
@@ -11,9 +12,11 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250803100617_MaterialInUse")]
+    partial class MaterialInUse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -498,29 +501,36 @@ namespace RequestManagement.Server.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date");
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("document_number");
 
                     b.Property<int>("EquipmentId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("equipment_id");
 
                     b.Property<int?>("FinanciallyResponsiblePersonId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("financially_responsible_person_id");
 
                     b.Property<int>("NomenclatureId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("nomenclature_id");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("quantity");
 
                     b.HasKey("Id");
 
@@ -530,7 +540,7 @@ namespace RequestManagement.Server.Migrations
 
                     b.HasIndex("NomenclatureId");
 
-                    b.ToTable("MaterialsInUse");
+                    b.ToTable("materials_in_use", (string)null);
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>

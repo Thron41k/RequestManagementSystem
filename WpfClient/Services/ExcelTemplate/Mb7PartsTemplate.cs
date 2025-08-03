@@ -20,7 +20,7 @@ public class Mb7PartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         templateSheet.Cells[18, 3].Value = data.Frp?.Position;
         templateSheet.Cells[18, 7].Value = data.Frp?.ShortName;
         var grouped = data.Expenses
-            .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id == 2 || e.Defect.Id == 3)
+            .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id == 2 || e.Defect.Id == 3 && e.Defect.DefectGroupId != 19)
             .OrderBy(e=>e.Stock.Nomenclature.Name)
             .GroupBy(e => e.Code!)
             .ToList();

@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service MaterialsInUseService {
+    rpc GetAllMaterialsInUse (GetAllMaterialsInUseRequest) returns (GetAllMaterialsInUseResponse);
+    rpc CreateMaterialsInUse(CreateMaterialsInUseRequest) returns (CreateMaterialsInUseResponse);
+    rpc UploadMaterialsInUse (UploadMaterialsInUseRequest) returns (UploadMaterialsInUseResponse);
+    rpc UpdateMaterialsInUse (UpdateMaterialsInUseRequest) returns (UpdateMaterialsInUseResponse);
+    rpc DeleteMaterialsInUse (DeleteMaterialsInUseRequest) returns (DeleteMaterialsInUseResponse);
+}
+
+message GetAllMaterialsInUsesRequest {
+    string filter = 1;
+    int32 financially_responsible_person_id = 2;
+}
+
+message GetAllMaterialsInUsesResponse {
+    repeated MaterialsInUse materials_in_use = 1;
+}
+
+message CreateMaterialsInUseRequest {
+    MaterialsInUse materials_in_use = 1;
+}
+
+message CreateMaterialsInUseResponse {
+    int32 id = 1;
+}
+
+message UploadMaterialsInUseRequest {
+	repeated MaterialsInUseForUpload materials_in_use = 1;
+}
+
+message UploadMaterialsInUseResponse {
+	bool success = 1;
+}
+
+message UpdateMaterialsInUseRequest {
+    MaterialsInUse materials_in_use = 1;
+}
+
+message UpdateMaterialsInUseResponse {
+    bool success = 1;
+}
+
+message DeleteMaterialsInUseRequest {
+    int32 id = 1;
+}
+
+message DeleteMaterialsInUseResponse {
+    bool success = 1;
+}
+
+message MaterialsInUseForUpload {
+    string document_number = 2;
+    string date = 3;
+    double quantity = 4;
+    string nomenclature_code = 5;
+    string nomenclature_name = 6;
+    string nomenclature_article = 7;
+    string equipment_name = 8;
+    string equipment_code = 9;
+    string financially_responsible_person_full_name = 10;
+}
+
+message MaterialsInUse {
+    int32 id = 1;
+    string document_number = 2;
+    string date = 3;
+    double quantity = 4;
+    int32 nomenclature_id = 5;
+    MaterialsInUseNomenclature nomenclature = 6;
+    int32 equipment_id = 7;
+	MaterialsInUseEquipment equipment = 8;
+    int32 financially_responsible_person_id = 7;
+	MaterialsInUseDriver financially_responsible_person = 8;
+}
+
+message MaterialsInUseNomenclature {
+    int32 id = 1;
+    string code = 2;
+    string name = 3;
+    string article = 4;
+    string unit_of_measure = 5;
+}
+
+message MaterialsInUseEquipment {
+    int32 id = 1;
+    string name = 2;
+    string license_plate = 3;
+    string code = 4;
+    string short_name = 5;
+    MaterialsInUseEquipmentGroup equipment_group = 6;
+}
+
+message MaterialsInUseEquipmentGroup {
+    int32 id = 1;
+    string name = 2;   
+}
+
+message MaterialsInUseDriver {
+    int32 id = 1;
+    string full_name = 2;
+    string short_name = 3;
+    string position = 4;
+    string code = 5;
+}

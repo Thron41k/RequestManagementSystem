@@ -25,7 +25,7 @@ public class DefectPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         templateSheet.Cells[11, 3].Value = data.EndDate.ToString("d MMMM yyyyг.", new CultureInfo("ru-RU"));
         templateSheet.Cells[22, 3].Value = data.Frp?.ShortName;
         var grouped = data.Expenses
-            .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 2 && e.Defect.Id != 3 && e.Defect.DefectGroupId != 15 && e.Defect.DefectGroupId != 16)
+            .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 2 && e.Defect.Id != 3 && e.Defect.DefectGroupId != 15 && e.Defect.DefectGroupId != 16 && e.Defect.DefectGroupId != 19)
             .GroupBy(e => e.Code!)
             .OrderBy(g => g.Key)
             .ToList();

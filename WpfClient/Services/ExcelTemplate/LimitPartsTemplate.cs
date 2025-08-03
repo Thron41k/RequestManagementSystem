@@ -27,7 +27,7 @@ public class LimitPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
         templateSheet.Cells[12, 3].Value = $"за период c {data.StartDate:dd.MM.yyyy} по {data.EndDate:dd.MM.yyyy}";
         templateSheet.Cells[20, 8].Value = data.Frp?.ShortName;
         var grouped = data.Expenses
-            .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 2 && e.Defect.Id != 3 && e.Defect.DefectGroupId != 15 && e.Defect.DefectGroupId != 16)
+            .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id != 2 && e.Defect.Id != 3 && e.Defect.DefectGroupId != 15 && e.Defect.DefectGroupId != 16 && e.Defect.DefectGroupId != 19)
             .GroupBy(e => e.Code!)
             .OrderBy(g => g.Key)
             .ToList();
