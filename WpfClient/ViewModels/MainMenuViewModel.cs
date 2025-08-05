@@ -16,6 +16,9 @@ public class MainMenuViewModel
     private readonly EquipmentViewModel _equipmentViewModel;
     private readonly DriverViewModel _driverViewModel;
     private readonly EquipmentGroupViewModel _equipmentGroupViewModel;
+    private readonly MaterialsInUseLoadViewModel _materialsInUseLoadViewModel;
+    private readonly MaterialInUseListViewModel _materialInUseListViewModel;
+    private readonly AddMaterialsInUseToOffViewModel _addMaterialsInUseToOffViewModel;
     private readonly DefectGroupViewModel _defectGroupViewModel;
     private readonly DefectViewModel _defectViewModel;
     private readonly WarehouseViewModel _warehouseViewModel;
@@ -50,8 +53,33 @@ public class MainMenuViewModel
     public ICommand ShowNomenclatureAnalogCommand { get; }
     public ICommand ShowIncomingDataLoadingCommand { get; }
     public ICommand ShowSparePartsOwnershipCommand { get; }
+    public ICommand ShowMaterialsInUseLoadingCommand { get; }
+    public ICommand ShowMaterialInUseListCommand { get; }
 
-    public MainMenuViewModel(SparePartsOwnershipViewModel sparePartsOwnershipViewModel, EquipmentViewModel equipmentViewModel, DriverViewModel driverViewModel, DefectGroupViewModel defectGroupViewModel, DefectViewModel defectViewModel, WarehouseViewModel warehouseViewModel, NomenclatureViewModel nomenclatureViewModel, IMessageBus messageBus, StockViewModel stockViewModel, ExpenseViewModel expenseViewModel, ExpenseListViewModel expenseListViewModel, RequestManagement.WpfClient.ViewModels.IncomingListViewModel incomingListViewModel, StartDataLoadViewModel startDataLoadViewModel, CommissionsViewModel commissionsViewModel, PrintReportViewModel printReportViewModel, ExpenseDataLoadViewModel expenseDataLoadViewModel, SparePartsAnalogsViewModel sparePartsAnalogsViewModel, IncomingDataLoadViewModel incomingDataLoadViewModel, LabelCountSelectorViewModel labelCountSelectorViewModel, LabelPrintListViewModel labelPrintListViewModel, EquipmentGroupViewModel equipmentGroupViewModel)
+    public MainMenuViewModel(SparePartsOwnershipViewModel sparePartsOwnershipViewModel,
+        EquipmentViewModel equipmentViewModel,
+        DriverViewModel driverViewModel,
+        DefectGroupViewModel defectGroupViewModel,
+        DefectViewModel defectViewModel,
+        WarehouseViewModel warehouseViewModel,
+        NomenclatureViewModel nomenclatureViewModel,
+        IMessageBus messageBus,
+        StockViewModel stockViewModel,
+        ExpenseViewModel expenseViewModel,
+        ExpenseListViewModel expenseListViewModel,
+        IncomingListViewModel incomingListViewModel,
+        StartDataLoadViewModel startDataLoadViewModel,
+        CommissionsViewModel commissionsViewModel,
+        PrintReportViewModel printReportViewModel,
+        ExpenseDataLoadViewModel expenseDataLoadViewModel,
+        SparePartsAnalogsViewModel sparePartsAnalogsViewModel,
+        IncomingDataLoadViewModel incomingDataLoadViewModel,
+        LabelCountSelectorViewModel labelCountSelectorViewModel,
+        LabelPrintListViewModel labelPrintListViewModel,
+        EquipmentGroupViewModel equipmentGroupViewModel,
+        MaterialsInUseLoadViewModel materialsInUseLoadViewModel,
+        MaterialInUseListViewModel materialInUseListViewModel,
+        AddMaterialsInUseToOffViewModel addMaterialsInUseToOffViewModel)
     {
         _sparePartsOwnershipViewModel = sparePartsOwnershipViewModel;
         _equipmentViewModel = equipmentViewModel;
@@ -74,12 +102,16 @@ public class MainMenuViewModel
         _labelCountSelectorViewModel = labelCountSelectorViewModel;
         _labelPrintListViewModel = labelPrintListViewModel;
         _equipmentGroupViewModel = equipmentGroupViewModel;
+        _materialsInUseLoadViewModel = materialsInUseLoadViewModel;
+        _materialInUseListViewModel = materialInUseListViewModel;
+        _addMaterialsInUseToOffViewModel = addMaterialsInUseToOffViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
         _messageBus.Subscribe<ShowTaskPrintDialogMessageExpense>(OnShowPrintDialogExpense);
         _messageBus.Subscribe<ShowTaskPrintDialogMessageIncoming>(OnShowPrintDialogIncoming);
         _messageBus.Subscribe<ShowResultMessage>(OnShowResultMessageDialog);
+        _messageBus.Subscribe<ShowResultMessageForMaterialsInUse>(OnShowResultMessageForMaterialsInUseDialog);
         ShowEquipmentCommand = new RelayCommand(ShowEquipment);
         ShowDriverCommand = new RelayCommand(ShowDriver);
         ShowDefectGroupCommand = new RelayCommand(ShowDefectGroup);
@@ -96,6 +128,45 @@ public class MainMenuViewModel
         ShowNomenclatureAnalogCommand = new RelayCommand(ShowNomenclatureAnalog);
         ShowIncomingDataLoadingCommand = new RelayCommand(ShowIncomingDataLoading);
         ShowSparePartsOwnershipCommand = new RelayCommand(ShowSparePartsOwnership);
+        ShowMaterialsInUseLoadingCommand = new RelayCommand(ShowMaterialsInUseLoading);
+        ShowMaterialInUseListCommand = new RelayCommand(ShowMaterialInUseList);
+    }
+
+    private Task OnShowResultMessageForMaterialsInUseDialog(ShowResultMessageForMaterialsInUse arg)
+    {
+        if (arg.Message == MessagesEnum.ShowAddMaterialsInUseToOffView && arg.Caller == typeof(AddMaterialsInUseToOffViewModel))
+        {
+            ShowAddMaterialsInUseToOffViewDialog(arg.DocumentNumber, arg.Reason, arg.DocumentDate, arg.Caller);
+        }
+        return Task.CompletedTask;
+    }
+
+    private void ShowMaterialInUseList()
+    {
+        var materialInUseListView = new MaterialInUseListView(_materialInUseListViewModel);
+        var window = new Window
+        {
+            Content = materialInUseListView,
+            Title = "Материалы в эксплуатации",
+            Width = 820,
+            Height = 710
+        };
+        window.ShowDialog();
+    }
+
+    private void ShowMaterialsInUseLoading()
+    {
+        var materialsInUseLoadView = new MaterialsInUseLoadView(_materialsInUseLoadViewModel);
+        var window = new Window
+        {
+            Content = materialsInUseLoadView,
+            Title = "Загрузка начальной эксплуатации",
+            Width = 520,
+            Height = 310,
+            ResizeMode = ResizeMode.NoResize
+        };
+        _materialsInUseLoadViewModel.Init();
+        window.ShowDialog();
     }
 
     private void ShowSparePartsOwnership()
@@ -124,6 +195,31 @@ public class MainMenuViewModel
             ShowLabelPrintListViewDialog(arg.Items, arg.Caller);
         }
         return Task.CompletedTask;
+    }
+
+
+    private void ShowAddMaterialsInUseToOffViewDialog(string documentNumber, string reason, DateTime documentDate, Type argCaller)
+    {
+        var addMaterialsInUseToOffView = new AddMaterialsInUseToOffView(_addMaterialsInUseToOffViewModel);
+        var window = new Window
+        {
+            Content = addMaterialsInUseToOffView,
+            Title = "Списание материалов в эксплуатацию",
+            Width = 400,
+            Height = 180
+        };
+        _addMaterialsInUseToOffViewModel.Init(documentNumber, reason, documentDate);
+        window.ShowDialog();
+        if (_addMaterialsInUseToOffViewModel.DialogResult)
+        {
+            _messageBus.Publish(
+                new ShowResultMessageForMaterialsInUse(
+                    MessagesEnum.ShowAddMaterialsInUseToOffView,
+                    argCaller,
+                    _addMaterialsInUseToOffViewModel.DocumentNumber,
+                    _addMaterialsInUseToOffViewModel.Reason,
+                    _addMaterialsInUseToOffViewModel.DocumentDate));
+        }
     }
 
     private void ShowLabelPrintListViewDialog(List<Incoming> labelList, Type argCaller)

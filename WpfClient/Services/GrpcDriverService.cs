@@ -2,6 +2,7 @@
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
+using Driver = RequestManagement.Common.Models.Driver;
 
 namespace RequestManagement.WpfClient.Services;
 
@@ -53,5 +54,24 @@ internal class GrpcDriverService(IGrpcClientFactory clientFactory, AuthTokenStor
         var client = clientFactory.CreateDriverClient();
         var result = await client.DeleteDriverAsync(new DeleteDriverRequest { Id = id }, headers);
         return result.Success;
+    }
+
+    public async Task<Driver> GetOrCreateDriverAsync(string requestFullName, string requestCode)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateDriverClient();
+        var result = await client.GetOrCreateDriverAsync(new GetOrCreateDriverRequest { FullName = requestFullName, Code = requestCode }, headers); 
+        return new Driver
+        {
+            Id = result.Driver.Id, 
+            FullName = result.Driver.FullName, 
+            ShortName = result.Driver.ShortName, 
+            Position = result.Driver.Position, 
+            Code = result.Driver.Code
+        };
     }
 }

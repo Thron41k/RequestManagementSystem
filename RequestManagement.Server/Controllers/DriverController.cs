@@ -36,8 +36,35 @@ public class DriverController(IDriverService driverService, ILogger<DriverContro
         return response;
     }
 
+    public override async Task<GetOrCreateDriverResponse> GetOrCreateDriver(GetOrCreateDriverRequest request,
+        ServerCallContext context)
+    {
+        var user = context.GetHttpContext().User;
+        if (user.Identity is { IsAuthenticated: false })
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+        }
+        _logger.LogInformation("Get or create new driver with full name: {Name}", request.FullName);
+        var driver = await _requestService.GetOrCreateDriverAsync(request.FullName, request.Code);
+        return new GetOrCreateDriverResponse
+        {
+            Driver = new Driver
+            {
+                Id = driver.Id,
+                FullName = driver.FullName,
+                ShortName = driver.ShortName,
+                Position = driver.Position,
+                Code = driver.Code
+            }
+        };
+    }
     public override async Task<CreateDriverResponse> CreateDriver(CreateDriverRequest request, ServerCallContext context)
     {
+        var user = context.GetHttpContext().User;
+        if (user.Identity is { IsAuthenticated: false })
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+        }
         _logger.LogInformation("Creating new driver with full name and position: {Name} - {Position}", request.Driver.FullName, request.Driver.Position);
 
         var driver = new RequestManagement.Common.Models.Driver
@@ -54,6 +81,11 @@ public class DriverController(IDriverService driverService, ILogger<DriverContro
 
     public override async Task<UpdateDriverResponse> UpdateDriver(UpdateDriverRequest request, ServerCallContext context)
     {
+        var user = context.GetHttpContext().User;
+        if (user.Identity is { IsAuthenticated: false })
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+        }
         _logger.LogInformation("Updating driver with ID: {Id}", request.Driver.Id);
 
         var driver = new RequestManagement.Common.Models.Driver
@@ -71,6 +103,11 @@ public class DriverController(IDriverService driverService, ILogger<DriverContro
 
     public override async Task<DeleteDriverResponse> DeleteDriver(DeleteDriverRequest request, ServerCallContext context)
     {
+        var user = context.GetHttpContext().User;
+        if (user.Identity is { IsAuthenticated: false })
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+        }
         _logger.LogInformation("Deleting driver with ID: {Id}", request.Id);
 
         var success = await _requestService.DeleteDriverAsync(request.Id);

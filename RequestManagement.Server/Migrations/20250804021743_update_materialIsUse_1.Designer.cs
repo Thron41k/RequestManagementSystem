@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RequestManagement.Server.Data;
@@ -11,9 +12,11 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250804021743_update_materialIsUse_1")]
+    partial class update_materialIsUse_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -505,22 +508,15 @@ namespace RequestManagement.Server.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("DateForWriteOff")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("DocumentNumberForWriteOff")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("EquipmentId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FinanciallyResponsiblePersonId")
+                    b.Property<int?>("FinanciallyResponsiblePersonId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsOut")
@@ -531,10 +527,6 @@ namespace RequestManagement.Server.Migrations
 
                     b.Property<decimal>("Quantity")
                         .HasColumnType("numeric(18,2)");
-
-                    b.Property<string>("ReasonForWriteOff")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -1026,8 +1018,7 @@ namespace RequestManagement.Server.Migrations
                     b.HasOne("RequestManagement.Common.Models.Driver", "FinanciallyResponsiblePerson")
                         .WithMany()
                         .HasForeignKey("FinanciallyResponsiblePersonId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("RequestManagement.Common.Models.Nomenclature", "Nomenclature")
                         .WithMany()

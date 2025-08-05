@@ -23,5 +23,6 @@ public enum MessagesEnum
     ShowLabelPrintListViewDialog,
     UpdateLabelPrintList,
     EquipmentGroupUpdated,
-    SelectEquipmentGroup
+    SelectEquipmentGroup,
+    ShowAddMaterialsInUseToOffView
 }

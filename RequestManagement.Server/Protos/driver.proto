@@ -7,10 +7,11 @@ service DriverService {
     rpc CreateDriver (CreateDriverRequest) returns (CreateDriverResponse);
     rpc UpdateDriver (UpdateDriverRequest) returns (UpdateDriverResponse);
     rpc DeleteDriver (DeleteDriverRequest) returns (DeleteDriverResponse);
+    rpc GetOrCreateDriver (GetOrCreateDriverRequest) returns (GetOrCreateDriverResponse);
 }
 
 message GetAllDriversRequest {
-    string filter = 1; // Фильтр для поиска по имени или должности
+    string filter = 1;
 }
 
 message GetAllDriversResponse {
@@ -22,7 +23,16 @@ message CreateDriverRequest {
 }
 
 message CreateDriverResponse {
-    int32 id = 1; // ID созданного водителя
+    int32 id = 1;
+}
+
+message GetOrCreateDriverRequest {
+    string full_name = 1;  
+    string code = 2;
+}
+
+message GetOrCreateDriverResponse {
+    Driver driver = 1;
 }
 
 message UpdateDriverRequest {
@@ -43,8 +53,8 @@ message DeleteDriverResponse {
 
 message Driver {
     int32 id = 1;
-    string full_name = 2;   // Полное ФИО
-    string short_name = 3;  // Фамилия с инициалами
-    string position = 4;    // Должность
+    string full_name = 2;  
+    string short_name = 3; 
+    string position = 4;    
     string code = 5;
 }

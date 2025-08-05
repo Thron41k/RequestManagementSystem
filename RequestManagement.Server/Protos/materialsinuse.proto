@@ -10,12 +10,12 @@ service MaterialsInUseService {
     rpc DeleteMaterialsInUse (DeleteMaterialsInUseRequest) returns (DeleteMaterialsInUseResponse);
 }
 
-message GetAllMaterialsInUsesRequest {
+message GetAllMaterialsInUseRequest {
     string filter = 1;
     int32 financially_responsible_person_id = 2;
 }
 
-message GetAllMaterialsInUsesResponse {
+message GetAllMaterialsInUseResponse {
     repeated MaterialsInUse materials_in_use = 1;
 }
 
@@ -58,9 +58,11 @@ message MaterialsInUseForUpload {
     string nomenclature_code = 5;
     string nomenclature_name = 6;
     string nomenclature_article = 7;
-    string equipment_name = 8;
-    string equipment_code = 9;
-    string financially_responsible_person_full_name = 10;
+    string nomenclature_unit_of_measure = 8;
+    string equipment_name = 9;
+    string equipment_code = 10;
+    string financially_responsible_person_full_name = 11;
+    string financially_responsible_person_full_code = 12;
 }
 
 message MaterialsInUse {
@@ -72,8 +74,12 @@ message MaterialsInUse {
     MaterialsInUseNomenclature nomenclature = 6;
     int32 equipment_id = 7;
 	MaterialsInUseEquipment equipment = 8;
-    int32 financially_responsible_person_id = 7;
-	MaterialsInUseDriver financially_responsible_person = 8;
+    int32 financially_responsible_person_id = 9;
+	MaterialsInUseDriver financially_responsible_person = 10;
+    bool is_out = 11;
+    string reason_for_write_off = 12;
+    string document_number_for_write_off = 13;
+    string date_for_write_off = 14;
 }
 
 message MaterialsInUseNomenclature {

@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="RequestManagement.WpfClient.Views.MaterialInUseListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RequestManagement.WpfClient.Views"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:RequestManagement.WpfClient.ViewModels.Behaviors"
+             xmlns:validationRules="clr-namespace:RequestManagement.WpfClient.ViewModels.ValidationRules"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="15,20,15,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="120"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" >
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
+                <TextBox materialDesign:HintAssist.Hint="МОЛ" 
+                         Margin="0,0,0,0"
+                         Tag="{Binding ClearSelectedFinanciallyResponsiblePersonCommand}" 
+                         IsReadOnly="True" 
+                         materialDesign:ValidationAssist.UsePopup="True"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         materialDesign:HintAssist.HintPaddingBrush="White"
+                         materialDesign:HintAssist.FloatingScale="1"
+                         FontSize="14"
+                         AcceptsReturn="True"
+                         Width="450" 
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                    <TextBox.Text>
+                        <Binding
+                            Path="SelectedFinanciallyResponsiblePerson.FullName"
+                            Mode="TwoWay"
+                            UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <validationRules:NotEmptyDriverNameValidationRule
+                                    ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                    <b:Interaction.Behaviors>
+                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectFinanciallyResponsiblePersonCommand}" />
+                    </b:Interaction.Behaviors>
+                </TextBox>
+                <TextBox materialDesign:HintAssist.Hint="Поиск техники" 
+                         FontSize="14"
+                         materialDesign:HintAssist.FloatingScale="1"
+                         Margin="0,10,0,0" 
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         materialDesign:HintAssist.HintPaddingBrush="White"
+                         Text="{Binding FilterEquipmentText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                </TextBox>
+            </StackPanel>
+        </Grid>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding EquipmentViewSource.View}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="0,10,0,10" CanUserResizeRows="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Название" Binding="{Binding Name}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Гос.номер" Binding="{Binding StateNumber}" IsReadOnly="True" Width="120"/>
+                <DataGridTextColumn Header="Код" Binding="{Binding Code}" IsReadOnly="True" Width="120"/>
+            </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <MouseBinding
+                    MouseAction="LeftClick"
+                    Command="{Binding EquipmentSelectByClickCommand}"/>
+            </DataGrid.InputBindings>
+        </DataGrid>
+        <GridSplitter Grid.Row="2" ShowsPreview="False" Height="6"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkBlue"/>
+        <DataGrid Grid.Row="3" Margin="0,10,0,0" ItemsSource="{Binding MaterialsInUseViewSource.View}"  SelectedItem="{Binding SelectedMaterialsInUse}" AutoGenerateColumns="False" CanUserResizeRows="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Nomenclature.Name}" IsReadOnly="True" Width="*"/>
+                <DataGridTextColumn Header="Артикул" Binding="{Binding Nomenclature.Article}" IsReadOnly="True" Width="Auto"/>
+                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="Auto"/>
+                <DataGridTextColumn Header="Документ передачи" Binding="{Binding DocumentNumber}" IsReadOnly="True" Width="Auto"/>
+                <DataGridTextColumn Header="Дата передачи" Binding="{Binding Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="Auto"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

@@ -8,4 +8,5 @@ public interface IDriverService
     Task<int> CreateDriverAsync(Driver driver);
     Task<bool> UpdateDriverAsync(Driver driver);
     Task<bool> DeleteDriverAsync(int id);
+    Task<Driver> GetOrCreateDriverAsync(string requestFullName, string requestCode);
 }

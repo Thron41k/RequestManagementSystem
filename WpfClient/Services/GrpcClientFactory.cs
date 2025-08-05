@@ -74,4 +74,9 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     {
         return serviceProvider.GetRequiredService<SparePartsOwnershipService.SparePartsOwnershipServiceClient>();
     }
+
+    public MaterialsInUseService.MaterialsInUseServiceClient CreateMaterialsInUseClient()
+    {
+        return serviceProvider.GetRequiredService<MaterialsInUseService.MaterialsInUseServiceClient>();
+    }
 }

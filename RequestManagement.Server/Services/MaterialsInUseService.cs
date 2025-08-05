@@ -35,18 +35,40 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
     {
         if (materialsInUse.Count == 0)
             return false;
-
-        foreach (var item in materialsInUse)
+        var validItems = materialsInUse
+            .Where(i => DateTime.TryParse(i.Date, out _))
+            .Select(i =>
+            {
+                i.Date = DateTime.Parse(i.Date).ToString("yyyy-MM-dd");
+                return i;
+            })
+            .ToList();
+        if (validItems.Count == 0)
+            return false;
+        var nomenclatureCodes = validItems.Select(i => i.NomenclatureCode).Distinct().ToList();
+        var equipmentCodes = validItems.Select(i => i.EquipmentCode).Distinct().ToList();
+        var molNames = validItems
+            .Where(i => !string.IsNullOrWhiteSpace(i.FinanciallyResponsiblePersonFullName))
+            .Select(i => i.FinanciallyResponsiblePersonFullName)
+            .Distinct()
+            .ToList();
+        var nomenclatures = await _dbContext.Nomenclatures
+            .Where(n => nomenclatureCodes.Contains(n.Code))
+            .ToDictionaryAsync(n => n.Code);
+        var equipments = await _dbContext.Equipments
+            .Where(e => equipmentCodes.Contains(e.Code))
+            .ToDictionaryAsync(e => e.Code);
+        var molList = await _dbContext.Set<Driver>()
+            .Where(d => molNames.Contains(d.FullName))
+            .ToDictionaryAsync(d => d.FullName);
+        var newNomenclatures = new List<Nomenclature>();
+        var newEquipments = new List<Equipment>();
+        var newMolList = new List<Driver>();
+        var newMaterialsInUse = new List<MaterialsInUse>();
+        foreach (var item in validItems)
         {
-            // Парсинг даты
-            if (!DateTime.TryParse(item.Date, out var parsedDate))
-                continue; // Логирование ошибки возможно
-
-            // Проверка номенклатуры
-            var nomenclature = await _dbContext.Nomenclatures
-                .FirstOrDefaultAsync(n => n.Code == item.NomenclatureCode);
-
-            if (nomenclature is null)
+            var date = DateTime.Parse(item.Date);
+            if (!nomenclatures.TryGetValue(item.NomenclatureCode, out var nomenclature))
             {
                 nomenclature = new Nomenclature
                 {
@@ -55,35 +77,23 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
                     Article = item.NomenclatureArticle,
                     UnitOfMeasure = item.NomenclatureUnitOfMeasure
                 };
-
-                _dbContext.Nomenclatures.Add(nomenclature);
-                await _dbContext.SaveChangesAsync(); // нужно сохранить, чтобы получить Id
+                newNomenclatures.Add(nomenclature);
+                nomenclatures[item.NomenclatureCode] = nomenclature;
             }
-
-            // Проверка техники
-            var equipment = await _dbContext.Equipments
-                .FirstOrDefaultAsync(e => e.Code == item.EquipmentCode);
-
-            if (equipment is null)
+            if (!equipments.TryGetValue(item.EquipmentCode, out var equipment))
             {
                 equipment = new Equipment
                 {
                     Code = item.EquipmentCode,
                     Name = item.EquipmentName
                 };
-
-                _dbContext.Equipments.Add(equipment);
-                await _dbContext.SaveChangesAsync();
+                newEquipments.Add(equipment);
+                equipments[item.EquipmentCode] = equipment;
             }
-
-            // Проверка МОЛ
             Driver? mol = null;
             if (!string.IsNullOrWhiteSpace(item.FinanciallyResponsiblePersonFullName))
             {
-                mol = await _dbContext.Set<Driver>()
-                    .FirstOrDefaultAsync(d => d.FullName == item.FinanciallyResponsiblePersonFullName);
-
-                if (mol is null)
+                if (!molList.TryGetValue(item.FinanciallyResponsiblePersonFullName, out mol))
                 {
                     mol = new Driver
                     {
@@ -92,39 +102,50 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
                         Position = "",
                         Code = ""
                     };
-
-                    _dbContext.Set<Driver>().Add(mol);
-                    await _dbContext.SaveChangesAsync();
+                    newMolList.Add(mol);
+                    molList[item.FinanciallyResponsiblePersonFullName] = mol;
                 }
             }
-
-            // Проверка на дублирование записи
             var exists = await _dbContext.Set<MaterialsInUse>().AnyAsync(mu =>
                 mu.DocumentNumber == item.DocumentNumber &&
-                mu.Date == parsedDate &&
-                mu.NomenclatureId == nomenclature.Id &&
-                mu.EquipmentId == equipment.Id &&
-                mu.FinanciallyResponsiblePersonId == mol!.Id);
-
+                mu.Date == date &&
+                mu.Nomenclature.Code == item.NomenclatureCode &&
+                mu.Equipment!.Code == item.EquipmentCode &&
+                mu.FinanciallyResponsiblePerson.FullName == mol!.FullName);
             if (!exists)
             {
-                var newEntry = new MaterialsInUse
+                newMaterialsInUse.Add(new MaterialsInUse
                 {
                     DocumentNumber = item.DocumentNumber,
-                    Date = parsedDate,
+                    Date = date,
                     Quantity = item.Quantity,
-                    NomenclatureId = nomenclature.Id,
-                    EquipmentId = equipment.Id,
-                    FinanciallyResponsiblePersonId = mol?.Id
-                };
-
-                _dbContext.Set<MaterialsInUse>().Add(newEntry);
+                    Nomenclature = nomenclature,
+                    Equipment = equipment,
+                    FinanciallyResponsiblePerson = mol!
+                });
             }
         }
-
+        if (newNomenclatures.Count > 0)
+            await _dbContext.Nomenclatures.AddRangeAsync(newNomenclatures);
+        if (newEquipments.Count > 0)
+            await _dbContext.Equipments.AddRangeAsync(newEquipments);
+        if (newMolList.Count > 0)
+            await _dbContext.Set<Driver>().AddRangeAsync(newMolList);
         await _dbContext.SaveChangesAsync();
+        if (newMaterialsInUse.Count > 0)
+        {
+            foreach (var entry in newMaterialsInUse)
+            {
+                entry.NomenclatureId = entry.Nomenclature.Id;
+                entry.EquipmentId = entry.Equipment!.Id;
+                entry.FinanciallyResponsiblePersonId = entry.FinanciallyResponsiblePerson.Id;
+            }
+            await _dbContext.Set<MaterialsInUse>().AddRangeAsync(newMaterialsInUse);
+            await _dbContext.SaveChangesAsync();
+        }
         return true;
     }
+
 
 
     public async Task<bool> UpdateMaterialsInUseAsync(MaterialsInUse materialsInUse)
@@ -141,7 +162,11 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         existMaterialsInUse.Quantity = materialsInUse.Quantity;
         existMaterialsInUse.NomenclatureId = materialsInUse.NomenclatureId;
         existMaterialsInUse.EquipmentId = materialsInUse.EquipmentId;
+        existMaterialsInUse.IsOut = materialsInUse.IsOut;
         existMaterialsInUse.FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId;
+        existMaterialsInUse.ReasonForWriteOff = materialsInUse.ReasonForWriteOff;
+        existMaterialsInUse.DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff;
+        existMaterialsInUse.DateForWriteOff = materialsInUse.DateForWriteOff;
         await _dbContext.SaveChangesAsync();
         return true;
     }

@@ -18,4 +18,5 @@ public interface IGrpcClientFactory
     DefectGroupService.DefectGroupServiceClient CreateDefectGroupClient();
     EquipmentGroupService.EquipmentGroupServiceClient CreateEquipmentGroupClient();
     SparePartsOwnershipService.SparePartsOwnershipServiceClient CreateSparePartsOwnershipClient();
+    MaterialsInUseService.MaterialsInUseServiceClient CreateMaterialsInUseClient();
 }

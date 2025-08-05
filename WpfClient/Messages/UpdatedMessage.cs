@@ -56,3 +56,12 @@ public class ShowResultMessage(MessagesEnum message, Type caller,List<Incoming> 
     public Type Caller { get; } = caller;
     public List<Incoming> Items { get; } = items;
 }
+
+public class ShowResultMessageForMaterialsInUse(MessagesEnum message, Type caller, string reason, string documentNumber, DateTime documentDate)
+{
+    public MessagesEnum Message { get; } = message;
+    public Type Caller { get; } = caller;
+    public string Reason { get; } = reason;
+    public string DocumentNumber { get; } = documentNumber;
+    public DateTime DocumentDate { get; } = documentDate;
+}

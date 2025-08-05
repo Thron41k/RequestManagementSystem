@@ -32,11 +32,13 @@
                 <MenuItem Header="Движения">
                     <MenuItem Header="Приходы" Command="{Binding ShowIncomingListCommand}"/>
                     <MenuItem Header="Расходы" Command="{Binding ShowExpensesCommand}"/>
+                    <MenuItem Header="Материалы в эксплуатации" Command="{Binding ShowMaterialInUseListCommand}"/>
                 </MenuItem>
                 <MenuItem Header="Администратирование">
                     <MenuItem Header="Загрузка начальных остатков" Command="{Binding ShowStartDataLoadingCommand}"/>
                     <MenuItem Header="Загрузка расходов" Command="{Binding ShowExpensesDataLoadingCommand}"/>
                     <MenuItem Header="Загрузка приходов" Command="{Binding ShowIncomingDataLoadingCommand}"/>
+                    <MenuItem Header="Загрузка начальной эксплуатации" Command="{Binding ShowMaterialsInUseLoadingCommand}"/>
                 </MenuItem>
             </Menu>
             <materialDesign:Badged

@@ -33,6 +33,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<DefectGroupService.DefectGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
         serviceCollection.AddGrpcClient<EquipmentGroupService.EquipmentGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
         serviceCollection.AddGrpcClient<SparePartsOwnershipService.SparePartsOwnershipServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<MaterialsInUseService.MaterialsInUseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();
@@ -52,7 +53,6 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<IFileSaveDialogService, FileSaveDialogService>();
         serviceCollection.AddSingleton<IExcelPrintService, ExcelPrintService>();
 
-        serviceCollection.AddScoped<GrpcAuthService>();
         serviceCollection.AddScoped<LoginViewModel>();
         serviceCollection.AddScoped<EquipmentViewModel>();
         serviceCollection.AddScoped<MainMenuViewModel>();
@@ -75,6 +75,10 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<LabelCountSelectorViewModel>();
         serviceCollection.AddScoped<LabelPrintListViewModel>();
         serviceCollection.AddScoped<SparePartsOwnershipViewModel>();
+        serviceCollection.AddScoped<MaterialsInUseLoadViewModel>();
+        serviceCollection.AddScoped<MaterialInUseListViewModel>();
+
+        serviceCollection.AddScoped<GrpcAuthService>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
         serviceCollection.AddScoped<IDriverService, GrpcDriverService>();
         serviceCollection.AddScoped<IDefectService, GrpcDefectService>();
@@ -89,6 +93,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<IEquipmentGroupService, GrpcEquipmentGroupService>();
         serviceCollection.AddScoped<INomenclatureAnalogService, GrpcNomenclatureAnalogService>();
         serviceCollection.AddScoped<ISparePartsOwnershipService, GrpcSparePartsOwnershipService>();
+        serviceCollection.AddScoped<IMaterialsInUseService, GrpcMaterialsInUseService>();
 
         // Представления
         serviceCollection.AddTransient<MainWindow>();
@@ -113,6 +118,8 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<LabelCountSelectorView>();
         serviceCollection.AddTransient<LabelPrintListView>();
         serviceCollection.AddTransient<SparePartsOwnershipView>();
+        serviceCollection.AddTransient<MaterialsInUseLoadView>();
+        serviceCollection.AddTransient<MaterialInUseListView>();
 
         return serviceCollection.BuildServiceProvider();
     }

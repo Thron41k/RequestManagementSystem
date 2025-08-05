@@ -79,6 +79,7 @@
     <Protobuf Include="..\RequestManagement.Server\Protos\defectgroup.proto" GrpcServices="Client" Link="Protos\defectgroup.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\equipmentgroups.proto" GrpcServices="Client" Link="Protos\equipmentgroups.proto" />
     <Protobuf Include="..\RequestManagement.Server\Protos\sparepartsownership.proto" GrpcServices="Client" Link="Protos\sparepartsownership.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\materialsinuse.proto" GrpcServices="Client" Link="Protos\materialsinuse.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,6 +98,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\ExpenseListView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\MaterialsInUseLoadView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\StockView.xaml.cs">

@@ -75,4 +75,19 @@ public class DriverService(ApplicationDbContext dbContext) : IDriverService
             return false;
         }
     }
+
+    public async Task<Driver> GetOrCreateDriverAsync(string requestFullName, string requestCode)
+    {
+        var driver = await _dbContext.Drivers
+            .FirstOrDefaultAsync(e => e.FullName == requestFullName && e.Code == requestCode);
+        if (driver != null) return driver;
+        driver = new Driver
+        {
+            FullName = requestFullName,
+            Code = requestCode
+        };
+        await _dbContext.Drivers.AddAsync(driver);
+        await _dbContext.SaveChangesAsync();
+        return driver;
+    }
 }
