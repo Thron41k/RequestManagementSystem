@@ -29,6 +29,7 @@ builder.Services.AddScoped<IDefectService, DefectService>();
 builder.Services.AddScoped<IEquipmentGroupService, EquipmentGroupService>();
 builder.Services.AddScoped<ISparePartsOwnershipService, SparePartsOwnershipService>();
 builder.Services.AddScoped<IMaterialsInUseService, MaterialsInUseService>();
+builder.Services.AddScoped<IReasonsForWritingOffMaterialsFromOperationService, ReasonsForWritingOffMaterialsFromOperationService>();
 
 // Настройка JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException());
@@ -74,5 +75,6 @@ app.MapGrpcService<RequestManagement.Server.Controllers.DefectGroupController>()
 app.MapGrpcService<RequestManagement.Server.Controllers.EquipmentGroupController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.SparePartsOwnershipController>();
 app.MapGrpcService<RequestManagement.Server.Controllers.MaterialsInUseController>();
+app.MapGrpcService<RequestManagement.Server.Controllers.ReasonsForWritingOffMaterialsFromOperationController>();
 
 app.Run();

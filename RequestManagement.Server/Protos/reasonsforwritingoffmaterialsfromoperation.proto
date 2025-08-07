@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option csharp_namespace = "RequestManagement.Server.Controllers";
+
+service ReasonsForWritingOffMaterialsFromOperationService {
+    rpc GetAllReasonsForWritingOffMaterialsFromOperation (GetAllReasonsForWritingOffMaterialsFromOperationRequest) returns (GetAllReasonsForWritingOffMaterialsFromOperationResponse);
+    rpc CreateReasonsForWritingOffMaterialsFromOperation (CreateReasonsForWritingOffMaterialsFromOperationRequest) returns (CreateReasonsForWritingOffMaterialsFromOperationResponse);
+    rpc UpdateReasonsForWritingOffMaterialsFromOperation (UpdateReasonsForWritingOffMaterialsFromOperationRequest) returns (UpdateReasonsForWritingOffMaterialsFromOperationResponse);
+    rpc DeleteReasonsForWritingOffMaterialsFromOperation (DeleteReasonsForWritingOffMaterialsFromOperationRequest) returns (DeleteReasonsForWritingOffMaterialsFromOperationResponse);
+}
+
+message GetAllReasonsForWritingOffMaterialsFromOperationRequest{
+    string filter = 1;
+}
+
+message GetAllReasonsForWritingOffMaterialsFromOperationResponse{
+	repeated ReasonsForWritingOffMaterialsFromOperation reasonsForWritingOffMaterialsFromOperation = 1;
+}
+
+message CreateReasonsForWritingOffMaterialsFromOperationRequest{
+    ReasonsForWritingOffMaterialsFromOperation reasonsForWritingOffMaterialsFromOperation = 1;
+}
+
+message CreateReasonsForWritingOffMaterialsFromOperationResponse{
+	 int32 id = 1;
+}
+
+message UpdateReasonsForWritingOffMaterialsFromOperationRequest{
+	ReasonsForWritingOffMaterialsFromOperation reasonsForWritingOffMaterialsFromOperation = 1;
+}
+
+message UpdateReasonsForWritingOffMaterialsFromOperationResponse{
+	bool success = 1;
+}
+
+message DeleteReasonsForWritingOffMaterialsFromOperationRequest{
+	int32 id = 1;
+}
+
+message DeleteReasonsForWritingOffMaterialsFromOperationResponse{
+	bool success = 1;
+}
+
+message ReasonsForWritingOffMaterialsFromOperation {
+    int32 id = 1;
+    string reason = 2;
+}

@@ -12,8 +12,8 @@ using RequestManagement.Server.Data;
 namespace RequestManagement.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250803092933_add material_in_use")]
-    partial class addmaterial_in_use
+    [Migration("20250807035945_v1")]
+    partial class v1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -497,6 +497,60 @@ namespace RequestManagement.Server.Migrations
                     b.ToTable("Incomings");
                 });
 
+            modelBuilder.Entity("RequestManagement.Common.Models.MaterialsInUse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DateForWriteOff")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DocumentNumberForWriteOff")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FinanciallyResponsiblePersonId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsOut")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("NomenclatureId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("ReasonForWriteOffId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EquipmentId");
+
+                    b.HasIndex("FinanciallyResponsiblePersonId");
+
+                    b.HasIndex("NomenclatureId");
+
+                    b.HasIndex("ReasonForWriteOffId");
+
+                    b.ToTable("MaterialsInUse");
+                });
+
             modelBuilder.Entity("RequestManagement.Common.Models.Nomenclature", b =>
                 {
                     b.Property<int>("Id")
@@ -596,6 +650,32 @@ namespace RequestManagement.Server.Migrations
                     b.HasIndex("UserId", "NomenclatureId");
 
                     b.ToTable("NomenclatureDefectMappings");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.ReasonsForWritingOffMaterialsFromOperation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Reason");
+
+                    b.ToTable("ReasonsForWritingOffMaterialsFromOperation");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Reason = ""
+                        });
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.RefreshToken", b =>
@@ -963,6 +1043,41 @@ namespace RequestManagement.Server.Migrations
                     b.Navigation("InWarehouse");
 
                     b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.MaterialsInUse", b =>
+                {
+                    b.HasOne("RequestManagement.Common.Models.Equipment", "Equipment")
+                        .WithMany()
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RequestManagement.Common.Models.Driver", "FinanciallyResponsiblePerson")
+                        .WithMany()
+                        .HasForeignKey("FinanciallyResponsiblePersonId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.HasOne("RequestManagement.Common.Models.Nomenclature", "Nomenclature")
+                        .WithMany()
+                        .HasForeignKey("NomenclatureId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RequestManagement.Common.Models.ReasonsForWritingOffMaterialsFromOperation", "ReasonForWriteOff")
+                        .WithMany()
+                        .HasForeignKey("ReasonForWriteOffId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Equipment");
+
+                    b.Navigation("FinanciallyResponsiblePerson");
+
+                    b.Navigation("Nomenclature");
+
+                    b.Navigation("ReasonForWriteOff");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.NomenclatureAnalog", b =>

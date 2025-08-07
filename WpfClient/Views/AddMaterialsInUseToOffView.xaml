@@ -7,18 +7,19 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:RequestManagement.WpfClient.ViewModels.Behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:validationRules="clr-namespace:RequestManagement.WpfClient.ViewModels.ValidationRules"
              mc:Ignorable="d" 
              d:DesignHeight="180" d:DesignWidth="400">
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,0">
                 <TextBox 
                     materialDesign:HintAssist.Hint="Номер документа"
                     Text="{Binding DocumentNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Width="250"
                     FontSize="14"
                     materialDesign:HintAssist.FloatingScale="1"
-                    Margin="10,5,5,5" 
+                    Margin="10,10,5,5" 
                     materialDesign:TextFieldAssist.HasClearButton="True"
                     materialDesign:HintAssist.HintPaddingBrush="White"
                     Tag="{Binding ClearEquipmentLicensePlateCommand}" 
@@ -37,20 +38,27 @@
                             materialDesign:HintAssist.Hint="Дата"
                             Style="{StaticResource MaterialDesignOutlinedDatePicker}"/>
             </StackPanel>
-            <TextBox 
-                HorizontalAlignment="Left"
-                materialDesign:HintAssist.Hint="Причина списания материалов из эксплуатации"
-                Text="{Binding Reason, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Width="380"
-                FontSize="14"
-                materialDesign:HintAssist.FloatingScale="1"
-                Margin="10,5,10,5" 
-                materialDesign:TextFieldAssist.HasClearButton="True"
-                materialDesign:HintAssist.HintPaddingBrush="White"
-                Tag="{Binding ClearEquipmentLicensePlateCommand}" 
-                Style="{StaticResource MaterialDesignOutlinedTextBox}">
+
+            <TextBox materialDesign:HintAssist.Hint="Причина списания материалов из эксплуатации" 
+                     Margin="10,15,10,5" 
+                     Tag="{Binding ClearSelectedFinanciallyResponsiblePersonCommand}" 
+                     IsReadOnly="True" 
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     FontSize="14"
+                     Width="380"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="Reason.Reason"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                    </Binding>
+                </TextBox.Text>
                 <b:Interaction.Behaviors>
-                    <behaviors:MouseClickCommandBehavior/>
+                    <behaviors:MouseClickCommandBehavior Command="{Binding SelectReasonsForWritingOffMaterialsFromOperationCommand}" />
                 </b:Interaction.Behaviors>
             </TextBox>
             <Button Content="Сохранить" Command="{Binding SaveResultCommand}" Margin="10"/>

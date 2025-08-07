@@ -33,6 +33,7 @@ public partial class MaterialInUseListViewModel : ObservableObject
         _messageBus = messageBus;
         _materialsInUseService = materialsInUseService;
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
+        _messageBus.Subscribe<ShowResultMessageForMaterialsInUse>(OnShow);
         _dispatcher = Dispatcher.CurrentDispatcher;
         _equipmentViewSource = new CollectionViewSource { Source = EquipmentList };
         _materialsInUseViewSource = new CollectionViewSource { Source = MaterialsInUsetList };
@@ -41,6 +42,22 @@ public partial class MaterialInUseListViewModel : ObservableObject
         {
             await _dispatcher.InvokeAsync(async () => { await LoadEquipmentAsync(); });
         };
+    }
+
+    private async Task OnShow(ShowResultMessageForMaterialsInUse arg)
+    {
+        if (arg.Caller != typeof(MaterialInUseListViewModel)) return;
+        switch (arg.Message)
+        {
+            case MessagesEnum.ShowAddMaterialsInUseToOffViewResult:
+                if (SelectedMaterialsInUse == null) break;
+                SelectedMaterialsInUse.ReasonForWriteOff = arg.Reason;
+                SelectedMaterialsInUse.DocumentNumberForWriteOff = arg.DocumentNumber;
+                SelectedMaterialsInUse.DateForWriteOff = arg.DocumentDate;
+                await _materialsInUseService.UpdateMaterialsInUseAsync(SelectedMaterialsInUse);
+                MaterialsInUseViewSource.View.Refresh();
+                break;
+        }
     }
 
     partial void OnSelectedFinanciallyResponsiblePersonChanged(Driver? value)
@@ -61,7 +78,7 @@ public partial class MaterialInUseListViewModel : ObservableObject
         await _dispatcher.InvokeAsync(() =>
         {
             EquipmentList = new ObservableCollection<Equipment>(
-                _materialsInUseList.Select(x => x.Equipment).GroupBy(x=>x.Id).Select(g=>g.First()).ToList());
+                _materialsInUseList.Select(x => x.Equipment).GroupBy(x => x.Id).Select(g => g.First()).ToList());
             EquipmentViewSource.Source = EquipmentList;
             return Task.CompletedTask;
         });
@@ -102,5 +119,17 @@ public partial class MaterialInUseListViewModel : ObservableObject
     private void EquipmentSelectByClick()
     {
         UpdateMaterialsInUseList();
+    }
+
+    [RelayCommand]
+    private async Task MaterialsInUseDoubleClick()
+    {
+        if (SelectedMaterialsInUse == null) return;
+        await _messageBus.Publish(new ShowResultMessageForMaterialsInUse(
+            MessagesEnum.ShowAddMaterialsInUseToOffView, 
+            typeof(MaterialInUseListViewModel), 
+            SelectedMaterialsInUse.DocumentNumberForWriteOff,
+            SelectedMaterialsInUse.ReasonForWriteOff,
+            SelectedMaterialsInUse.DateForWriteOff));
     }
 }

@@ -24,5 +24,8 @@ public enum MessagesEnum
     UpdateLabelPrintList,
     EquipmentGroupUpdated,
     SelectEquipmentGroup,
-    ShowAddMaterialsInUseToOffView
+    ShowAddMaterialsInUseToOffView,
+    ShowAddMaterialsInUseToOffViewResult,
+    SelectReasonsForWritingOffMaterialsFromOperation,
+    ResultReasonsForWritingOffMaterialsFromOperation
 }

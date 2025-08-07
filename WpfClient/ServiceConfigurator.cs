@@ -34,6 +34,7 @@ public class ServiceConfigurator
         serviceCollection.AddGrpcClient<EquipmentGroupService.EquipmentGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
         serviceCollection.AddGrpcClient<SparePartsOwnershipService.SparePartsOwnershipServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
         serviceCollection.AddGrpcClient<MaterialsInUseService.MaterialsInUseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<ReasonsForWritingOffMaterialsFromOperationService.ReasonsForWritingOffMaterialsFromOperationServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();
@@ -77,6 +78,8 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<SparePartsOwnershipViewModel>();
         serviceCollection.AddScoped<MaterialsInUseLoadViewModel>();
         serviceCollection.AddScoped<MaterialInUseListViewModel>();
+        serviceCollection.AddScoped<AddMaterialsInUseToOffViewModel>();
+        serviceCollection.AddScoped<ReasonsForWritingOffMaterialsFromOperationViewModel>();
 
         serviceCollection.AddScoped<GrpcAuthService>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
@@ -94,6 +97,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<INomenclatureAnalogService, GrpcNomenclatureAnalogService>();
         serviceCollection.AddScoped<ISparePartsOwnershipService, GrpcSparePartsOwnershipService>();
         serviceCollection.AddScoped<IMaterialsInUseService, GrpcMaterialsInUseService>();
+        serviceCollection.AddScoped<IReasonsForWritingOffMaterialsFromOperationService, GrpcReasonsForWritingOffMaterialsFromOperationService>();
 
         // Представления
         serviceCollection.AddTransient<MainWindow>();
@@ -120,6 +124,8 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<SparePartsOwnershipView>();
         serviceCollection.AddTransient<MaterialsInUseLoadView>();
         serviceCollection.AddTransient<MaterialInUseListView>();
+        serviceCollection.AddTransient<AddMaterialsInUseToOffView>();
+        serviceCollection.AddTransient<ReasonsForWritingOffMaterialsFromOperationView>();
 
         return serviceCollection.BuildServiceProvider();
     }

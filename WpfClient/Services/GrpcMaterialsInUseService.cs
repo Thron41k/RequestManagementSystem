@@ -45,9 +45,14 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                 EquipmentId = materialsInUse.EquipmentId,
                 FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId,
                 IsOut = materialsInUse.IsOut,
-                ReasonForWriteOff = materialsInUse.ReasonForWriteOff,
+                MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperationId = materialsInUse.ReasonForWriteOffId,
+                MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation = new MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation
+                {
+                    Id = materialsInUse.ReasonForWriteOff.Id,
+                    Reason = materialsInUse.ReasonForWriteOff.Reason
+                },
                 DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff,
-                DateForWriteOff = materialsInUse.DateForWriteOff.ToString()
+                DateForWriteOff = materialsInUse.DateForWriteOff.ToString("yyyy-MM-dd")
             }
         }, headers);
         return result.Id;
@@ -95,11 +100,17 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                 Id = materialsInUse.Id,
                 Date = materialsInUse.Date.ToString(CultureInfo.CurrentCulture),
                 Quantity = (double)materialsInUse.Quantity,
+                DocumentNumber =  materialsInUse.DocumentNumber,
                 NomenclatureId = materialsInUse.NomenclatureId,
                 EquipmentId = materialsInUse.EquipmentId,
                 FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId,
-                IsOut = materialsInUse.IsOut,
-                ReasonForWriteOff = materialsInUse.ReasonForWriteOff,
+                IsOut = materialsInUse.IsOut, 
+                MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperationId = materialsInUse.ReasonForWriteOffId,
+                MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation = new MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation
+                {
+                    Id = materialsInUse.ReasonForWriteOff.Id,
+                    Reason = materialsInUse.ReasonForWriteOff.Reason
+                },
                 DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff,
                 DateForWriteOff = materialsInUse.DateForWriteOff.ToString()
             }

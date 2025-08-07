@@ -51,7 +51,15 @@ public static class MaterialsInUseConverter
                 Position = entity.FinanciallyResponsiblePerson.Position,
                 Code = entity.FinanciallyResponsiblePerson.Code
             },
-            IsOut = entity.IsOut
+            IsOut = entity.IsOut,
+            MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperationId = entity.ReasonForWriteOff.Id,
+            MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation = new MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation
+            {
+                Id = entity.ReasonForWriteOff.Id,
+                Reason = entity.ReasonForWriteOff.Reason
+            },
+            DateForWriteOff = entity.DateForWriteOff.ToString("yyyy-MM-dd"),
+            DocumentNumberForWriteOff = entity.DocumentNumberForWriteOff
         };
     }
 }

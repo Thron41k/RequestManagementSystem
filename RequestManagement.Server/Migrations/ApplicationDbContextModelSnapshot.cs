@@ -505,7 +505,7 @@ namespace RequestManagement.Server.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("DateForWriteOff")
+                    b.Property<DateTime>("DateForWriteOff")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DocumentNumber")
@@ -532,9 +532,8 @@ namespace RequestManagement.Server.Migrations
                     b.Property<decimal>("Quantity")
                         .HasColumnType("numeric(18,2)");
 
-                    b.Property<string>("ReasonForWriteOff")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("ReasonForWriteOffId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -543,6 +542,8 @@ namespace RequestManagement.Server.Migrations
                     b.HasIndex("FinanciallyResponsiblePersonId");
 
                     b.HasIndex("NomenclatureId");
+
+                    b.HasIndex("ReasonForWriteOffId");
 
                     b.ToTable("MaterialsInUse");
                 });
@@ -646,6 +647,32 @@ namespace RequestManagement.Server.Migrations
                     b.HasIndex("UserId", "NomenclatureId");
 
                     b.ToTable("NomenclatureDefectMappings");
+                });
+
+            modelBuilder.Entity("RequestManagement.Common.Models.ReasonsForWritingOffMaterialsFromOperation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Reason");
+
+                    b.ToTable("ReasonsForWritingOffMaterialsFromOperation");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Reason = ""
+                        });
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.RefreshToken", b =>
@@ -1035,11 +1062,19 @@ namespace RequestManagement.Server.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("RequestManagement.Common.Models.ReasonsForWritingOffMaterialsFromOperation", "ReasonForWriteOff")
+                        .WithMany()
+                        .HasForeignKey("ReasonForWriteOffId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Equipment");
 
                     b.Navigation("FinanciallyResponsiblePerson");
 
                     b.Navigation("Nomenclature");
+
+                    b.Navigation("ReasonForWriteOff");
                 });
 
             modelBuilder.Entity("RequestManagement.Common.Models.NomenclatureAnalog", b =>

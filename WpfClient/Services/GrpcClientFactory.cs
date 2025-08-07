@@ -79,4 +79,9 @@ public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFa
     {
         return serviceProvider.GetRequiredService<MaterialsInUseService.MaterialsInUseServiceClient>();
     }
+
+    public ReasonsForWritingOffMaterialsFromOperationService.ReasonsForWritingOffMaterialsFromOperationServiceClient CreateReasonsForWritingOffMaterialsFromOperationClient()
+    {
+        return serviceProvider.GetRequiredService<ReasonsForWritingOffMaterialsFromOperationService.ReasonsForWritingOffMaterialsFromOperationServiceClient>();
+    }
 }

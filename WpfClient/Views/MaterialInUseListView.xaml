@@ -78,7 +78,16 @@
                 <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="Auto"/>
                 <DataGridTextColumn Header="Документ передачи" Binding="{Binding DocumentNumber}" IsReadOnly="True" Width="Auto"/>
                 <DataGridTextColumn Header="Дата передачи" Binding="{Binding Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="Auto"/>
+                <DataGridTextColumn Header="Срок использования (мес.)" Binding="{Binding ServiceLife}" IsReadOnly="True" Width="Auto"/>
+                <DataGridTextColumn Header="Документ списания" Binding="{Binding DocumentNumberForWriteOff}" IsReadOnly="True" Width="Auto"/>
+                <DataGridTextColumn Header="Дата списания" Binding="{Binding DateForList}" IsReadOnly="True" Width="Auto"/>
+                <DataGridTextColumn Header="Причина списания" Binding="{Binding ReasonForWriteOff.Reason}" IsReadOnly="True" Width="Auto"/>
             </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <MouseBinding
+                    MouseAction="LeftDoubleClick"
+                    Command="{Binding MaterialsInUseDoubleClickCommand}"/>
+            </DataGrid.InputBindings>
         </DataGrid>
     </Grid>
 </UserControl>

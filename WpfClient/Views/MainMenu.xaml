@@ -27,6 +27,7 @@
                     <MenuItem Header="Номенклатура" Command="{Binding ShowNomenclatureCommand}"/>
                     <MenuItem Header="Комиссия" Command="{Binding ShowCommissionsCommand}"/>
                     <MenuItem Header="Аналоги" Command="{Binding ShowNomenclatureAnalogCommand}"/>
+                    <MenuItem Header="Причины списания материалов из эксплуатации" Command="{Binding ShowReasonsForWritingOffMaterialsFromOperationCommand}"/>
                     <MenuItem Header="Принадлежность номенклатуры" Command="{Binding ShowSparePartsOwnershipCommand}"/>
                 </MenuItem>
                 <MenuItem Header="Движения">

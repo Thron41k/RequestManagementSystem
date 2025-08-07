@@ -17,12 +17,8 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
         {
             throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
         }
-
         _logger.LogInformation("Getting all materialsInUses by filter");
-
         var materialsInUseList = await _materialsInUseService.GetAllMaterialsInUseAsync(request.FinanciallyResponsiblePersonId, request.Filter);
-        var response = new GetAllMaterialsInUseResponse();
-
         return MaterialsInUseConverter.ToGrpc(materialsInUseList);
     }
 
@@ -64,7 +60,11 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
             EquipmentId = request.MaterialsInUse.EquipmentId,
             FinanciallyResponsiblePersonId = request.MaterialsInUse.FinanciallyResponsiblePersonId,
             IsOut = request.MaterialsInUse.IsOut,
-            ReasonForWriteOff = request.MaterialsInUse.ReasonForWriteOff,
+            ReasonForWriteOff = new Common.Models.ReasonsForWritingOffMaterialsFromOperation
+            {
+                Id = request.MaterialsInUse.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Id,
+                Reason = request.MaterialsInUse.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
+            },
             DocumentNumberForWriteOff = request.MaterialsInUse.DocumentNumberForWriteOff,
             DateForWriteOff = DateTime.Parse(request.MaterialsInUse.DateForWriteOff)
         };
@@ -75,7 +75,6 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
     public override async Task<UpdateMaterialsInUseResponse> UpdateMaterialsInUse(UpdateMaterialsInUseRequest request, ServerCallContext context)
     {
         _logger.LogInformation("Updating materialsInUse with ID: {Id}", request.MaterialsInUse.Id);
-
         var materialsInUse = new Common.Models.MaterialsInUse
         {
             Id = request.MaterialsInUse.Id,
@@ -86,11 +85,15 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
             EquipmentId = request.MaterialsInUse.EquipmentId,
             FinanciallyResponsiblePersonId = request.MaterialsInUse.FinanciallyResponsiblePersonId,
             IsOut = request.MaterialsInUse.IsOut,
-            ReasonForWriteOff = request.MaterialsInUse.ReasonForWriteOff,
+            ReasonForWriteOffId = request.MaterialsInUse.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Id,
+            ReasonForWriteOff = new Common.Models.ReasonsForWritingOffMaterialsFromOperation
+            {
+                Id = request.MaterialsInUse.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Id,
+                Reason = request.MaterialsInUse.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
+            },
             DocumentNumberForWriteOff = request.MaterialsInUse.DocumentNumberForWriteOff,
             DateForWriteOff = DateTime.Parse(request.MaterialsInUse.DateForWriteOff)
         };
-
         var success = await _materialsInUseService.UpdateMaterialsInUseAsync(materialsInUse);
         return new UpdateMaterialsInUseResponse { Success = success };
     }
@@ -98,7 +101,6 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
     public override async Task<DeleteMaterialsInUseResponse> DeleteMaterialsInUse(DeleteMaterialsInUseRequest request, ServerCallContext context)
     {
         _logger.LogInformation("Deleting materialsInUse with ID: {Id}", request.Id);
-
         var success = await _materialsInUseService.DeleteMaterialsInUseAsync(request.Id);
         return new DeleteMaterialsInUseResponse { Success = success };
     }

@@ -44,7 +44,15 @@ public static class MaterialsInUseConverter
                 Position = proto.FinanciallyResponsiblePerson.Position,
                 Code = proto.FinanciallyResponsiblePerson.Code
             },
-            IsOut = proto.IsOut
+            IsOut = proto.IsOut,
+            DocumentNumberForWriteOff = proto.DocumentNumberForWriteOff,
+            ReasonForWriteOffId = proto.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperationId,
+            ReasonForWriteOff = new RequestManagement.Common.Models.ReasonsForWritingOffMaterialsFromOperation
+            {
+                Id = proto.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Id,
+                Reason = proto.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
+            },
+            DateForWriteOff = proto.DateForWriteOff == "" ? DateTime.MinValue : DateTime.Parse(proto.DateForWriteOff)
         }).ToList();
     }
 }

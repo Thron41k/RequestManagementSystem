@@ -77,9 +77,10 @@ message MaterialsInUse {
     int32 financially_responsible_person_id = 9;
 	MaterialsInUseDriver financially_responsible_person = 10;
     bool is_out = 11;
-    string reason_for_write_off = 12;
-    string document_number_for_write_off = 13;
-    string date_for_write_off = 14;
+    string document_number_for_write_off = 12;
+    string date_for_write_off = 13;
+    int32 materials_in_use_driver_reasons_for_writing_off_materials_from_operation_id = 14;
+    MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation materials_in_use_driver_reasons_for_writing_off_materials_from_operation = 15;
 }
 
 message MaterialsInUseNomenclature {
@@ -110,4 +111,9 @@ message MaterialsInUseDriver {
     string short_name = 3;
     string position = 4;
     string code = 5;
+}
+
+message MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation{
+	int32 id = 1;
+	string reason = 2;
 }

@@ -24,8 +24,11 @@ namespace RequestManagement.Common.Models
         public Equipment? Equipment { get; set; } = null;
         public Driver FinanciallyResponsiblePerson { get; set; } = null!;
         public int FinanciallyResponsiblePersonId { get; set; } = 1;
-        public string ReasonForWriteOff { get; set; } = "";
+        public int ReasonForWriteOffId { get; set; } = 1;
+        public ReasonsForWritingOffMaterialsFromOperation ReasonForWriteOff { get; set; } = null!;
         public string DocumentNumberForWriteOff { get; set; } = "";
-        public DateTime? DateForWriteOff { get; set; }
+        public DateTime DateForWriteOff { get; set; }
+        [NotMapped] public string DateForList => DateForWriteOff == DateTime.MinValue ? "" : DateForWriteOff.ToString("dd.MM.yyyy");
+        [NotMapped] public string ServiceLife => ((DateTime.Now.Year - Date.Year) * 12 + DateTime.Now.Month - Date.Month - 1).ToString();
     }
 }

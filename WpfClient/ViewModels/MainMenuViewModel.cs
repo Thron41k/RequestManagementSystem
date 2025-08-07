@@ -19,6 +19,7 @@ public class MainMenuViewModel
     private readonly MaterialsInUseLoadViewModel _materialsInUseLoadViewModel;
     private readonly MaterialInUseListViewModel _materialInUseListViewModel;
     private readonly AddMaterialsInUseToOffViewModel _addMaterialsInUseToOffViewModel;
+    private readonly ReasonsForWritingOffMaterialsFromOperationViewModel _reasonsForWritingOffMaterialsFromOperationViewModel;
     private readonly DefectGroupViewModel _defectGroupViewModel;
     private readonly DefectViewModel _defectViewModel;
     private readonly WarehouseViewModel _warehouseViewModel;
@@ -55,6 +56,7 @@ public class MainMenuViewModel
     public ICommand ShowSparePartsOwnershipCommand { get; }
     public ICommand ShowMaterialsInUseLoadingCommand { get; }
     public ICommand ShowMaterialInUseListCommand { get; }
+    public ICommand ShowReasonsForWritingOffMaterialsFromOperationCommand { get; }
 
     public MainMenuViewModel(SparePartsOwnershipViewModel sparePartsOwnershipViewModel,
         EquipmentViewModel equipmentViewModel,
@@ -79,7 +81,8 @@ public class MainMenuViewModel
         EquipmentGroupViewModel equipmentGroupViewModel,
         MaterialsInUseLoadViewModel materialsInUseLoadViewModel,
         MaterialInUseListViewModel materialInUseListViewModel,
-        AddMaterialsInUseToOffViewModel addMaterialsInUseToOffViewModel)
+        AddMaterialsInUseToOffViewModel addMaterialsInUseToOffViewModel,
+        ReasonsForWritingOffMaterialsFromOperationViewModel reasonsForWritingOffMaterialsFromOperationViewModel)
     {
         _sparePartsOwnershipViewModel = sparePartsOwnershipViewModel;
         _equipmentViewModel = equipmentViewModel;
@@ -105,6 +108,7 @@ public class MainMenuViewModel
         _materialsInUseLoadViewModel = materialsInUseLoadViewModel;
         _materialInUseListViewModel = materialInUseListViewModel;
         _addMaterialsInUseToOffViewModel = addMaterialsInUseToOffViewModel;
+        _reasonsForWritingOffMaterialsFromOperationViewModel = reasonsForWritingOffMaterialsFromOperationViewModel;
         StockControlProperty = new StockView(_stockViewModel, true);
         _messageBus.Subscribe<SelectTaskMessage>(OnSelect);
         _messageBus.Subscribe<ShowTaskMessage>(OnShowDialog);
@@ -130,11 +134,12 @@ public class MainMenuViewModel
         ShowSparePartsOwnershipCommand = new RelayCommand(ShowSparePartsOwnership);
         ShowMaterialsInUseLoadingCommand = new RelayCommand(ShowMaterialsInUseLoading);
         ShowMaterialInUseListCommand = new RelayCommand(ShowMaterialInUseList);
+        ShowReasonsForWritingOffMaterialsFromOperationCommand = new RelayCommand(ShowReasonsForWritingOffMaterialsFromOperation);
     }
 
     private Task OnShowResultMessageForMaterialsInUseDialog(ShowResultMessageForMaterialsInUse arg)
     {
-        if (arg.Message == MessagesEnum.ShowAddMaterialsInUseToOffView && arg.Caller == typeof(AddMaterialsInUseToOffViewModel))
+        if (arg.Message == MessagesEnum.ShowAddMaterialsInUseToOffView && arg.Caller == typeof(MaterialInUseListViewModel))
         {
             ShowAddMaterialsInUseToOffViewDialog(arg.DocumentNumber, arg.Reason, arg.DocumentDate, arg.Caller);
         }
@@ -198,23 +203,24 @@ public class MainMenuViewModel
     }
 
 
-    private void ShowAddMaterialsInUseToOffViewDialog(string documentNumber, string reason, DateTime documentDate, Type argCaller)
+    private void ShowAddMaterialsInUseToOffViewDialog(string documentNumber, ReasonsForWritingOffMaterialsFromOperation reason, DateTime documentDate, Type argCaller)
     {
         var addMaterialsInUseToOffView = new AddMaterialsInUseToOffView(_addMaterialsInUseToOffViewModel);
         var window = new Window
         {
             Content = addMaterialsInUseToOffView,
             Title = "Списание материалов в эксплуатацию",
-            Width = 400,
-            Height = 180
+            Width = 420,
+            Height = 280,
+            ResizeMode = ResizeMode.NoResize
         };
-        _addMaterialsInUseToOffViewModel.Init(documentNumber, reason, documentDate);
+        _addMaterialsInUseToOffViewModel.Init(reason, documentNumber, documentDate);
         window.ShowDialog();
         if (_addMaterialsInUseToOffViewModel.DialogResult)
         {
             _messageBus.Publish(
                 new ShowResultMessageForMaterialsInUse(
-                    MessagesEnum.ShowAddMaterialsInUseToOffView,
+                    MessagesEnum.ShowAddMaterialsInUseToOffViewResult,
                     argCaller,
                     _addMaterialsInUseToOffViewModel.DocumentNumber,
                     _addMaterialsInUseToOffViewModel.Reason,
@@ -454,6 +460,9 @@ public class MainMenuViewModel
             case MessagesEnum.SelectCommissions:
                 ShowCommissions(false, arg.Caller);
                 break;
+            case MessagesEnum.SelectReasonsForWritingOffMaterialsFromOperation:
+                ShowReasonsForWritingOffMaterialsFromOperation(false, arg.Caller);
+                break;
         }
 
         return Task.CompletedTask;
@@ -617,6 +626,34 @@ public class MainMenuViewModel
                     }));
     }
 
+    private void ShowReasonsForWritingOffMaterialsFromOperation()
+    {
+        ShowReasonsForWritingOffMaterialsFromOperation(true);
+    }
+
+    private void ShowReasonsForWritingOffMaterialsFromOperation(bool editMode, Type? argCaller = null)
+    {
+        var reasonsForWritingOffMaterialsFromOperationView = new ReasonsForWritingOffMaterialsFromOperationView(_reasonsForWritingOffMaterialsFromOperationViewModel, editMode);
+        var window = new Window
+        {
+            Content = reasonsForWritingOffMaterialsFromOperationView,
+            Title = "Причины списания материалов из эксплуатации",
+            Width = 770,
+            Height = 600
+        };
+        _ = _reasonsForWritingOffMaterialsFromOperationViewModel.Load();
+        _reasonsForWritingOffMaterialsFromOperationViewModel.EditMode = editMode;
+        window.ShowDialog();
+        if (_reasonsForWritingOffMaterialsFromOperationViewModel.SelectedReasonsForWritingOffMaterialsFromOperation != null && 
+            argCaller != null && _reasonsForWritingOffMaterialsFromOperationViewModel.DialogResult)
+            _messageBus.Publish(
+                new SelectResultMessage(
+                    MessagesEnum.ResultReasonsForWritingOffMaterialsFromOperation, argCaller, new ReasonsForWritingOffMaterialsFromOperation
+                    {
+                        Id = _reasonsForWritingOffMaterialsFromOperationViewModel.SelectedReasonsForWritingOffMaterialsFromOperation.Id,
+                        Reason = _reasonsForWritingOffMaterialsFromOperationViewModel.SelectedReasonsForWritingOffMaterialsFromOperation.Reason
+                    }));
+    }
     private void ShowEquipmentGroup(bool editMode, Type? argCaller = null)
     {
         var equipmentGroupView = new EquipmentGroupView(_equipmentGroupViewModel, editMode);

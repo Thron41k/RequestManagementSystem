@@ -19,4 +19,5 @@ public interface IGrpcClientFactory
     EquipmentGroupService.EquipmentGroupServiceClient CreateEquipmentGroupClient();
     SparePartsOwnershipService.SparePartsOwnershipServiceClient CreateSparePartsOwnershipClient();
     MaterialsInUseService.MaterialsInUseServiceClient CreateMaterialsInUseClient();
+    ReasonsForWritingOffMaterialsFromOperationService.ReasonsForWritingOffMaterialsFromOperationServiceClient CreateReasonsForWritingOffMaterialsFromOperationClient();
 }

@@ -25,7 +25,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Application> Applications { get; set; }
     public DbSet<SparePartsOwnership> SparePartsOwnerships { get; set; }
     public DbSet<MaterialsInUse> MaterialsInUse { get; set; }
-
+    public DbSet<ReasonsForWritingOffMaterialsFromOperation> ReasonsForWritingOffMaterialsFromOperation { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureUser(modelBuilder);
@@ -46,6 +46,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         ConfigureEquipmentGroup(modelBuilder);
         ConfigureEquipmentGroupNomenclature(modelBuilder);
         ConfigureMaterialsInUse(modelBuilder);
+        ConfigureReasonsForWritingOffMaterialsFromOperation(modelBuilder);
         SeedInitialData(modelBuilder);
     }
 
@@ -82,15 +83,31 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 .IsRequired();
 
             entity.HasOne(e => e.Equipment)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(e => e.EquipmentId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
 
             entity.HasOne(e => e.FinanciallyResponsiblePerson)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(e => e.FinanciallyResponsiblePersonId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.ReasonForWriteOff)
+                .WithMany()
+                .HasForeignKey(e => e.ReasonForWriteOffId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+    }
+
+    private void ConfigureReasonsForWritingOffMaterialsFromOperation(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ReasonsForWritingOffMaterialsFromOperation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Reason)
+                .IsRequired();
+            entity.HasIndex(e => e.Reason);
         });
     }
 
@@ -138,7 +155,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasMany(e => e.Equipments)
                 .WithOne(d => d.EquipmentGroup)
                 .HasForeignKey(d => d.EquipmentGroupId)
-                .IsRequired(false) 
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
         });
     }
@@ -573,5 +590,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 EquipmentId = 1
             }
         );
+
+        modelBuilder.Entity<ReasonsForWritingOffMaterialsFromOperation>().HasData(
+            new ReasonsForWritingOffMaterialsFromOperation { Id = 1, Reason = "" }
+            );
     }
 }

@@ -15,6 +15,7 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
             .Include(e => e.Nomenclature)
             .Include(e => e.Equipment)
             .Include(e => e.FinanciallyResponsiblePerson)
+            .Include(e => e.ReasonForWriteOff)
             .AsQueryable();
         if (!string.IsNullOrWhiteSpace(filter))
         {
@@ -139,6 +140,8 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
                 entry.NomenclatureId = entry.Nomenclature.Id;
                 entry.EquipmentId = entry.Equipment!.Id;
                 entry.FinanciallyResponsiblePersonId = entry.FinanciallyResponsiblePerson.Id;
+                entry.ReasonForWriteOffId = 1;
+                entry.DateForWriteOff = DateTime.MinValue;
             }
             await _dbContext.Set<MaterialsInUse>().AddRangeAsync(newMaterialsInUse);
             await _dbContext.SaveChangesAsync();
@@ -164,7 +167,7 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         existMaterialsInUse.EquipmentId = materialsInUse.EquipmentId;
         existMaterialsInUse.IsOut = materialsInUse.IsOut;
         existMaterialsInUse.FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId;
-        existMaterialsInUse.ReasonForWriteOff = materialsInUse.ReasonForWriteOff;
+        existMaterialsInUse.ReasonForWriteOffId = materialsInUse.ReasonForWriteOffId;
         existMaterialsInUse.DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff;
         existMaterialsInUse.DateForWriteOff = materialsInUse.DateForWriteOff;
         await _dbContext.SaveChangesAsync();
