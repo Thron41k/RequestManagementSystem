@@ -3,10 +3,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:OneCOverlayClient.Views"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignHeight="118" d:DesignWidth="669">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35">
+                <materialDesign:PackIcon Kind="ArrowLeftThick" Width="35" Height="35" Margin="-3,0,0,0">
+                </materialDesign:PackIcon>
+            </Button>
+            <TextBox materialDesign:HintAssist.Hint="Номер документа" 
+                     FontSize="14"
+                     Width="120"
+                     materialDesign:HintAssist.FloatingScale="0.8"
+                     Margin="10,0,10,0"
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+            <Button Width="280" Margin="0,0,10,0">
+            </Button>
+            <Button Width="100" Margin="0,0,10,0">
+            </Button>
+            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35">
+                <materialDesign:PackIcon Kind="ArrowLeftThick" Width="35" Height="35" RenderTransformOrigin="0.5,0.5">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="-1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+            </Button>
+            <Button Margin="10,0,0,0" Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35" Background="Red">
+                <materialDesign:PackIcon Kind="CloseCircleOutline" Width="35" Height="35" Margin="-1,-1,0,0">
+                </materialDesign:PackIcon>
+            </Button>
+        </StackPanel>
+        <StackPanel Grid.Row="1">
+        </StackPanel>
+        <StackPanel Grid.Row="2">
+        </StackPanel>
     </Grid>
 </UserControl>

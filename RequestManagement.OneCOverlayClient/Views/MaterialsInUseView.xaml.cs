@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using OneCOverlayClient.ViewModels;
 
 namespace OneCOverlayClient.Views
 {
@@ -20,9 +21,14 @@ namespace OneCOverlayClient.Views
     /// </summary>
     public partial class MaterialsInUseView : UserControl
     {
-        public MaterialsInUseView()
+        public MaterialsInUseView(MaterialsInUseViewModel viewModel)
         {
             InitializeComponent();
+            DataContext = viewModel;
+            if (DataContext == null)
+            {
+                MessageBox.Show("DataContext не установлен!");
+            }
         }
     }
 }

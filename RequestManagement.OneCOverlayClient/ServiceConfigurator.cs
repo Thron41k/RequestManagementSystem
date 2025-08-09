@@ -17,13 +17,9 @@ public class ServiceConfigurator
     public static IServiceProvider ConfigureServices()
     {
         var serviceCollection = new ServiceCollection();
-
-        // gRPC клиент с gRPC-Web поверх HTTP/1.1
         serviceCollection.AddSingleton(services =>
         {
             var httpClientHandler = new HttpClientHandler();
-
-            // gRPC-Web поверх HTTP/1.1
             var grpcWebHandler = new GrpcWebHandler(GrpcWebMode.GrpcWeb, httpClientHandler)
             {
                 GrpcWebMode = GrpcWebMode.GrpcWeb
@@ -32,17 +28,18 @@ public class ServiceConfigurator
             var channel = GrpcChannel.ForAddress($"http://{Vars.Server}:5001", new GrpcChannelOptions
             {
                 HttpHandler = grpcWebHandler,
-                HttpVersion = HttpVersion.Version11, // <-- теперь здесь
+                HttpVersion = HttpVersion.Version11,
                 HttpVersionPolicy = HttpVersionPolicy.RequestVersionOrLower
             });
-
             return new AuthService.AuthServiceClient(channel);
         });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddScoped<LoginViewModel>();
         serviceCollection.AddScoped<MainWindowViewModel>();
+        serviceCollection.AddScoped<MaterialsInUseViewModel>();
         serviceCollection.AddSingleton<AuthTokenStore>();
+        serviceCollection.AddSingleton<IWindowService, WindowService>();
         serviceCollection.AddSingleton<IMessageBus, MessageBusService>();
         serviceCollection.AddSingleton<IGrpcClientFactory, GrpcClientFactory>();
         serviceCollection.AddScoped<GrpcAuthService>();
@@ -50,6 +47,7 @@ public class ServiceConfigurator
         // Представления
         serviceCollection.AddTransient<LoginView>();
         serviceCollection.AddTransient<MainWindowView>();
+        serviceCollection.AddTransient<MaterialsInUseView>();
 
         return serviceCollection.BuildServiceProvider();
     }
