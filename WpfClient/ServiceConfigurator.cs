@@ -19,22 +19,22 @@ public class ServiceConfigurator
         var serviceCollection = new ServiceCollection();
 
         // gRPC клиенты
-        serviceCollection.AddGrpcClient<AuthService.AuthServiceClient>(o => {o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<NomenclatureService.NomenclatureServiceClient>(o => {o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<StockService.StockServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<WarehouseService.WarehouseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<CommissionsService.CommissionsServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<NomenclatureAnalogService.NomenclatureAnalogServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<EquipmentService.EquipmentServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<DriverService.DriverServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<DefectService.DefectServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<DefectGroupService.DefectGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<EquipmentGroupService.EquipmentGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<SparePartsOwnershipService.SparePartsOwnershipServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<MaterialsInUseService.MaterialsInUseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
-        serviceCollection.AddGrpcClient<ReasonsForWritingOffMaterialsFromOperationService.ReasonsForWritingOffMaterialsFromOperationServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:5001"); });
+        serviceCollection.AddGrpcClient<AuthService.AuthServiceClient>(o => {o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<NomenclatureService.NomenclatureServiceClient>(o => {o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<StockService.StockServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<ExpenseService.ExpenseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<IncomingService.IncomingServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<WarehouseService.WarehouseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<CommissionsService.CommissionsServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<NomenclatureAnalogService.NomenclatureAnalogServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<EquipmentService.EquipmentServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<DriverService.DriverServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<DefectService.DefectServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<DefectGroupService.DefectGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<EquipmentGroupService.EquipmentGroupServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<SparePartsOwnershipService.SparePartsOwnershipServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<MaterialsInUseService.MaterialsInUseServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
+        serviceCollection.AddGrpcClient<ReasonsForWritingOffMaterialsFromOperationService.ReasonsForWritingOffMaterialsFromOperationServiceClient>(o => { o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
 
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();

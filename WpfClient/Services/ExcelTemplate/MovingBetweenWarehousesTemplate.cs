@@ -2,6 +2,7 @@
 using OfficeOpenXml;
 using RequestManagement.Common.Utilities;
 using RequestManagement.WpfClient.Models.ExcelWriterModels;
+using RequestManagement.WpfClient.Utilities;
 using static RequestManagement.WpfClient.ViewModels.Helpers.ExcelColumnsWidth;
 
 namespace RequestManagement.WpfClient.Services.ExcelTemplate;

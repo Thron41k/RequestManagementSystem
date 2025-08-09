@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0-android</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\RequestManagement.Common\Utilities\*.cs" Link="Utilities\%(Filename)%(Extension)" />
+    <Compile Include="..\RequestManagement.Common\Interfaces\*.cs" Link="Interfaces\%(Filename)%(Extension)" />
+    <Compile Include="..\RequestManagement.Common\Models\**\*.cs" Link="Models\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

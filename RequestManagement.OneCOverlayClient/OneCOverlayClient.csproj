@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net9.0-windows10.0.26100.0</TargetFrameworks>
+    <RootNamespace>OneCOverlayClient</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.31.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.Client.Web" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MaterialDesignColors" Version="5.2.1" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="..\RequestManagement.Server\Protos\nomenclature.proto" GrpcServices="Client" Link="Protos\nomenclature.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\auth.proto" GrpcServices="Client" Link="Protos\auth.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\stock.proto" GrpcServices="Client" Link="Protos\stock.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\expense.proto" GrpcServices="Client" Link="Protos\expense.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\incoming.proto" GrpcServices="Client" Link="Protos\incoming.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\warehouse.proto" GrpcServices="Client" Link="Protos\warehouse.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\commissions.proto" GrpcServices="Client" Link="Protos\commissions.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\nomenclatureanalog.proto" GrpcServices="Client" Link="Protos\nomenclatureanalog.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\equipment.proto" GrpcServices="Client" Link="Protos\equipment.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\driver.proto" GrpcServices="Client" Link="Protos\driver.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\defect.proto" GrpcServices="Client" Link="Protos\defect.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\defectgroup.proto" GrpcServices="Client" Link="Protos\defectgroup.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\equipmentgroups.proto" GrpcServices="Client" Link="Protos\equipmentgroups.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\sparepartsownership.proto" GrpcServices="Client" Link="Protos\sparepartsownership.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\materialsinuse.proto" GrpcServices="Client" Link="Protos\materialsinuse.proto" />
+    <Protobuf Include="..\RequestManagement.Server\Protos\reasonsforwritingoffmaterialsfromoperation.proto" GrpcServices="Client" Link="Protos\reasonsforwritingoffmaterialsfromoperation.proto" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RequestManagement.Common\RequestManagement.Common.csproj" />
+  </ItemGroup>
+</Project>

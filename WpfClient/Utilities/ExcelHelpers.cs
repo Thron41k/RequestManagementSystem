@@ -1,8 +1,9 @@
 ﻿using System.Drawing;
 using System.Drawing.Text;
+using System.IO;
 using Font = System.Drawing.Font;
 
-namespace RequestManagement.Common.Utilities
+namespace RequestManagement.WpfClient.Utilities
 {
     public static class ExcelHelpers
     {

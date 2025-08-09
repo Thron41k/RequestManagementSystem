@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using RequestManagement.Common.Utilities;
 using RequestManagement.WpfClient.Models.ExcelWriterModels;
+using RequestManagement.WpfClient.Utilities;
 
 namespace RequestManagement.WpfClient.Services.ExcelTemplate;
 
