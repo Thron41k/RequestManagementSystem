@@ -1,13 +1,13 @@
-﻿using Grpc.Core;
+﻿using System.Globalization;
+using Grpc.Core;
+using OneCOverlayClient.Services.Interfaces;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
-using RequestManagement.WpfClient.Services.Interfaces;
-using System.Globalization;
-using static RequestManagement.WpfClient.Converters.MaterialsInUseConverter;
+using static OneCOverlayClient.Converters.MaterialsInUseConverter;
 using MaterialsInUse = RequestManagement.Common.Models.MaterialsInUse;
 using MaterialsInUseForUpload = RequestManagement.Common.Models.MaterialsInUseForUpload;
 
-namespace RequestManagement.WpfClient.Services;
+namespace OneCOverlayClient.Services;
 
 public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IMaterialsInUseService
 {
@@ -27,9 +27,20 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
         return FromGrpc(response.MaterialsInUse);
     }
 
-    public Task<List<MaterialsInUse>> GetAllMaterialsInUseForOffAsync(int financiallyResponsiblePersonId, DateTime date)
+    public async Task<List<MaterialsInUse>> GetAllMaterialsInUseForOffAsync(int financiallyResponsiblePersonId, DateTime date)
     {
-        throw new NotImplementedException();
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateMaterialsInUseClient();
+        var response = await client.GetAllMaterialsInUseForOffAsync(new GetAllMaterialsInUseForOffRequest
+        {
+            FinanciallyResponsiblePersonId = financiallyResponsiblePersonId,
+            DateForOff = date.ToString("yyyy-MM-dd")
+        }, headers);
+        return FromGrpc(response.MaterialsInUse);
     }
 
     public async Task<int> CreateMaterialsInUseAsync(MaterialsInUse materialsInUse)
@@ -118,7 +129,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                     Reason = materialsInUse.ReasonForWriteOff.Reason
                 },
                 DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff,
-                DateForWriteOff = materialsInUse.DateForWriteOff.ToString()
+                DateForWriteOff = materialsInUse.DateForWriteOff.ToString(CultureInfo.InvariantCulture)
             }
         }, headers);
         return result.Success;

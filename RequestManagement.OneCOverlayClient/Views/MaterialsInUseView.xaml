@@ -9,15 +9,16 @@
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
-            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35">
+            <Button Command="{Binding PrevEquipmentCommand}"
+                Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35">
                 <materialDesign:PackIcon Kind="ArrowLeftThick" Width="35" Height="35" Margin="-3,0,0,0">
                 </materialDesign:PackIcon>
             </Button>
             <TextBox materialDesign:HintAssist.Hint="Номер документа" 
+                     Text="{Binding MainSelectedMaterialsInUse.DocumentNumberForWriteOff}"
                      FontSize="14"
                      Width="120"
                      materialDesign:HintAssist.FloatingScale="0.8"
@@ -26,11 +27,12 @@
                      materialDesign:TextFieldAssist.HasClearButton="True"
                      materialDesign:HintAssist.HintPaddingBrush="White"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-            <Button Width="280" Margin="0,0,10,0">
+            <Button Width="280" Margin="0,0,10,0" Content="{Binding MainSelectedMaterialsInUse.Equipment.FullName}" >
             </Button>
-            <Button Width="100" Margin="0,0,10,0">
+            <Button Width="100" Margin="0,0,10,0" Content="{Binding MainSelectedMaterialsInUse.Equipment.Code}">
             </Button>
-            <Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35">
+            <Button Command="{Binding NextEquipmentCommand}"
+                    Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35">
                 <materialDesign:PackIcon Kind="ArrowLeftThick" Width="35" Height="35" RenderTransformOrigin="0.5,0.5">
                     <materialDesign:PackIcon.RenderTransform>
                         <TransformGroup>
@@ -42,14 +44,56 @@
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
             </Button>
-            <Button Margin="10,0,0,0" Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35" Background="Red">
+            <Button Margin="10,0,0,0" 
+                    Style="{StaticResource MaterialDesignFloatingActionLightButton}" 
+                    Width="35" Height="35" Background="Red"
+                    Command="{Binding CloseWindowCommand}">
                 <materialDesign:PackIcon Kind="CloseCircleOutline" Width="35" Height="35" Margin="-1,-1,0,0">
                 </materialDesign:PackIcon>
             </Button>
         </StackPanel>
-        <StackPanel Grid.Row="1">
-        </StackPanel>
-        <StackPanel Grid.Row="2">
-        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="599"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Height="60" Width="50" Style="{StaticResource MaterialDesignFlatLightBgButton}" Command="{Binding PrevItemCommand}">
+                <materialDesign:PackIcon Kind="ArrowExpandLeft" Width="35" Height="35" Margin="-15,0,0,0">
+                </materialDesign:PackIcon>
+            </Button>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Button Width="400" Margin="5,5,5,0" Content="{Binding SelectedMaterialsInUse.Nomenclature.Name}">
+                    </Button>
+                    <Button Width="120" Margin="5,5,5,0">
+                    </Button>
+                    <Button Width="50" Margin="5,5,0,0">
+                    </Button>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Width="150" Margin="5,5,5,0">
+                    </Button>
+                    <Button Width="150" Margin="5,5,5,0">
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <Button Grid.Column="2" Height="60" Width="50" Style="{StaticResource MaterialDesignFlatLightBgButton}" Margin="0,6,0,6" RenderTransformOrigin="0.5,0.5" Command="{Binding NextItemCommand}">
+                <materialDesign:PackIcon Kind="ArrowExpandLeft" Margin="-29,-1,0,0" Width="35" Height="35" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="-1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+            </Button>
+        </Grid>
     </Grid>
 </UserControl>

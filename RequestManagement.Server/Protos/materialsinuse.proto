@@ -4,6 +4,7 @@ option csharp_namespace = "RequestManagement.Server.Controllers";
 
 service MaterialsInUseService {
     rpc GetAllMaterialsInUse (GetAllMaterialsInUseRequest) returns (GetAllMaterialsInUseResponse);
+    rpc GetAllMaterialsInUseForOff (GetAllMaterialsInUseForOffRequest) returns (GetAllMaterialsInUseResponse);
     rpc CreateMaterialsInUse(CreateMaterialsInUseRequest) returns (CreateMaterialsInUseResponse);
     rpc UploadMaterialsInUse (UploadMaterialsInUseRequest) returns (UploadMaterialsInUseResponse);
     rpc UpdateMaterialsInUse (UpdateMaterialsInUseRequest) returns (UpdateMaterialsInUseResponse);
@@ -12,6 +13,11 @@ service MaterialsInUseService {
 
 message GetAllMaterialsInUseRequest {
     string filter = 1;
+    int32 financially_responsible_person_id = 2;
+}
+
+message GetAllMaterialsInUseForOffRequest {
+    string date_for_off = 1;
     int32 financially_responsible_person_id = 2;
 }
 

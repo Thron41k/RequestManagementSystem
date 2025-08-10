@@ -22,6 +22,18 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
         return MaterialsInUseConverter.ToGrpc(materialsInUseList);
     }
 
+    public override async Task<GetAllMaterialsInUseResponse> GetAllMaterialsInUseForOff(GetAllMaterialsInUseForOffRequest request, ServerCallContext context)
+    {
+        var user = context.GetHttpContext().User;
+        if (user.Identity is { IsAuthenticated: false })
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+        }
+        _logger.LogInformation("Getting all materialsInUses by filter");
+        var materialsInUseList = await _materialsInUseService.GetAllMaterialsInUseForOffAsync(request.FinanciallyResponsiblePersonId, DateTime.Parse(request.DateForOff));
+        return MaterialsInUseConverter.ToGrpc(materialsInUseList);
+    }
+
     public override async Task<UploadMaterialsInUseResponse> UploadMaterialsInUse(UploadMaterialsInUseRequest request, ServerCallContext context)
     {
         var user = context.GetHttpContext().User;

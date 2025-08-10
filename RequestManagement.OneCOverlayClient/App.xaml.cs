@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
-using System.Data;
 using System.Windows;
 using OneCOverlayClient.ViewModels;
 using OneCOverlayClient.Views;
@@ -17,6 +15,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         ServiceProvider = ServiceConfigurator.ConfigureServices();
+        ServiceProvider.ConfigureMessageHandlers();
         var loginViewModel = ServiceProvider.GetRequiredService<LoginViewModel>();
         var loginWindow = new LoginView(loginViewModel);
         loginWindow.Show();

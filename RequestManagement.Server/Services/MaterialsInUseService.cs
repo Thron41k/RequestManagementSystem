@@ -25,6 +25,21 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         }
         return await query.ToListAsync();
     }
+
+    public async Task<List<MaterialsInUse>> GetAllMaterialsInUseForOffAsync(
+        int financiallyResponsiblePersonId,
+        DateTime date)
+    {
+        return await dbContext.MaterialsInUse
+            .Include(e => e.Nomenclature)
+            .Include(e => e.Equipment)
+            .Include(e => e.FinanciallyResponsiblePerson)
+            .Include(e => e.ReasonForWriteOff)
+            .Where(e => e.FinanciallyResponsiblePersonId == financiallyResponsiblePersonId)
+            .Where(e => e.DateForWriteOff == date) 
+            .ToListAsync();
+    }
+
     public async Task<int> CreateMaterialsInUseAsync(MaterialsInUse materialsInUse)
     {
         _dbContext.MaterialsInUse.Add(materialsInUse);
