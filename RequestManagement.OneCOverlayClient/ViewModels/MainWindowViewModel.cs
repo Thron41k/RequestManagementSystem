@@ -55,7 +55,7 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 Content = materialsInUseWindow,
                 Title = "",
-                Width = 669,
+                Width = 729,
                 Height = 118,
                 Left = 1130,
                 Top = 50,

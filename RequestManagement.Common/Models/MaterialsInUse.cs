@@ -21,7 +21,7 @@ namespace RequestManagement.Common.Models
         public int NomenclatureId { get; set; }
         public Nomenclature Nomenclature { get; set; } = null!;
         public int EquipmentId { get; set; }
-        public Equipment? Equipment { get; set; } = null;
+        public Equipment Equipment { get; set; }
         public Driver FinanciallyResponsiblePerson { get; set; } = null!;
         public int FinanciallyResponsiblePersonId { get; set; } = 1;
         public int ReasonForWriteOffId { get; set; } = 1;

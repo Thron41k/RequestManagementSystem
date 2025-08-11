@@ -9,7 +9,9 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
 {
     private readonly ApplicationDbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
-    public async Task<List<MaterialsInUse>> GetAllMaterialsInUseAsync(int financiallyResponsiblePersonId, string filter = "")
+    public async Task<List<MaterialsInUse>> GetAllMaterialsInUseAsync(
+        int financiallyResponsiblePersonId,
+        string filter = "")
     {
         var query = dbContext.MaterialsInUse
             .Include(e => e.Nomenclature)
@@ -17,14 +19,38 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
             .Include(e => e.FinanciallyResponsiblePerson)
             .Include(e => e.ReasonForWriteOff)
             .AsQueryable();
+
+        // Отфильтруем по ответственному лицу
+        query = query.Where(e => e.FinanciallyResponsiblePersonId == financiallyResponsiblePersonId);
+
         if (!string.IsNullOrWhiteSpace(filter))
         {
-            query = query.Where(e => EF.Functions.ILike(e.Nomenclature.Name, $"%{filter}%") ||
-                                     EF.Functions.ILike(e.Nomenclature.Article ?? "", $"%{filter}%") ||
-                                     EF.Functions.ILike(e.Nomenclature.Code, $"%{filter}%"));
+            // Разбиваем на слова и убираем пустые
+            var words = filter
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var word in words)
+            {
+                var w = word; // локальная переменная для замыкания
+
+                query = query.Where(e =>
+                    EF.Functions.ILike(e.Nomenclature.Name, $"%{w}%") ||
+                    EF.Functions.ILike(e.Nomenclature.Article ?? "", $"%{w}%") ||
+                    EF.Functions.ILike(e.Nomenclature.Code, $"%{w}%") ||
+                    // Логика FullName: Name(StateNumber) если есть, иначе Name
+                    EF.Functions.ILike(
+                        (e.Equipment.StateNumber != null && e.Equipment.StateNumber != "")
+                            ? (e.Equipment.Name + "(" + e.Equipment.StateNumber + ")")
+                            : e.Equipment.Name,
+                        $"%{w}%"
+                    )
+                );
+            }
         }
+
         return await query.ToListAsync();
     }
+
 
     public async Task<List<MaterialsInUse>> GetAllMaterialsInUseForOffAsync(
         int financiallyResponsiblePersonId,
@@ -188,6 +214,41 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         await _dbContext.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> UpdateMaterialsInUseAnyAsync(List<MaterialsInUse> materialsInUseAny)
+    {
+        var materialsInUses = materialsInUseAny.ToList();
+        if (!materialsInUses.Any())
+            return false;
+        var filteredMaterials = materialsInUses.Where(m => m.Id != 1).ToList();
+        if (filteredMaterials.Count == 0)
+            return true;
+        var idsToUpdate = filteredMaterials.Select(m => m.Id).ToList();
+        var existingMaterials = await _dbContext.MaterialsInUse
+            .Where(m => idsToUpdate.Contains(m.Id))
+            .ToListAsync();
+
+        if (existingMaterials.Count == 0)
+            return false;
+        foreach (var existMaterial in existingMaterials)
+        {
+            var updatedMaterial = filteredMaterials.First(m => m.Id == existMaterial.Id);
+
+            existMaterial.DocumentNumber = updatedMaterial.DocumentNumber;
+            existMaterial.Date = updatedMaterial.Date;
+            existMaterial.Quantity = updatedMaterial.Quantity;
+            existMaterial.NomenclatureId = updatedMaterial.NomenclatureId;
+            existMaterial.EquipmentId = updatedMaterial.EquipmentId;
+            existMaterial.IsOut = updatedMaterial.IsOut;
+            existMaterial.FinanciallyResponsiblePersonId = updatedMaterial.FinanciallyResponsiblePersonId;
+            existMaterial.ReasonForWriteOffId = updatedMaterial.ReasonForWriteOffId;
+            existMaterial.DocumentNumberForWriteOff = updatedMaterial.DocumentNumberForWriteOff;
+            existMaterial.DateForWriteOff = updatedMaterial.DateForWriteOff;
+        }
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
+
 
     public async Task<bool> DeleteMaterialsInUseAsync(int id)
     {

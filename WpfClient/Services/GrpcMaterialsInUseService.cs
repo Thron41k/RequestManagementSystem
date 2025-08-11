@@ -118,10 +118,15 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                     Reason = materialsInUse.ReasonForWriteOff.Reason
                 },
                 DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff,
-                DateForWriteOff = materialsInUse.DateForWriteOff.ToString()
+                DateForWriteOff = materialsInUse.DateForWriteOff.ToString("yyyy-MM-dd")
             }
         }, headers);
         return result.Success;
+    }
+
+    public Task<bool> UpdateMaterialsInUseAnyAsync(List<MaterialsInUse> materialsInUseAny)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<bool> DeleteMaterialsInUseAsync(int id)

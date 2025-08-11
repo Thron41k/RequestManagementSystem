@@ -29,7 +29,7 @@ public static class MaterialsInUseConverter
                 UnitOfMeasure = entity.Nomenclature.UnitOfMeasure
             },
             EquipmentId = entity.EquipmentId,
-            Equipment = entity.Equipment is null ? null : new MaterialsInUseEquipment
+            Equipment = new MaterialsInUseEquipment
             {
                 Id = entity.Equipment.Id,
                 Name = entity.Equipment.Name,

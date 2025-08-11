@@ -20,17 +20,20 @@
             <TextBox materialDesign:HintAssist.Hint="Номер документа" 
                      Text="{Binding MainSelectedMaterialsInUse.DocumentNumberForWriteOff}"
                      FontSize="14"
-                     Width="120"
+                     Width="110"
                      materialDesign:HintAssist.FloatingScale="0.8"
-                     Margin="10,0,10,0"
+                     Margin="5,0,5,0"
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
                      materialDesign:HintAssist.HintPaddingBrush="White"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-            <Button Width="280" Margin="0,0,10,0" Content="{Binding MainSelectedMaterialsInUse.Equipment.FullName}" >
-            </Button>
-            <Button Width="100" Margin="0,0,10,0" Content="{Binding MainSelectedMaterialsInUse.Equipment.Code}">
-            </Button>
+            <Button Width="280" Margin="0,0,5,0" 
+                    Content="{Binding MainSelectedMaterialsInUse.Equipment.FullName}" 
+                    Command="{Binding CopyEquipmentNameToClipboardCommand}"/>
+            <Button Width="100" Margin="0,0,5,0" 
+                    Content="{Binding MainSelectedMaterialsInUse.Equipment.Code}"
+                    Command="{Binding CopyEquipmentCodeToClipboardCommand}"/>
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Width="58" FontWeight="Bold" Margin="1,0,1,0" Content ="{Binding MainProgress}"/>
             <Button Command="{Binding NextEquipmentCommand}"
                     Style="{StaticResource MaterialDesignFloatingActionLightButton}" Width="35" Height="35">
                 <materialDesign:PackIcon Kind="ArrowLeftThick" Width="35" Height="35" RenderTransformOrigin="0.5,0.5">
@@ -44,7 +47,14 @@
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
             </Button>
-            <Button Margin="10,0,0,0" 
+            <Button Margin="5,0,0,0" 
+                    Style="{StaticResource MaterialDesignFloatingActionLightButton}" 
+                    Width="35" Height="35"
+                    Command="{Binding SaveDocNumberCommand}">
+                <materialDesign:PackIcon Kind="ContentSaveOutline" Width="30" Height="30" Margin="-1,-1,0,0">
+                </materialDesign:PackIcon>
+            </Button>
+            <Button Margin="4,0,0,0" 
                     Style="{StaticResource MaterialDesignFloatingActionLightButton}" 
                     Width="35" Height="35" Background="Red"
                     Command="{Binding CloseWindowCommand}">
@@ -55,7 +65,7 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
-                <ColumnDefinition Width="599"/>
+                <ColumnDefinition Width="659"/>
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Height="60" Width="50" Style="{StaticResource MaterialDesignFlatLightBgButton}" Command="{Binding PrevItemCommand}">
@@ -68,18 +78,24 @@
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Button Width="400" Margin="5,5,5,0" Content="{Binding SelectedMaterialsInUse.Nomenclature.Name}">
-                    </Button>
-                    <Button Width="120" Margin="5,5,5,0">
-                    </Button>
-                    <Button Width="50" Margin="5,5,0,0">
-                    </Button>
+                    <Button Width="450" Margin="5,5,5,0" 
+                            Content="{Binding SelectedMaterialsInUse.Nomenclature.Name}"
+                            Command="{Binding CopyNomenclatureNameToClipboardCommand}"/>
+                    <Button Width="120" Margin="5,5,5,0" 
+                            Content="{Binding SelectedMaterialsInUse.Nomenclature.Code}"
+                            Command="{Binding CopyNomenclatureCodeToClipboardCommand}"/>
+                    <Button Width="60" Margin="5,5,0,0" 
+                            Content="{Binding SelectedMaterialsInUse.Quantity}"
+                            Command="{Binding CopyNomenclatureQuantityToClipboardCommand}"/>
                 </StackPanel>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Width="150" Margin="5,5,5,0">
-                    </Button>
-                    <Button Width="150" Margin="5,5,5,0">
-                    </Button>
+                    <Button Width="150" Margin="5,5,5,0" 
+                            Content="{Binding SelectedMaterialsInUse.DocumentNumber}"
+                            Command="{Binding CopyDocumentNumberToClipboardCommand}"/>
+                    <Button Width="150" Margin="5,5,5,0" Language="ru-RU" 
+                            Content="{Binding SelectedMaterialsInUse.Date,StringFormat={}{0:dd.MM.yyyy}}" 
+                            Command="{Binding CopyDocumentDateToClipboardCommand}"/>
+                    <Label VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Margin="20,5,0,0" Content ="{Binding Progress}"/>
                 </StackPanel>
             </Grid>
             <Button Grid.Column="2" Height="60" Width="50" Style="{StaticResource MaterialDesignFlatLightBgButton}" Margin="0,6,0,6" RenderTransformOrigin="0.5,0.5" Command="{Binding NextItemCommand}">

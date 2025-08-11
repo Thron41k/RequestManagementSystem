@@ -22,7 +22,7 @@ public static class MaterialsInUseConverter
                 UnitOfMeasure = proto.Nomenclature.UnitOfMeasure
             },
             EquipmentId = proto.EquipmentId,
-            Equipment = proto.Equipment is null ? null : new RequestManagement.Common.Models.Equipment
+            Equipment = new RequestManagement.Common.Models.Equipment
             {
                 Id = proto.Equipment.Id,
                 Name = proto.Equipment.Name,

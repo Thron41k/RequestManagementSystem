@@ -110,6 +110,32 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
         return new UpdateMaterialsInUseResponse { Success = success };
     }
 
+    public override async Task<UpdateMaterialsInUseResponse> UpdateMaterialsInUseAny(UpdateMaterialsInUseAnyRequest request, ServerCallContext context)
+    {
+        _logger.LogInformation("Updating materialsInUseAny with IDs");
+        var materialsInUseAny = request.MaterialsInUse.Select(x=> new Common.Models.MaterialsInUse
+        {
+            Id = x.Id,
+            DocumentNumber = x.DocumentNumber,
+            Date = DateTime.Parse(x.Date),
+            Quantity = (decimal)x.Quantity,
+            NomenclatureId = x.NomenclatureId,
+            EquipmentId = x.EquipmentId,
+            FinanciallyResponsiblePersonId = x.FinanciallyResponsiblePersonId,
+            IsOut = x.IsOut,
+            ReasonForWriteOffId = x.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Id,
+            ReasonForWriteOff = new Common.Models.ReasonsForWritingOffMaterialsFromOperation
+            {
+                Id = x.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Id,
+                Reason = x.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
+            },
+            DocumentNumberForWriteOff = x.DocumentNumberForWriteOff,
+            DateForWriteOff = DateTime.Parse(x.DateForWriteOff)
+        }) ;
+        var success = await _materialsInUseService.UpdateMaterialsInUseAnyAsync(materialsInUseAny.ToList());
+        return new UpdateMaterialsInUseResponse { Success = success };
+    }
+
     public override async Task<DeleteMaterialsInUseResponse> DeleteMaterialsInUse(DeleteMaterialsInUseRequest request, ServerCallContext context)
     {
         _logger.LogInformation("Deleting materialsInUse with ID: {Id}", request.Id);

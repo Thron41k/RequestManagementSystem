@@ -9,5 +9,6 @@ public interface IMaterialsInUseService
     Task<int> CreateMaterialsInUseAsync(MaterialsInUse materialsInUse);
     Task<bool> UploadMaterialsInUseAsync(List<MaterialsInUseForUpload> materialsInUse);
     Task<bool> UpdateMaterialsInUseAsync(MaterialsInUse materialsInUse);
+    Task<bool> UpdateMaterialsInUseAnyAsync(List<MaterialsInUse> materialsInUseAny);
     Task<bool> DeleteMaterialsInUseAsync(int id);
 }

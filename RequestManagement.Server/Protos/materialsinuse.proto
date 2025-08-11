@@ -8,6 +8,7 @@ service MaterialsInUseService {
     rpc CreateMaterialsInUse(CreateMaterialsInUseRequest) returns (CreateMaterialsInUseResponse);
     rpc UploadMaterialsInUse (UploadMaterialsInUseRequest) returns (UploadMaterialsInUseResponse);
     rpc UpdateMaterialsInUse (UpdateMaterialsInUseRequest) returns (UpdateMaterialsInUseResponse);
+    rpc UpdateMaterialsInUseAny (UpdateMaterialsInUseAnyRequest) returns (UpdateMaterialsInUseResponse);
     rpc DeleteMaterialsInUse (DeleteMaterialsInUseRequest) returns (DeleteMaterialsInUseResponse);
 }
 
@@ -43,6 +44,10 @@ message UploadMaterialsInUseResponse {
 
 message UpdateMaterialsInUseRequest {
     MaterialsInUse materials_in_use = 1;
+}
+
+message UpdateMaterialsInUseAnyRequest {
+    repeated MaterialsInUse materials_in_use = 1;
 }
 
 message UpdateMaterialsInUseResponse {
