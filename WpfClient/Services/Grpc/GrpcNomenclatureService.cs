@@ -3,11 +3,11 @@ using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 internal class GrpcNomenclatureService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : INomenclatureService
 {
-    public async Task<List<RequestManagement.Common.Models.Nomenclature>> GetAllNomenclaturesAsync(string filter = "")
+    public async Task<List<Common.Models.Nomenclature>> GetAllNomenclaturesAsync(string filter = "")
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
@@ -16,10 +16,10 @@ internal class GrpcNomenclatureService(IGrpcClientFactory clientFactory, AuthTok
         }
         var client = clientFactory.CreateNomenclatureClient();
         var response = await client.GetAllNomenclaturesAsync(new GetAllNomenclaturesRequest { Filter = filter }, headers);
-        return response.Nomenclature.Select(nomenclature => new RequestManagement.Common.Models.Nomenclature { Id = nomenclature.Id, Name = nomenclature.Name,Code = nomenclature.Code,Article = nomenclature.Article,UnitOfMeasure = nomenclature.UnitOfMeasure}).ToList();
+        return response.Nomenclature.Select(nomenclature => new Common.Models.Nomenclature { Id = nomenclature.Id, Name = nomenclature.Name,Code = nomenclature.Code,Article = nomenclature.Article,UnitOfMeasure = nomenclature.UnitOfMeasure}).ToList();
     }
 
-    public async Task<int> CreateNomenclatureAsync(RequestManagement.Common.Models.Nomenclature nomenclature)
+    public async Task<int> CreateNomenclatureAsync(Common.Models.Nomenclature nomenclature)
     {
         try
         {
@@ -39,7 +39,7 @@ internal class GrpcNomenclatureService(IGrpcClientFactory clientFactory, AuthTok
         }
     }
 
-    public async Task<bool> UpdateNomenclatureAsync(RequestManagement.Common.Models.Nomenclature nomenclature)
+    public async Task<bool> UpdateNomenclatureAsync(Common.Models.Nomenclature nomenclature)
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))

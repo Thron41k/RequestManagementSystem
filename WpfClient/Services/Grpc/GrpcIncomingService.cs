@@ -7,7 +7,7 @@ using RequestManagement.WpfClient.Converters;
 using RequestManagement.WpfClient.Services.Interfaces;
 using Incoming = RequestManagement.Common.Models.Incoming;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 internal class GrpcIncomingService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IIncomingService
 {

@@ -1,0 +1,1 @@
+dotnet publish -c Release -f net9.0-windows10.0.26100.0 -r win-x64 --self-contained true -o bin\publish\ -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishReadyToRun=true

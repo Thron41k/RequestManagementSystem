@@ -7,7 +7,7 @@ using static RequestManagement.WpfClient.Converters.MaterialsInUseConverter;
 using MaterialsInUse = RequestManagement.Common.Models.MaterialsInUse;
 using MaterialsInUseForUpload = RequestManagement.Common.Models.MaterialsInUseForUpload;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IMaterialsInUseService
 {
@@ -42,7 +42,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
         var client = clientFactory.CreateMaterialsInUseClient();
         var result = await client.CreateMaterialsInUseAsync(new CreateMaterialsInUseRequest
         {
-            MaterialsInUse = new RequestManagement.Server.Controllers.MaterialsInUse
+            MaterialsInUse = new Server.Controllers.MaterialsInUse
             {
                 DocumentNumber = materialsInUse.DocumentNumber,
                 Date = materialsInUse.Date.ToString(CultureInfo.CurrentCulture),
@@ -73,7 +73,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
         }
         var client = clientFactory.CreateMaterialsInUseClient();
         var result = await client.UploadMaterialsInUseAsync(new UploadMaterialsInUseRequest { 
-            MaterialsInUse = { materialsInUse.Select(x => new RequestManagement.Server.Controllers.MaterialsInUseForUpload
+            MaterialsInUse = { materialsInUse.Select(x => new Server.Controllers.MaterialsInUseForUpload
             {
                 DocumentNumber = x.DocumentNumber,
                 Date = x.Date.ToString(CultureInfo.CurrentCulture),
@@ -101,7 +101,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
         var client = clientFactory.CreateMaterialsInUseClient();
         var result = await client.UpdateMaterialsInUseAsync(new UpdateMaterialsInUseRequest
         {
-            MaterialsInUse = new RequestManagement.Server.Controllers.MaterialsInUse
+            MaterialsInUse = new Server.Controllers.MaterialsInUse
             {
                 Id = materialsInUse.Id,
                 Date = materialsInUse.Date.ToString(CultureInfo.CurrentCulture),

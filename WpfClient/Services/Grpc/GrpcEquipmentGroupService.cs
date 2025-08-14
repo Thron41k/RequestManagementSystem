@@ -4,7 +4,7 @@ using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 using EquipmentGroup = RequestManagement.Common.Models.EquipmentGroup;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 public class GrpcEquipmentGroupService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IEquipmentGroupService
 {
@@ -21,7 +21,7 @@ public class GrpcEquipmentGroupService(IGrpcClientFactory clientFactory, AuthTok
         {
             Id = equipmentGroup.Id, 
             Name = equipmentGroup.Name,
-            Equipments = equipmentGroup.Equipments.Select(equipment => new RequestManagement.Common.Models.Equipment
+            Equipments = equipmentGroup.Equipments.Select(equipment => new Common.Models.Equipment
             {
                 Id = equipment.Id, 
                 Name = equipment.Name,
@@ -40,7 +40,7 @@ public class GrpcEquipmentGroupService(IGrpcClientFactory clientFactory, AuthTok
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
         var client = clientFactory.CreateEquipmentGroupClient();
-        var result = await client.CreateEquipmentGroupAsync(new CreateEquipmentGroupRequest { EquipmentGroup = new RequestManagement.Server.Controllers.EquipmentGroup { Name = equipmentGroup.Name } }, headers);
+        var result = await client.CreateEquipmentGroupAsync(new CreateEquipmentGroupRequest { EquipmentGroup = new Server.Controllers.EquipmentGroup { Name = equipmentGroup.Name } }, headers);
         return result.Id;
     }
 
@@ -52,7 +52,7 @@ public class GrpcEquipmentGroupService(IGrpcClientFactory clientFactory, AuthTok
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
         var client = clientFactory.CreateEquipmentGroupClient();
-        var result = await client.UpdateEquipmentGroupAsync(new UpdateEquipmentGroupRequest { EquipmentGroup = new RequestManagement.Server.Controllers.EquipmentGroup {Id = equipmentGroup.Id, Name = equipmentGroup.Name } }, headers);
+        var result = await client.UpdateEquipmentGroupAsync(new UpdateEquipmentGroupRequest { EquipmentGroup = new Server.Controllers.EquipmentGroup {Id = equipmentGroup.Id, Name = equipmentGroup.Name } }, headers);
         return result.Success;
     }
 

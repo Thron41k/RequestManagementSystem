@@ -4,7 +4,7 @@ using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 using ReasonsForWritingOffMaterialsFromOperation = RequestManagement.Common.Models.ReasonsForWritingOffMaterialsFromOperation;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 public class GrpcReasonsForWritingOffMaterialsFromOperationService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IReasonsForWritingOffMaterialsFromOperationService
 {
@@ -37,7 +37,7 @@ public class GrpcReasonsForWritingOffMaterialsFromOperationService(IGrpcClientFa
         var client = clientFactory.CreateReasonsForWritingOffMaterialsFromOperationClient();
         var result = await client.CreateReasonsForWritingOffMaterialsFromOperationAsync(new CreateReasonsForWritingOffMaterialsFromOperationRequest
         {
-            ReasonsForWritingOffMaterialsFromOperation = new RequestManagement.Server.Controllers.ReasonsForWritingOffMaterialsFromOperation
+            ReasonsForWritingOffMaterialsFromOperation = new Server.Controllers.ReasonsForWritingOffMaterialsFromOperation
             {
                 Reason = reasonsForWritingOffMaterialsFromOperation.Reason
             }
@@ -55,7 +55,7 @@ public class GrpcReasonsForWritingOffMaterialsFromOperationService(IGrpcClientFa
         var client = clientFactory.CreateReasonsForWritingOffMaterialsFromOperationClient();
         var result = await client.UpdateReasonsForWritingOffMaterialsFromOperationAsync(new UpdateReasonsForWritingOffMaterialsFromOperationRequest
         {
-            ReasonsForWritingOffMaterialsFromOperation = new RequestManagement.Server.Controllers.ReasonsForWritingOffMaterialsFromOperation
+            ReasonsForWritingOffMaterialsFromOperation = new Server.Controllers.ReasonsForWritingOffMaterialsFromOperation
             {
                 Id = reasonsForWritingOffMaterialsFromOperation.Id, 
                 Reason = reasonsForWritingOffMaterialsFromOperation.Reason

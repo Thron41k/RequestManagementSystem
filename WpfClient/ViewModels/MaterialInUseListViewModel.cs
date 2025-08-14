@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Models;
 using RequestManagement.WpfClient.Services.Interfaces;
 using Timer = System.Timers.Timer;
 
@@ -126,10 +127,16 @@ public partial class MaterialInUseListViewModel : ObservableObject
     {
         if (SelectedMaterialsInUse == null) return;
         await _messageBus.Publish(new ShowResultMessageForMaterialsInUse(
-            MessagesEnum.ShowAddMaterialsInUseToOffView, 
-            typeof(MaterialInUseListViewModel), 
+            MessagesEnum.ShowAddMaterialsInUseToOffView,
+            typeof(MaterialInUseListViewModel),
             SelectedMaterialsInUse.DocumentNumberForWriteOff,
             SelectedMaterialsInUse.ReasonForWriteOff,
             SelectedMaterialsInUse.DateForWriteOff));
+    }
+
+    [RelayCommand]
+    private async Task Print()
+    {
+        await _messageBus.Publish(new PrintMaterialInUseOffModel { MaterialsInUse = _materialsInUseList });
     }
 }

@@ -2,7 +2,7 @@
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 public class GrpcClientFactory(IServiceProvider serviceProvider) : IGrpcClientFactory
 {

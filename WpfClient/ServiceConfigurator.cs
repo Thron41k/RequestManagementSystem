@@ -5,6 +5,7 @@ using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services;
 using RequestManagement.WpfClient.Services.ExcelTemplate;
+using RequestManagement.WpfClient.Services.Grpc;
 using RequestManagement.WpfClient.Services.Interfaces;
 using RequestManagement.WpfClient.ViewModels;
 using RequestManagement.WpfClient.Views;
@@ -17,6 +18,8 @@ public class ServiceConfigurator
     public static IServiceProvider ConfigureServices()
     {
         var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddMessageHandlers();
 
         // gRPC клиенты
         serviceCollection.AddGrpcClient<AuthService.AuthServiceClient>(o => {o.Address = new Uri($"http://{Vars.Server}:{Vars.Port}"); });
@@ -39,7 +42,6 @@ public class ServiceConfigurator
         // Сервисы и ViewModel'ы
         serviceCollection.AddSingleton<IPrinterService, PrinterService>();
         serviceCollection.AddSingleton<AuthTokenStore>();
-        serviceCollection.AddSingleton<IMessageBus, MessageBusService>();
         serviceCollection.AddSingleton<IGrpcClientFactory, GrpcClientFactory>();
         serviceCollection.AddSingleton<IExcelReaderService, ExcelReaderService>();
         serviceCollection.AddSingleton<IExcelWriterService, ExcelWriterService>();
@@ -51,6 +53,8 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<IExcelTemplateWriter, OperationsTemplate>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, RequisitionInvoiceTemplate>();
         serviceCollection.AddSingleton<IExcelTemplateWriter, MovingBetweenWarehousesTemplate>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, MaterialsInUseOffTemplateV1>();
+        serviceCollection.AddSingleton<IExcelTemplateWriter, MaterialsInUseOffTemplateV2>();
         serviceCollection.AddSingleton<IFileSaveDialogService, FileSaveDialogService>();
         serviceCollection.AddSingleton<IExcelPrintService, ExcelPrintService>();
 

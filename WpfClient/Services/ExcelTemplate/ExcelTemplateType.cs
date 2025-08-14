@@ -9,5 +9,7 @@ public enum ExcelTemplateType
     Consumables,
     Operations,
     RequisitionInvoice,
-    MovingBetweenWarehouses
+    MovingBetweenWarehouses,
+    MaterialsInUseOffTemplateV1,
+    MaterialsInUseOffTemplateV2
 }

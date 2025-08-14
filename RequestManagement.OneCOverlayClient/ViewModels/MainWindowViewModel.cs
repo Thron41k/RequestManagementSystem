@@ -48,30 +48,30 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-        private void MaterialsInUse()
+    private async Task MaterialsInUse()
+    {
+        var materialsInUseWindow = new MaterialsInUseView(_materialsInUseViewModel);
+        var window = new Window
         {
-            var materialsInUseWindow = new MaterialsInUseView(_materialsInUseViewModel);
-            var window = new Window
-            {
-                Content = materialsInUseWindow,
-                Title = "",
-                Width = 729,
-                Height = 118,
-                Left = 1130,
-                Top = 50,
-                ResizeMode = ResizeMode.NoResize,
-                WindowStyle = WindowStyle.None,
-                Topmost = true,
-                ShowInTaskbar = false
-            };
-            window.MouseLeftButtonDown += (s, e) =>
-            {
-                if (e.ButtonState == MouseButtonState.Pressed)
-                    window.DragMove();
-            };
-            _windowService.Hide(this);
-            _materialsInUseViewModel.Init(WorkDateTime, SelectedFinanciallyResponsiblePerson);
-            window.ShowDialog();
-            _windowService.Show(this);
-        }
+            Content = materialsInUseWindow,
+            Title = "",
+            Width = 729,
+            Height = 118,
+            Left = 1130,
+            Top = 50,
+            ResizeMode = ResizeMode.NoResize,
+            WindowStyle = WindowStyle.None,
+            Topmost = true,
+            ShowInTaskbar = false
+        };
+        window.MouseLeftButtonDown += (s, e) =>
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+                window.DragMove();
+        };
+        _windowService.Hide(this);
+        await _materialsInUseViewModel.Init(WorkDateTime, SelectedFinanciallyResponsiblePerson);
+        window.ShowDialog();
+        _windowService.Show(this);
     }
+}

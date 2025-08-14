@@ -5,7 +5,7 @@ using RequestManagement.WpfClient.Services.Interfaces;
 using SparePartsOwnership = RequestManagement.Common.Models.SparePartsOwnership;
 using SparePartsOwnershipConverter = RequestManagement.WpfClient.Converters.SparePartsOwnershipConverter;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 internal class GrpcSparePartsOwnershipService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : ISparePartsOwnershipService
 {

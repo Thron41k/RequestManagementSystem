@@ -4,7 +4,7 @@ using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 using Defect = RequestManagement.Common.Models.Defect;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 public class GrpcDefectService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IDefectService
 {
@@ -28,7 +28,7 @@ public class GrpcDefectService(IGrpcClientFactory clientFactory, AuthTokenStore 
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
         var client = clientFactory.CreateDefectClient();
-        var result = await client.CreateDefectAsync(new CreateDefectRequest { Defect = new RequestManagement.Server.Controllers.Defect { Name = defect.Name, DefectGroupId = defect.DefectGroupId } }, headers);
+        var result = await client.CreateDefectAsync(new CreateDefectRequest { Defect = new Server.Controllers.Defect { Name = defect.Name, DefectGroupId = defect.DefectGroupId } }, headers);
         return result.Id;
     }
 
@@ -40,7 +40,7 @@ public class GrpcDefectService(IGrpcClientFactory clientFactory, AuthTokenStore 
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
         var client = clientFactory.CreateDefectClient();
-        var result = await client.UpdateDefectAsync(new UpdateDefectRequest { Defect = new RequestManagement.Server.Controllers.Defect { Id = defect.Id, Name = defect.Name, DefectGroupId = defect.DefectGroupId } }, headers);
+        var result = await client.UpdateDefectAsync(new UpdateDefectRequest { Defect = new Server.Controllers.Defect { Id = defect.Id, Name = defect.Name, DefectGroupId = defect.DefectGroupId } }, headers);
         return result.Success;
     }
 

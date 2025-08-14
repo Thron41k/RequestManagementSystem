@@ -5,7 +5,7 @@ using RequestManagement.WpfClient.Services.Interfaces;
 using Commissions = RequestManagement.Common.Models.Commissions;
 using Driver = RequestManagement.Common.Models.Driver;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 public class GrpcCommissionsService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : ICommissionsService
 {

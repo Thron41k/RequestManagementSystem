@@ -3,12 +3,12 @@ using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore)
     : IEquipmentService
 {
-    public async Task<int> CreateEquipmentAsync(RequestManagement.Common.Models.Equipment equipment)
+    public async Task<int> CreateEquipmentAsync(Common.Models.Equipment equipment)
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
@@ -28,7 +28,7 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         return result.Id;
     }
 
-    public async Task<bool> UpdateEquipmentAsync(RequestManagement.Common.Models.Equipment equipment)
+    public async Task<bool> UpdateEquipmentAsync(Common.Models.Equipment equipment)
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
@@ -62,7 +62,7 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         return result.Success;
     }
 
-    public async Task<List<RequestManagement.Common.Models.Equipment>> GetAllEquipmentAsync(string filter = "")
+    public async Task<List<Common.Models.Equipment>> GetAllEquipmentAsync(string filter = "")
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
@@ -71,14 +71,14 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
         }
         var client = clientFactory.CreateEquipmentClient();
         var response = await client.GetAllEquipmentAsync(new GetAllEquipmentRequest { Filter = filter }, headers);
-        return response.Equipment.Select(equipment => new RequestManagement.Common.Models.Equipment
+        return response.Equipment.Select(equipment => new Common.Models.Equipment
         {
             Id = equipment.Id, 
             Name = equipment.Name, 
             StateNumber = equipment.LicensePlate, 
             Code = equipment.Code,
             ShortName = equipment.ShortName,
-            EquipmentGroup = new RequestManagement.Common.Models.EquipmentGroup { Id = equipment.EquipmentGroup.Id, Name = equipment.EquipmentGroup.Name }
+            EquipmentGroup = new Common.Models.EquipmentGroup { Id = equipment.EquipmentGroup.Id, Name = equipment.EquipmentGroup.Name }
         }).ToList();
     }
 }

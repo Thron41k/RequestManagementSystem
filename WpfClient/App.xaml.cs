@@ -14,7 +14,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         ServiceProvider = ServiceConfigurator.ConfigureServices();
-
+        ServiceProvider.ConfigureMessageHandlers();
         var viewModel = ServiceProvider.GetRequiredService<LoginViewModel>();
         var mainWindow = new MainWindow(viewModel);
         mainWindow.Show();

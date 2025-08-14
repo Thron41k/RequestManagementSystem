@@ -8,7 +8,7 @@ using Expense = RequestManagement.Common.Models.Expense;
 using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
 using Stock = RequestManagement.Common.Models.Stock;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IExpenseService
 {
@@ -41,13 +41,13 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
             {
                 Id = expense.Stock.Id,
                 WarehouseId = expense.Stock.Warehouse.Id,
-                Warehouse = new RequestManagement.Common.Models.Warehouse
+                Warehouse = new Common.Models.Warehouse
                 {
                     Id = expense.Stock.Warehouse.Id,
                     Name = expense.Stock.Warehouse.Name
                 },
                 NomenclatureId = expense.Stock.Nomenclature.Id,
-                Nomenclature = new RequestManagement.Common.Models.Nomenclature
+                Nomenclature = new Common.Models.Nomenclature
                 {
                     Id = expense.Stock.Nomenclature.Id,
                     Name = expense.Stock.Nomenclature.Name,
@@ -60,7 +60,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 ConsumedQuantity = (decimal)expense.Stock.ConsumedQuantity
             },
             EquipmentId = expense.Equipment.Id,
-            Equipment = new RequestManagement.Common.Models.Equipment
+            Equipment = new Common.Models.Equipment
             {
                 Id = expense.Equipment.Id,
                 Code = expense.Equipment.Code,
@@ -68,7 +68,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 StateNumber = expense.Equipment.LicensePlate
             },
             DriverId = expense.Driver.Id,
-            Driver = new RequestManagement.Common.Models.Driver
+            Driver = new Common.Models.Driver
             {
                 Id = expense.Driver.Id,
                 Code = expense.Driver.Code,
@@ -77,12 +77,12 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 Position = expense.Driver.Position
             },
             DefectId = expense.Defect.Id,
-            Defect = new RequestManagement.Common.Models.Defect
+            Defect = new Common.Models.Defect
             {
                 Id = expense.Defect.Id,
                 Name = expense.Defect.Name,
                 DefectGroupId = expense.Defect.DefectGroup.Id,
-                DefectGroup = new RequestManagement.Common.Models.DefectGroup
+                DefectGroup = new Common.Models.DefectGroup
                 {
                     Id = expense.Defect.DefectGroup.Id,
                     Name = expense.Defect.DefectGroup.Name
@@ -109,7 +109,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 MaterialExpenses =
                 {
                     materials.Select(
-                        material => new RequestManagement.Server.Controllers.MaterialExpense
+                        material => new Server.Controllers.MaterialExpense
                         {
                             Number = material.Number,
                             DriverFullName = material.DriverFullName,
@@ -210,8 +210,8 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         var result = await client.GetLastSelectionAsync(new GetLastSelectionRequest { NomenclatureId = userId }, headers);
         return new UserLastSelection
         {
-            Driver = new RequestManagement.Common.Models.Driver { Id = result.Driver.Id, FullName = result.Driver.FullName, ShortName = result.Driver.ShortName, Position = result.Driver.Position },
-            Equipment = new RequestManagement.Common.Models.Equipment { Id = result.Equipment.Id, Name = result.Equipment.Name, StateNumber = result.Equipment.LicensePlate },
+            Driver = new Common.Models.Driver { Id = result.Driver.Id, FullName = result.Driver.FullName, ShortName = result.Driver.ShortName, Position = result.Driver.Position },
+            Equipment = new Common.Models.Equipment { Id = result.Equipment.Id, Name = result.Equipment.Name, StateNumber = result.Equipment.LicensePlate },
             
         };
     }
@@ -233,7 +233,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         var mapping = new NomenclatureDefectMapping();
         if (result is { Defect: not null })
         {
-            mapping.Defect = new RequestManagement.Common.Models.Defect
+            mapping.Defect = new Common.Models.Defect
                 { Id = result.Defect.Id, Name = result.Defect.Name };
             mapping.Term = result.Term;
         }

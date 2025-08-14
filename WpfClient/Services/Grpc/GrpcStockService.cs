@@ -5,11 +5,11 @@ using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 using WpfClient.Models;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 internal class GrpcStockService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IStockService
 {
-    public async Task<List<RequestManagement.Common.Models.Stock>> GetAllStocksAsync(
+    public async Task<List<Common.Models.Stock>> GetAllStocksAsync(
         int warehouseId,
         string filter = "",
         int initialQuantityFilterType = 0,
@@ -42,7 +42,7 @@ internal class GrpcStockService(IGrpcClientFactory clientFactory, AuthTokenStore
                 FinalQuantityFilterType = finalQuantityFilterType,
                 FinalQuantity = finalQuantity
             }, headers);
-        return response.Stocks.Select(stock => new RequestManagement.Common.Models.Stock
+        return response.Stocks.Select(stock => new Common.Models.Stock
         {
             Id = stock.Id,
             WarehouseId = stock.WarehouseId,
@@ -50,7 +50,7 @@ internal class GrpcStockService(IGrpcClientFactory clientFactory, AuthTokenStore
             InitialQuantity = (decimal)stock.InitialQuantity,
             ReceivedQuantity = (decimal)stock.ReceivedQuantity,
             ConsumedQuantity = (decimal)stock.ConsumedQuantity,
-            Nomenclature = new RequestManagement.Common.Models.Nomenclature{Code = stock.Nomenclature.Code, Name = stock.Nomenclature.Name, Article = stock.Nomenclature.Article, UnitOfMeasure = stock.Nomenclature.UnitOfMeasure},
+            Nomenclature = new Common.Models.Nomenclature{Code = stock.Nomenclature.Code, Name = stock.Nomenclature.Name, Article = stock.Nomenclature.Article, UnitOfMeasure = stock.Nomenclature.UnitOfMeasure},
         }).ToList();
     }
 
@@ -68,7 +68,7 @@ internal class GrpcStockService(IGrpcClientFactory clientFactory, AuthTokenStore
         return result.Success;
     }
 
-    public async Task<int> CreateStockAsync(RequestManagement.Common.Models.Stock stock)
+    public async Task<int> CreateStockAsync(Common.Models.Stock stock)
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
@@ -80,7 +80,7 @@ internal class GrpcStockService(IGrpcClientFactory clientFactory, AuthTokenStore
         return result.Id;
     }
 
-    public async Task<bool> UpdateStockAsync(RequestManagement.Common.Models.Stock stock)
+    public async Task<bool> UpdateStockAsync(Common.Models.Stock stock)
     {
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))

@@ -18,44 +18,53 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" >
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
-                <TextBox materialDesign:HintAssist.Hint="МОЛ" 
-                         Margin="0,0,0,0"
-                         Tag="{Binding ClearSelectedFinanciallyResponsiblePersonCommand}" 
-                         IsReadOnly="True" 
-                         materialDesign:ValidationAssist.UsePopup="True"
-                         materialDesign:TextFieldAssist.HasClearButton="True"
-                         materialDesign:HintAssist.HintPaddingBrush="White"
-                         materialDesign:HintAssist.FloatingScale="1"
-                         FontSize="14"
-                         AcceptsReturn="True"
-                         Width="450" 
-                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
-                    <TextBox.Text>
-                        <Binding
-                            Path="SelectedFinanciallyResponsiblePerson.FullName"
-                            Mode="TwoWay"
-                            UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <validationRules:NotEmptyDriverNameValidationRule
-                                    ValidatesOnTargetUpdated="True"/>
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox.Text>
-                    <b:Interaction.Behaviors>
-                        <behaviors:MouseClickCommandBehavior Command="{Binding SelectFinanciallyResponsiblePersonCommand}" />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-                <TextBox materialDesign:HintAssist.Hint="Поиск техники" 
-                         FontSize="14"
-                         materialDesign:HintAssist.FloatingScale="1"
-                         Margin="0,10,0,0" 
-                         materialDesign:TextFieldAssist.HasClearButton="True"
-                         materialDesign:HintAssist.HintPaddingBrush="White"
-                         Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
-                </TextBox>
-            </StackPanel>
+            <Grid HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Grid.Column="0">
+                    <TextBox materialDesign:HintAssist.Hint="МОЛ" 
+                             Margin="0,0,0,0"
+                             Tag="{Binding ClearSelectedFinanciallyResponsiblePersonCommand}" 
+                             IsReadOnly="True" 
+                             materialDesign:ValidationAssist.UsePopup="True"
+                             materialDesign:TextFieldAssist.HasClearButton="True"
+                             materialDesign:HintAssist.HintPaddingBrush="White"
+                             materialDesign:HintAssist.FloatingScale="1"
+                             FontSize="14"
+                             AcceptsReturn="True"
+                             Width="380" 
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                        <TextBox.Text>
+                            <Binding
+                                Path="SelectedFinanciallyResponsiblePerson.FullName"
+                                Mode="TwoWay"
+                                UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <validationRules:NotEmptyDriverNameValidationRule
+                                        ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                        <b:Interaction.Behaviors>
+                            <behaviors:MouseClickCommandBehavior Command="{Binding SelectFinanciallyResponsiblePersonCommand}" />
+                        </b:Interaction.Behaviors>
+                    </TextBox>
+                    <TextBox materialDesign:HintAssist.Hint="Поиск техники" 
+                             FontSize="14"
+                             materialDesign:HintAssist.FloatingScale="1"
+                             Margin="0,10,0,0" 
+                             materialDesign:TextFieldAssist.HasClearButton="True"
+                             materialDesign:HintAssist.HintPaddingBrush="White"
+                             Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                    </TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Grid.Column="1" VerticalAlignment="Center" Margin="15,0,0,0">
+                    <Button Content="Печать списания" Command="{Binding PrintCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=ExpenseViewWindow}"/>
+                </StackPanel>
+            </Grid>
         </Grid>
         <DataGrid Grid.Row="1" ItemsSource="{Binding EquipmentViewSource.View}"  SelectedItem="{Binding SelectedEquipment}" AutoGenerateColumns="False" Margin="0,10,0,10" CanUserResizeRows="False" CanUserAddRows="False">
             <DataGrid.Columns>

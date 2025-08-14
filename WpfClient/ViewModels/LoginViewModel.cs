@@ -3,6 +3,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Models.Enums;
 using RequestManagement.WpfClient.Services;
+using RequestManagement.WpfClient.Services.Grpc;
 using RequestManagement.WpfClient.Views;
 
 namespace RequestManagement.WpfClient.ViewModels;

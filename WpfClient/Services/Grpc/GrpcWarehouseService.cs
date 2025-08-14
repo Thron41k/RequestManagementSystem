@@ -5,7 +5,7 @@ using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 using Warehouse = RequestManagement.Common.Models.Warehouse;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 internal class GrpcWarehouseService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : IWarehouseService
 {
@@ -25,7 +25,7 @@ internal class GrpcWarehouseService(IGrpcClientFactory clientFactory, AuthTokenS
             LastUpdated = DateTime.Parse(warehouse.LastUpdated),
             Code = warehouse.Code,
             FinanciallyResponsiblePersonId = warehouse.FinanciallyResponsiblePersonId,
-            FinanciallyResponsiblePerson = warehouse.FinanciallyResponsiblePerson != null ? new RequestManagement.Common.Models.Driver
+            FinanciallyResponsiblePerson = warehouse.FinanciallyResponsiblePerson != null ? new Common.Models.Driver
             {
                 Id = warehouse.FinanciallyResponsiblePerson.Id,
                 FullName = warehouse.FinanciallyResponsiblePerson.FullName,
@@ -52,7 +52,7 @@ internal class GrpcWarehouseService(IGrpcClientFactory clientFactory, AuthTokenS
             LastUpdated = DateTime.Parse(response.Warehouse.LastUpdated),
             Code = response.Warehouse.Code,
             FinanciallyResponsiblePersonId = response.Warehouse.FinanciallyResponsiblePersonId,
-            FinanciallyResponsiblePerson = response.Warehouse.FinanciallyResponsiblePerson != null ? new RequestManagement.Common.Models.Driver
+            FinanciallyResponsiblePerson = response.Warehouse.FinanciallyResponsiblePerson != null ? new Common.Models.Driver
             {
                 Id = response.Warehouse.FinanciallyResponsiblePerson.Id,
                 FullName = response.Warehouse.FinanciallyResponsiblePerson.FullName,
@@ -75,7 +75,7 @@ internal class GrpcWarehouseService(IGrpcClientFactory clientFactory, AuthTokenS
             var client = clientFactory.CreateWarehouseClient();
             var result = await client.CreateWarehouseAsync(new CreateWarehouseRequest
             {
-                Warehouse = new RequestManagement.Server.Controllers.Warehouse
+                Warehouse = new Server.Controllers.Warehouse
                 {
                     Name = warehouse.Name, 
                     LastUpdated = DateTime.Now.ToString(CultureInfo.CurrentCulture),
@@ -102,7 +102,7 @@ internal class GrpcWarehouseService(IGrpcClientFactory clientFactory, AuthTokenS
         var client = clientFactory.CreateWarehouseClient();
         var result = await client.UpdateWarehouseAsync(new UpdateWarehouseRequest
         {
-            Warehouse = new RequestManagement.Server.Controllers.Warehouse
+            Warehouse = new Server.Controllers.Warehouse
             {
                 Id = warehouse.Id, 
                 Name = warehouse.Name, 

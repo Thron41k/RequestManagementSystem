@@ -5,7 +5,7 @@ using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
 using Nomenclature = RequestManagement.Common.Models.Nomenclature;
 
-namespace RequestManagement.WpfClient.Services;
+namespace RequestManagement.WpfClient.Services.Grpc;
 
 internal class GrpcNomenclatureAnalogService(IGrpcClientFactory clientFactory, AuthTokenStore tokenStore) : INomenclatureAnalogService
 {
