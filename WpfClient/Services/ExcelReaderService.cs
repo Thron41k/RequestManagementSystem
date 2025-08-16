@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Windows.Media.Media3D;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using OfficeOpenXml;
 using RequestManagement.Common.Models;
 using RequestManagement.WpfClient.Services.Interfaces;
@@ -101,10 +103,15 @@ public class ExcelReaderService : IExcelReaderService
                     continue;
                 try
                 {
+                    var code = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
+                    if(string.IsNullOrEmpty(code))
+                        code = worksheet.Cells[row, 5].Value?.ToString()?.Trim() ?? string.Empty;
+                    if(string.IsNullOrEmpty(code))
+                        throw new Exception("Code is empty");
                     var material = new MaterialStock
                     {
                         ItemName = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
-                        Code = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty,
+                        Code = code,
                         Article = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty,
                         Unit = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty,
                         FinalBalance =

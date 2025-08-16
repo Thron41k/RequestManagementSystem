@@ -147,4 +147,28 @@ public partial class StartDataLoadViewModel : ObservableObject
         SelectedWarehouseName = "";
         SelectedWarehouse = null;
     }
+
+    [RelayCommand]
+    private async Task ClearWarehouse()
+    {
+        try
+        {
+            if(SelectedWarehouse == null)return;
+            if (string.IsNullOrEmpty(SelectedWarehouseName)) return;
+            IsBusy = true;
+            var result =
+                await _stockService.UploadMaterialsStockAsync([], SelectedWarehouse.Id, ToDate);
+            ResultDialogText = result ? "Склад успешно очищен" : "Ошибка очистки склада";
+            IsShowResultDialog = true;
+        }
+        catch (Exception ex)
+        {
+            ResultDialogText = "Не удалось очистить склад";
+            IsShowResultDialog = true;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }

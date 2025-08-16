@@ -21,7 +21,7 @@ public class GrpcEquipmentService(IGrpcClientFactory clientFactory, AuthTokenSto
             LicensePlate = equipment.StateNumber, 
             Code = equipment.Code,
             ShortName = equipment.ShortName,
-            EquipmentGroupId = equipment.EquipmentGroup!.Id
+            EquipmentGroupId = equipment.EquipmentGroupId ?? 1
         };
         var client = clientFactory.CreateEquipmentClient();
         var result = await client.CreateEquipmentAsync(request, headers);

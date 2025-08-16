@@ -1,7 +1,8 @@
-﻿using OfficeOpenXml;
-using RequestManagement.Common.Utilities;
+﻿using System.Globalization;
+using OfficeOpenXml;
 using RequestManagement.WpfClient.Models.ExcelWriterModels;
 using RequestManagement.WpfClient.Utilities;
+using static RequestManagement.WpfClient.ViewModels.Helpers.ExcelColumnsWidth;
 
 namespace RequestManagement.WpfClient.Services.ExcelTemplate;
 
@@ -19,11 +20,11 @@ public class MaterialsInUseOffTemplateV1 : ExcelTemplateWriterBase<MaterialsInUs
         templateSheet.Cells[3, 18].Value = data.Commissions?.ApproveForAct?.Position;
         templateSheet.Cells[5, 20].Value = data.Commissions?.ApproveForAct?.ShortName;
         templateSheet.Cells[41, 9].Value = data.Commissions?.Chairman?.Position;
-        templateSheet.Cells[41, 14].Value = data.Commissions?.Chairman?.Position;
+        templateSheet.Cells[41, 14].Value = data.Commissions?.Chairman?.ShortName;
         templateSheet.Cells[43, 9].Value = data.Commissions?.Member1?.Position;
-        templateSheet.Cells[43, 14].Value = data.Commissions?.Member1?.Position;
+        templateSheet.Cells[43, 14].Value = data.Commissions?.Member1?.ShortName;
         templateSheet.Cells[45, 9].Value = data.Commissions?.Member2?.Position;
-        templateSheet.Cells[45, 14].Value = data.Commissions?.Member2?.Position;
+        templateSheet.Cells[45, 14].Value = data.Commissions?.Member2?.ShortName;
         var grouped = data.MaterialsInUse
             .GroupBy(e => e.DocumentNumberForWriteOff)
             .OrderBy(g => g.Key)
@@ -34,7 +35,9 @@ public class MaterialsInUseOffTemplateV1 : ExcelTemplateWriterBase<MaterialsInUs
             var sheetName = ExcelHelpers.GetSafeSheetName(code);
             var newSheet = package.Workbook.Worksheets.Add(sheetName, templateSheet);
             newSheet.Cells[3, 3].Value = $"АКТ № {code}";
-            newSheet.Cells[11, 10].Value = group.First().DateForWriteOff.ToString("dd.MM.yyyy");
+            newSheet.Cells[14, 15].Value = group.First().DateForWriteOff.ToString("dd.MM.yyyy");
+            newSheet.Cells[25, 12].Value = group.Sum(x => x.Quantity);
+            newSheet.Cells[27, 5].Value = ExcelHelpers.NumberToWords((int)group.Sum(x => x.Quantity));
             var startRow = startDataRow;
             foreach (var item in group.OrderBy(x => x.Nomenclature.Name))
             {
@@ -44,15 +47,18 @@ public class MaterialsInUseOffTemplateV1 : ExcelTemplateWriterBase<MaterialsInUs
                     newSheet.DeleteRow(startRow);
                 }
                 newSheet.Cells[startRow, 3].Value = item.Nomenclature.Name;
-                var nameHeight = ExcelHelpers.GetRowHeight(ViewModels.Helpers.ExcelColumnsWidth.GetColumnsWidth(newSheet,3,4), newSheet.Cells[startRow, 3].Style.Font.Name, newSheet.Cells[startRow, 3].Style.Font.Size, item.Nomenclature.Name);
+                newSheet.Cells[startRow, 3, startRow, 4].Merge = true;
+                var nameHeight = ExcelHelpers.GetRowHeight(GetColumnsWidth(newSheet,3,4), newSheet.Cells[startRow, 3].Style.Font.Name, newSheet.Cells[startRow, 3].Style.Font.Size, item.Nomenclature.Name);
                 newSheet.Cells[startRow, 5].Value = item.Nomenclature.Article;
-                var articleHeight = ExcelHelpers.GetRowHeight(ViewModels.Helpers.ExcelColumnsWidth.GetColumnsWidth(newSheet, 5, 5), newSheet.Cells[startRow, 5].Style.Font.Name, newSheet.Cells[startRow, 5].Style.Font.Size, item.Nomenclature.Article!);
+                var articleHeight = ExcelHelpers.GetRowHeight(GetColumnsWidth(newSheet, 5, 5), newSheet.Cells[startRow, 5].Style.Font.Name, newSheet.Cells[startRow, 5].Style.Font.Size, item.Nomenclature.Article!);
                 newSheet.Cells[startRow, 10].Value = item.Nomenclature.UnitOfMeasure;
+                newSheet.Cells[startRow, 10, startRow, 11].Merge = true;
                 newSheet.Cells[startRow, 12].Value = item.Quantity;
-                newSheet.Cells[startRow, 13].Value = item.DateForList;
+                newSheet.Cells[startRow, 13].Value = item.Date.ToString("dd.MM.yyyy");
                 newSheet.Cells[startRow, 17].Value = item.ServiceLife;
                 newSheet.Cells[startRow, 18].Value = item.ReasonForWriteOff.Reason;
-                var reasonHeight = ExcelHelpers.GetRowHeight(ViewModels.Helpers.ExcelColumnsWidth.GetColumnsWidth(newSheet, 18, 19), newSheet.Cells[startRow, 18].Style.Font.Name, newSheet.Cells[startRow, 18].Style.Font.Size, item.ReasonForWriteOff.Reason);
+                newSheet.Cells[startRow, 18, startRow, 19].Merge = true;
+                var reasonHeight = ExcelHelpers.GetRowHeight(GetColumnsWidth(newSheet, 18, 19), newSheet.Cells[startRow, 18].Style.Font.Name, newSheet.Cells[startRow, 18].Style.Font.Size, item.ReasonForWriteOff.Reason);
                 newSheet.Row(startRow).Height = new[] { nameHeight, articleHeight, reasonHeight }.Max();
                 startRow++;
                 if (startDataRow + cc - 1 > startRow)
@@ -61,7 +67,6 @@ public class MaterialsInUseOffTemplateV1 : ExcelTemplateWriterBase<MaterialsInUs
                 }
             }
         }
-
         package.Workbook.Worksheets.Delete(0);
         return package.GetAsByteArray();
     }

@@ -57,7 +57,6 @@ internal class GrpcStockService(IGrpcClientFactory clientFactory, AuthTokenStore
     public async Task<bool> UploadMaterialsStockAsync(List<MaterialStock>? materials, int warehouseId, DateTime date)
     {
         if(materials == null) return false;
-        if (materials.Count == 0) return false;
         var headers = new Metadata();
         if (!string.IsNullOrEmpty(tokenStore.GetToken()))
         {

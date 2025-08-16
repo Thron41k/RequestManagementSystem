@@ -163,7 +163,8 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                     material.NomenclatureArticle,
                     material.NomenlatureUnitOfMeasure);
 
-
+                if("Ю0014569" == material.NomenclatureCode)
+                    Console.WriteLine(material.NomenclatureCode);
                 if (!stockMap.TryGetValue(key, out var stock))
                 {
                     error.Add(material);

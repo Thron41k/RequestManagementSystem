@@ -31,6 +31,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
             <TextBox helpers:PlaceholderHelper.PlaceholderText="Комиссия" Tag="{Binding ClearSelectedCommissionsCommand}" Text="{Binding SelectedCommissions.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="400" Style="{StaticResource ClearableTextBoxStyle}">
@@ -69,7 +70,16 @@
                       Style="{StaticResource StyledComboBox}">
             </ComboBox>
         </StackPanel>
-        <StackPanel Grid.Row="4"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
+        <StackPanel Grid.Row ="4">
+            <DatePicker Margin="0,15,0,0" 
+                        SelectedDate="{Binding SelectedDate}" 
+                        FontSize="14"
+                        Width="400"
+                        Height="50"
+                        Visibility="{Binding ShowDateSelector, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Style="{StaticResource MaterialDesignOutlinedDatePicker}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="5"  Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Center">
             <Button Margin="5" Content="Печать" Style="{StaticResource StyledButton}"/>
             <Button Margin="5" Content="Сохранить в файл" Style="{StaticResource StyledButton}" Command="{Binding SaveToFileCommand}"/>
             <Button Margin="5" Content="Отмена" Style="{StaticResource StyledButton}"/>

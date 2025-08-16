@@ -28,7 +28,7 @@ public class MovingBetweenWarehousesTemplate : ExcelTemplateWriterBase<IncomingP
             var code = group.Key;
             var sheetName = ExcelHelpers.GetSafeSheetName(code);
             var newSheet = package.Workbook.Worksheets.Add(sheetName, templateSheet);
-            var title = $"Перемещение между складами № {code} от {data.EndDate.ToString("d MMMM yyyyг.", new CultureInfo("ru-RU"))}";
+            var title = $"Перемещение между складами № {code} от {group.First().Date.ToString("d MMMM yyyyг.", new CultureInfo("ru-RU"))}";
             newSheet.Cells[2, 2].Value = title;
             newSheet.Cells[6, 7].Value = group.First().InWarehouse?.Name;
             newSheet.Cells[18, 6].Value = group.First().InWarehouse?.FinanciallyResponsiblePerson?.ShortName;

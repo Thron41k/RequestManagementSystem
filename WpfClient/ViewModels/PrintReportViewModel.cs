@@ -30,6 +30,8 @@ public partial class PrintReportViewModel : ObservableObject
     [ObservableProperty] private int _selectedTypeDocumentForPrint = -1;
     [ObservableProperty] private ObservableCollection<string> _docTypeList = [];
     [ObservableProperty] private bool _incomingMode;
+    [ObservableProperty] private bool _showDateSelector = true;
+    [ObservableProperty] private DateTime? _selectedDate;
     public PrintReportViewModel()
     {
 
@@ -224,29 +226,31 @@ public partial class PrintReportViewModel : ObservableObject
                 switch (SelectedTypeDocumentForPrint)
                 {
                     case 0:
-                    {
-                        var materialsInUseOffPrintModel = new MaterialsInUseOffPrintModel
                         {
-                            Commissions = SelectedCommissions,
-                            MaterialsInUse = _listMaterialsInUse.Where(x=>x.ReasonForWriteOffId is 2 or 12).ToList()
-                        };
-                        _excelWriterService.ExportAndSave(ExcelTemplateType.MaterialsInUseOffTemplateV1,
-                            materialsInUseOffPrintModel,
-                            "Списание АКБ и Автошин");
-                        break;
-                    }
+                            if(SelectedDate == null) return;
+                            var materialsInUseOffPrintModel = new MaterialsInUseOffPrintModel
+                            {
+                                Commissions = SelectedCommissions,
+                                MaterialsInUse = _listMaterialsInUse.Where(x => x.ReasonForWriteOffId is 2 or 12 && x.DateForWriteOff == SelectedDate).ToList()
+                            };
+                            _excelWriterService.ExportAndSave(ExcelTemplateType.MaterialsInUseOffTemplateV2,
+                                materialsInUseOffPrintModel,
+                                "Списание АКБ и Автошин");
+                            break;
+                        }
                     case 1:
-                    {
-                        var materialsInUseOffPrintModel = new MaterialsInUseOffPrintModel
                         {
-                            Commissions = SelectedCommissions,
-                            MaterialsInUse = _listMaterialsInUse.Where(x => x.ReasonForWriteOffId is not 2 and 12).ToList()
-                        };
-                        _excelWriterService.ExportAndSave(ExcelTemplateType.MaterialsInUseOffTemplateV2,
-                            materialsInUseOffPrintModel,
-                            "Списание АКБ и Автошин");
-                        break;
-                    }
+                            if (SelectedDate == null) return;
+                            var materialsInUseOffPrintModel = new MaterialsInUseOffPrintModel
+                            {
+                                Commissions = SelectedCommissions,
+                                MaterialsInUse = _listMaterialsInUse.Where(x => x.ReasonForWriteOffId != 2 && x.ReasonForWriteOffId != 12 && x.DateForWriteOff == SelectedDate).ToList()
+                            };
+                            _excelWriterService.ExportAndSave(ExcelTemplateType.MaterialsInUseOffTemplateV1,
+                                materialsInUseOffPrintModel,
+                                "Списание малоценки");
+                            break;
+                        }
                 }
                 break;
             default:
@@ -256,6 +260,7 @@ public partial class PrintReportViewModel : ObservableObject
 
     public void Init(List<MaterialsInUse> messageMaterialsInUse)
     {
+        ShowDateSelector = false;
         _listMaterialsInUse = messageMaterialsInUse;
         _printDialogType = PrintDialogType.MaterialsInUse;
         IncomingMode = true;

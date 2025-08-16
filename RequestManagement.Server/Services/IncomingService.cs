@@ -406,7 +406,6 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                     var incomingKey = (stock.Id, application?.Id ?? 1, incomingCode);
                     if (existingIncomings.TryGetValue(incomingKey, out var existingIncoming))
                     {
-
                         var quantityDifference = (decimal)material.FinalBalance - existingIncoming.Quantity;
                         existingIncoming.Quantity = (decimal)material.FinalBalance;
                         existingIncoming.Date = incomingDate;
@@ -425,7 +424,8 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                         DocType = incomingType,
                         ApplicationId = application?.Id ?? 1,
                         InWarehouseId = currentWarehouse?.Id ?? null
-                    };
+                    }
+                ;
                     stock.ReceivedQuantity += incomingEntry.Quantity;
                     newIncomings.Add(incomingEntry);
                     existingIncomings[incomingKey] = incomingEntry;

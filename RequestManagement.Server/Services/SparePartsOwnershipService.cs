@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
 using RequestManagement.Server.Data;
 using SparePartsOwnership = RequestManagement.Common.Models.SparePartsOwnership;
@@ -21,19 +22,10 @@ public class SparePartsOwnershipService(ApplicationDbContext dbContext) : ISpare
         var ownershipByNomenclatureId = ownerships.ToDictionary(spo => spo.NomenclatureId);
 
         // 2. Получаем все ID номенклатуры из ownerships
-        var nomenclatureIds = ownershipByNomenclatureId.Keys.ToHashSet();
+        var initialNomenclatureIds = ownershipByNomenclatureId.Keys.ToHashSet();
 
-        // 3. Находим все аналоги (в обе стороны)
-        var analogs = await dbContext.NomenclatureAnalogs
-            .Where(na => nomenclatureIds.Contains(na.OriginalId) || nomenclatureIds.Contains(na.AnalogId))
-            .ToListAsync();
-
-        var allRelatedNomenclatureIds = new HashSet<int>(nomenclatureIds);
-        foreach (var analog in analogs)
-        {
-            allRelatedNomenclatureIds.Add(analog.OriginalId);
-            allRelatedNomenclatureIds.Add(analog.AnalogId);
-        }
+        // 3. Находим ВСЕ связанные номенклатуры (рекурсивно через аналоги)
+        var allRelatedNomenclatureIds = await GetAllRelatedNomenclatureIdsAsync(initialNomenclatureIds);
 
         // 4. Получаем SPO по группе и связанным номенклатурам, включая Nomenclature
         var allOwnerships = await dbContext.SparePartsOwnerships
@@ -65,16 +57,8 @@ public class SparePartsOwnershipService(ApplicationDbContext dbContext) : ISpare
                 .Where(n => missingNomenclatureIds.Contains(n.Id))
                 .ToListAsync();
 
-            // Карта: аналогId -> оригиналId
-            var analogToOriginal = new Dictionary<int, int>();
-            foreach (var analog in analogs)
-            {
-                if (ownershipByNomenclatureId.ContainsKey(analog.OriginalId))
-                    analogToOriginal[analog.AnalogId] = analog.OriginalId;
-
-                if (ownershipByNomenclatureId.ContainsKey(analog.AnalogId))
-                    analogToOriginal[analog.OriginalId] = analog.AnalogId;
-            }
+            // Строим карту аналогов (аналог -> ближайший оригинал из ownerships)
+            var analogToOriginal = BuildAnalogToOriginalMap(initialNomenclatureIds, allRelatedNomenclatureIds);
 
             foreach (var nomenclature in missingNomenclatures)
             {
@@ -113,9 +97,75 @@ public class SparePartsOwnershipService(ApplicationDbContext dbContext) : ISpare
         return allOwnerships;
     }
 
+    private async Task<HashSet<int>> GetAllRelatedNomenclatureIdsAsync(HashSet<int> initialIds)
+    {
+        var allRelatedIds = new HashSet<int>(initialIds);
+        var queue = new Queue<int>(initialIds);
 
+        while (queue.Count > 0)
+        {
+            var currentId = queue.Dequeue();
 
+            // Находим все прямые аналоги (в обе стороны)
+            var analogs = await dbContext.NomenclatureAnalogs
+                .Where(na => na.OriginalId == currentId || na.AnalogId == currentId)
+                .Select(na => na.OriginalId == currentId ? na.AnalogId : na.OriginalId)
+                .ToListAsync();
 
+            foreach (var analogId in analogs)
+            {
+                if (!allRelatedIds.Contains(analogId))
+                {
+                    allRelatedIds.Add(analogId);
+                    queue.Enqueue(analogId);
+                }
+            }
+        }
+
+        return allRelatedIds;
+    }
+
+    private Dictionary<int, int> BuildAnalogToOriginalMap(
+        HashSet<int> originalNomenclatureIds,
+        HashSet<int> allRelatedNomenclatureIds)
+    {
+        var analogToOriginal = new Dictionary<int, int>();
+        var visited = new HashSet<int>();
+        var queue = new Queue<(int current, int? original)>();
+
+        // Инициализируем очередь оригиналами
+        foreach (var id in originalNomenclatureIds)
+        {
+            queue.Enqueue((id, null));
+            visited.Add(id);
+        }
+
+        while (queue.Count > 0)
+        {
+            var (currentId, originalId) = queue.Dequeue();
+
+            // Находим все прямые аналоги (в обе стороны)
+            var analogs = dbContext.NomenclatureAnalogs
+                .Where(na => na.OriginalId == currentId || na.AnalogId == currentId)
+                .AsEnumerable()
+                .Select(na => na.OriginalId == currentId ? na.AnalogId : na.OriginalId)
+                .Where(id => allRelatedNomenclatureIds.Contains(id));
+
+            foreach (var analogId in analogs)
+            {
+                if (!visited.Contains(analogId))
+                {
+                    visited.Add(analogId);
+                    // Если это первый уровень, то оригинал - currentId, иначе передаем originalId
+                    var newOriginalId = originalId ?? currentId;
+                    analogToOriginal[analogId] = newOriginalId;
+                    queue.Enqueue((analogId, newOriginalId));
+                }
+            }
+        }
+
+        return analogToOriginal;
+    }
 
     public async Task<int> CreateSparePartsOwnershipAsync(SparePartsOwnership sparePartsOwnership)
     {

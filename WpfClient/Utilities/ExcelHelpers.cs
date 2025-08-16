@@ -35,5 +35,49 @@ namespace RequestManagement.WpfClient.Utilities
             var lineCount = (int)Math.Ceiling(textSize.Height / rowHeight);
             return lineCount;
         }
+        public static string NumberToWords(int number)
+        {
+            if (number == 0) return "ноль";
+
+            string[] units =
+            [
+                "", "один", "два", "три", "четыре", "пять",
+                "шесть", "семь", "восемь", "девять", "десять",
+                "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать",
+                "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"
+            ];
+
+            string[] tens =
+            [
+                "", "", "двадцать", "тридцать", "сорок",
+                "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
+            ];
+
+            string[] hundreds =
+            [
+                "", "сто", "двести", "триста", "четыреста",
+                "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
+            ];
+
+            switch (number)
+            {
+                case < 20:
+                    return units[number];
+                case < 100:
+                    return tens[number / 10] + (number % 10 > 0 ? " " + units[number % 10] : "");
+                case < 1000:
+                    return hundreds[number / 100] + (number % 100 > 0 ? " " + NumberToWords(number % 100) : "");
+                case < 10000:
+                {
+                    var thousands = number / 1000;
+                    var thousandWord = thousands == 1 ? "тысяча" :
+                        thousands < 5 ? NumberToWords(thousands) + " тысячи" :
+                        NumberToWords(thousands) + " тысяч";
+                    return thousandWord + (number % 1000 > 0 ? " " + NumberToWords(number % 1000) : "");
+                }
+                default:
+                    return number.ToString();
+            }
+        }
     }
 }

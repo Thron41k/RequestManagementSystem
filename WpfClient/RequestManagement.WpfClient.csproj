@@ -14,6 +14,7 @@
     <None Remove="Resources\DefectPartsTemplate.xlsx" />
     <None Remove="Resources\LimitPartsTemplate.xlsx" />
     <None Remove="Resources\MaterialsInUseOffTemplateV1.xlsx" />
+    <None Remove="Resources\MaterialsInUseOffTemplateV2.xlsx" />
     <None Remove="Resources\Mb7PartsTemplate.xlsx" />
     <None Remove="Resources\OperationsTemplate.xlsx" />
     <None Remove="Resources\RequisitionInvoiceTemplate.xlsx" />
@@ -37,6 +38,7 @@
     <EmbeddedResource Include="Resources\DefectPartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\LimitPartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\MaterialsInUseOffTemplateV1.xlsx" />
+    <EmbeddedResource Include="Resources\MaterialsInUseOffTemplateV2.xlsx" />
     <EmbeddedResource Include="Resources\Mb7PartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\MovingBetweenWarehousesTemplate.xlsx" />
     <EmbeddedResource Include="Resources\OperationsTemplate.xlsx" />

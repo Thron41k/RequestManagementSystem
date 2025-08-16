@@ -4,6 +4,7 @@ using OfficeOpenXml.Style;
 using RequestManagement.Common.Utilities;
 using RequestManagement.WpfClient.Models.ExcelWriterModels;
 using RequestManagement.WpfClient.Utilities;
+using static RequestManagement.WpfClient.ViewModels.Helpers.ExcelColumnsWidth;
 
 namespace RequestManagement.WpfClient.Services.ExcelTemplate;
 
@@ -36,8 +37,9 @@ public class DefectPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
             var sheetName = ExcelHelpers.GetSafeSheetName(code);
             var newSheet = package.Workbook.Worksheets.Add(sheetName, templateSheet);
             newSheet.Cells[13, 4].Value = group.First().Equipment.Name;
-            var equipmentHeight = ExcelHelpers.GetRowHeight(newSheet.Column(4).Width+ newSheet.Column(5).Width+ newSheet.Column(6).Width, newSheet.Cells[13, 4].Style.Font.Name, newSheet.Cells[13, 4].Style.Font.Size, group.First().Equipment.Name);
-            newSheet.Row(13).Height = equipmentHeight;
+            var equipmentHeight = ExcelHelpers.GetRowHeight(GetColumnsWidth(newSheet,4,6), newSheet.Cells[13, 4].Style.Font.Name, newSheet.Cells[13, 4].Style.Font.Size, group.First().Equipment.Name);
+            var preEquipmentHeight = ExcelHelpers.GetRowHeight(GetColumnsWidth(newSheet, 1, 2), newSheet.Cells[13, 1].Style.Font.Name, newSheet.Cells[13, 1].Style.Font.Size, "Марка транспортного средства (машины, механизма):");
+            newSheet.Row(13).Height = new[]{equipmentHeight, preEquipmentHeight}.Max();
             newSheet.Cells[14, 2].Value = group.First().Equipment.StateNumber;
             var startRow = startDataRow;
             var groupingByDefectGroupName = group.OrderBy(x=>x.Defect.DefectGroup.Name).GroupBy(e => e.Defect.DefectGroup.Name).ToList();

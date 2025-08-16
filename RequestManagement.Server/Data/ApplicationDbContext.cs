@@ -67,7 +67,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 .IsRequired();
 
             entity.Property(e => e.Quantity)
-                .HasColumnType("numeric(18,2)")
+                .HasColumnType("numeric(18,3)")
                 .IsRequired();
 
             entity.Property(e => e.NomenclatureId)
@@ -260,11 +260,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.InitialQuantity)
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("decimal(18,3)");
             entity.Property(e => e.ReceivedQuantity)
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("decimal(18,3)");
             entity.Property(e => e.ConsumedQuantity)
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("decimal(18,3)");
             entity.HasOne(e => e.Warehouse)
                 .WithMany(w => w.Stocks)
                 .HasForeignKey(e => e.WarehouseId)
@@ -286,7 +286,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(e => e.Code)
                 .HasMaxLength(50);
             entity.Property(e => e.Quantity)
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("decimal(18,3)");
             entity.Property(e => e.Date)
                 .HasColumnType("timestamp with time zone");
             entity.HasOne(e => e.Stock)
@@ -316,7 +316,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasKey(e => e.Id);
             entity.Ignore(e => e.IsSelected);
             entity.Property(e => e.Quantity)
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("decimal(18,3)");
             entity.Property(e => e.Date)
                 .HasColumnType("timestamp with time zone");
             entity.Property(e => e.DocType)

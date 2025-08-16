@@ -88,16 +88,24 @@ public class StockService(ApplicationDbContext dbContext) : IStockService
             .ToListAsync();
     }
 
-    public async Task<bool> UploadMaterialsStockAsync(List<MaterialStock> materials, int warehouseId, DateTime date)
+    public async Task<bool> UploadMaterialsStockAsync(List<MaterialStock>? materials, int warehouseId, DateTime date)
     {
-        if (materials == null || !materials.Any())
-        {
-            return false;
-        }
-
         try
         {
-            // Получаем существующие номенклатуры и склады
+            if (materials == null) return false;
+            var warehouseExists = await _dbContext.Warehouses.AnyAsync(w => w.Id == warehouseId);
+            if (!warehouseExists)
+            {
+                return false;
+            }
+
+            await _dbContext.Stocks
+                .Where(s => s.WarehouseId == warehouseId)
+                .ExecuteUpdateAsync(upd => upd
+                    .SetProperty(s => s.InitialQuantity, 0)
+                    .SetProperty(s => s.ReceivedQuantity, 0)
+                    .SetProperty(s => s.ConsumedQuantity, 0));
+
             var existingNomenclatures = await _dbContext.Nomenclatures
                 .Where(n => materials.Select(m => m.Code).Contains(n.Code) &&
                             materials.Select(m => m.Article).Contains(n.Article) &&
@@ -105,13 +113,6 @@ public class StockService(ApplicationDbContext dbContext) : IStockService
                             materials.Select(m => m.Unit).Contains(n.UnitOfMeasure))
                 .ToDictionaryAsync(n => (n.Code, n.Article, n.Name, n.UnitOfMeasure), n => n.Id);
 
-            var warehouseExists = await _dbContext.Warehouses.AnyAsync(w => w.Id == warehouseId);
-            if (!warehouseExists)
-            {
-                return false;
-            }
-
-            // Получаем существующие записи Stock для указанного склада
             var existingStocks = await _dbContext.Stocks
                 .Include(s => s.Nomenclature)
                 .Where(s => s.WarehouseId == warehouseId)
