@@ -9,10 +9,11 @@ using RequestManagement.Common.Models;
 using CommunityToolkit.Mvvm.Input;
 using Timer = System.Timers.Timer;
 using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Models;
 
 namespace RequestManagement.WpfClient.ViewModels;
 
-public partial class SparePartsOwnershipViewModel : ObservableObject
+public partial class SparePartsOwnershipViewModel : BaseViewModel
 {
     private readonly IMessageBus _messageBus;
     private readonly IEquipmentGroupService _equipmentGroupService;
@@ -130,9 +131,17 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
         if (SelectedEquipmentGroup == null) return;
         var currentSortDescriptions = (NomenclaturesViewSource.View?.SortDescriptions!).ToList() ?? [];
         var nomenclatureList = await _sparePartsOwnershipService.GetAllSparePartsOwnershipsAsync(SelectedEquipmentGroup.Id, SelectedWarehouse?.Id ?? 0);
-        Nomenclatures = new ObservableCollection<SparePartsOwnership>(nomenclatureList.Where(x => x.AnalogId == 0));
+        var originals = nomenclatureList.Where(x => x.AnalogId == 0).ToList();
+        var analogs = nomenclatureList.Where(x => x.AnalogId != 0).ToList();
+        Nomenclatures = new ObservableCollection<SparePartsOwnership>(originals);
+        NomenclatureAnalogs = new ObservableCollection<SparePartsOwnership>(analogs);
+        foreach (var original in Nomenclatures)
+        {
+            original.AnalogSum = NomenclatureAnalogs
+                .Where(a => a.AnalogId == original.Id)
+                .Sum(a => a.CurrentQuantity);
+        }
         NomenclaturesViewSource.Source = Nomenclatures;
-        NomenclatureAnalogs = new ObservableCollection<SparePartsOwnership>(nomenclatureList.Where(x => x.AnalogId != 0));
         Comment = string.Empty;
         RequiredQuantity = 1;
         SelectedNomenclature = null;
@@ -219,6 +228,25 @@ public partial class SparePartsOwnershipViewModel : ObservableObject
                 RequiredQuantity = RequiredQuantity
             });
             await NomenclatureListUpdate();
+        }
+    }
+
+    [RelayCommand]
+    private async Task EditAnalogForNomenclature()
+    {
+        if (SelectedNomenclature == null) return;
+        var results = await _messageBus.Request(new DialogSparePartsAnalogsModel
+        {
+            Caller = Id,
+            InitNomenclature = SelectedNomenclature
+        });
+        var accepted = results.FirstOrDefault(r => r.Result);
+        if (accepted is not null)
+        {
+            if (accepted.Caller == Id && accepted.Result)
+            {
+                await NomenclatureListUpdate();
+            }
         }
     }
 }

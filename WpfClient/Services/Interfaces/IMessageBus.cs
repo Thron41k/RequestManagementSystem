@@ -24,4 +24,5 @@ public interface IMessageBus
     /// <param name="message">Сообщение для отправки.</param>
     /// <returns>Задача, завершающаяся после обработки всеми подписчиками.</returns>
     Task Publish<TMessage>(TMessage message);
+    Task<IReadOnlyCollection<TMessage>> Request<TMessage>(TMessage message);
 }

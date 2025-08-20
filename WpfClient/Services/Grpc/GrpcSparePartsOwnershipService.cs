@@ -58,7 +58,7 @@ internal class GrpcSparePartsOwnershipService(IGrpcClientFactory clientFactory, 
             EqipmentGroupId = sparePartsOwnership.EquipmentGroupId,
             NomenclatureId = sparePartsOwnership.NomenclatureId,
             RequiredQuantity = sparePartsOwnership.RequiredQuantity,
-            Comment = sparePartsOwnership.Comment
+            Comment = sparePartsOwnership.Comment ?? ""
         }, headers);
         return result.Success;
     }

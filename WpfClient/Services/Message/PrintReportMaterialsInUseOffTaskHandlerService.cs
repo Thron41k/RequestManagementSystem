@@ -6,7 +6,7 @@ using RequestManagement.WpfClient.Views;
 
 namespace RequestManagement.WpfClient.Services.Message;
 
-public class PrintReportMaterialsInUseOffTaskHandlerService(IMessageBus messageBus, PrintReportViewModel printReportViewModel) : IMessageHandlerService<PrintMaterialInUseOffModel>
+public class PrintReportMaterialsInUseOffTaskHandlerService(PrintReportViewModel printReportViewModel) : IMessageHandlerService<PrintMaterialInUseOffModel>
 {
     public Task HandleAsync(PrintMaterialInUseOffModel message)
     {

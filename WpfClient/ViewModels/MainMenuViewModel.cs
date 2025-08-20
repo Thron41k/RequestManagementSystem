@@ -5,12 +5,13 @@ using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Models;
 using RequestManagement.Common.Models.Interfaces;
 using RequestManagement.WpfClient.Messages;
+using RequestManagement.WpfClient.Models;
 using RequestManagement.WpfClient.Services.Interfaces;
 using RequestManagement.WpfClient.Views;
 
 namespace RequestManagement.WpfClient.ViewModels;
 
-public class MainMenuViewModel
+public partial class MainMenuViewModel : BaseViewModel
 {
     private readonly SparePartsOwnershipViewModel _sparePartsOwnershipViewModel;
     private readonly EquipmentViewModel _equipmentViewModel;
@@ -32,7 +33,6 @@ public class MainMenuViewModel
     private readonly ExpenseDataLoadViewModel _expenseDataLoadViewModel;
     private readonly CommissionsViewModel _commissionsViewModel;
     private readonly PrintReportViewModel _printReportViewModel;
-    private readonly SparePartsAnalogsViewModel _sparePartsAnalogsViewModel;
     private readonly IncomingDataLoadViewModel _incomingDataLoadViewModel;
     private readonly LabelCountSelectorViewModel _labelCountSelectorViewModel;
     private readonly LabelPrintListViewModel _labelPrintListViewModel;
@@ -51,7 +51,6 @@ public class MainMenuViewModel
     public ICommand ShowStartDataLoadingCommand { get; }
     public ICommand ShowCommissionsCommand { get; }
     public ICommand ShowExpensesDataLoadingCommand { get; }
-    public ICommand ShowNomenclatureAnalogCommand { get; }
     public ICommand ShowIncomingDataLoadingCommand { get; }
     public ICommand ShowSparePartsOwnershipCommand { get; }
     public ICommand ShowMaterialsInUseLoadingCommand { get; }
@@ -74,7 +73,6 @@ public class MainMenuViewModel
         CommissionsViewModel commissionsViewModel,
         PrintReportViewModel printReportViewModel,
         ExpenseDataLoadViewModel expenseDataLoadViewModel,
-        SparePartsAnalogsViewModel sparePartsAnalogsViewModel,
         IncomingDataLoadViewModel incomingDataLoadViewModel,
         LabelCountSelectorViewModel labelCountSelectorViewModel,
         LabelPrintListViewModel labelPrintListViewModel,
@@ -100,7 +98,7 @@ public class MainMenuViewModel
         _commissionsViewModel = commissionsViewModel;
         _printReportViewModel = printReportViewModel;
         _expenseDataLoadViewModel = expenseDataLoadViewModel;
-        _sparePartsAnalogsViewModel = sparePartsAnalogsViewModel;
+
         _incomingDataLoadViewModel = incomingDataLoadViewModel;
         _labelCountSelectorViewModel = labelCountSelectorViewModel;
         _labelPrintListViewModel = labelPrintListViewModel;
@@ -129,12 +127,21 @@ public class MainMenuViewModel
         ShowStartDataLoadingCommand = new RelayCommand(ShowStartDataLoading);
         ShowCommissionsCommand = new RelayCommand(ShowCommissions);
         ShowExpensesDataLoadingCommand = new RelayCommand(ShowExpensesDataLoading);
-        ShowNomenclatureAnalogCommand = new RelayCommand(ShowNomenclatureAnalog);
         ShowIncomingDataLoadingCommand = new RelayCommand(ShowIncomingDataLoading);
         ShowSparePartsOwnershipCommand = new RelayCommand(ShowSparePartsOwnership);
         ShowMaterialsInUseLoadingCommand = new RelayCommand(ShowMaterialsInUseLoading);
         ShowMaterialInUseListCommand = new RelayCommand(ShowMaterialInUseList);
         ShowReasonsForWritingOffMaterialsFromOperationCommand = new RelayCommand(ShowReasonsForWritingOffMaterialsFromOperation);
+    }
+
+    [RelayCommand]
+    private async Task ShowNomenclatureAnalog()
+    {
+        await _messageBus.Publish(new DialogSparePartsAnalogsModel
+        {
+            Caller = Id,
+            InitNomenclature = null
+        });
     }
 
     private Task OnShowResultMessageForMaterialsInUseDialog(ShowResultMessageForMaterialsInUse arg)
@@ -256,19 +263,6 @@ public class MainMenuViewModel
         window.ShowDialog();
     }
 
-    private void ShowNomenclatureAnalog()
-    {
-        var sparePartsAnalogsView = new SparePartsAnalogsView(_sparePartsAnalogsViewModel);
-        var window = new Window
-        {
-            Content = sparePartsAnalogsView,
-            Title = "Аналоги номенклатуры",
-            Width = 850,
-            Height = 510,
-            ResizeMode = ResizeMode.NoResize
-        };
-        window.ShowDialog();
-    }
     private void ShowCommissions()
     {
         ShowCommissions(true);

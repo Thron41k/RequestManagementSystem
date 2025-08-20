@@ -113,7 +113,6 @@
                     Margin="30,30,0,0" 
                     CornerRadius="20"
                     BadgeBackground="Red"
-
                     BadgeForeground="White"
                     Badge="{Binding NotificationCount}">
                 <materialDesign:Badged.Resources>

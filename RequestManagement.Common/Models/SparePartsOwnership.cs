@@ -13,6 +13,8 @@ public class SparePartsOwnership : IEntity
     public string? Comment { get; set; }
     [NotMapped]
     public int? AnalogId { get; set; }
+    [NotMapped]
+    public decimal? AnalogSum { get; set; }
     public int EquipmentGroupId { get; set; }
     public EquipmentGroup EquipmentGroup { get; set; } = null!;
 

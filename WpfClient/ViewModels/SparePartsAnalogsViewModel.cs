@@ -10,7 +10,7 @@ using RequestManagement.WpfClient.Services.Interfaces;
 
 namespace RequestManagement.WpfClient.ViewModels;
 
-public partial class SparePartsAnalogsViewModel : ObservableObject
+public partial class SparePartsAnalogsViewModel : BaseViewModel
 {
     private readonly IMessageBus _messageBus;
     private readonly INomenclatureService _nomenclatureService;
@@ -93,8 +93,10 @@ public partial class SparePartsAnalogsViewModel : ObservableObject
     private async Task AddNomenclatureAnalogAsync(Nomenclature nomenclature)
     {
         if (SelectedNomenclature == null) return;
-        await _nomenclatureAnalogService.AddNomenclatureAnalogAsync(new NomenclatureAnalog { OriginalId = SelectedNomenclature.Id, AnalogId = nomenclature.Id });
+        var result = await _nomenclatureAnalogService.AddNomenclatureAnalogAsync(new NomenclatureAnalog { OriginalId = SelectedNomenclature.Id, AnalogId = nomenclature.Id });
+        if(result == 0) return;
         await LoadNomenclatureAnalogAsync();
+        DialogResult = true;
     }
 
     [RelayCommand]
@@ -113,7 +115,16 @@ public partial class SparePartsAnalogsViewModel : ObservableObject
     private async Task DeleteNomenclatureAnalog()
     {
         if(SelectedNomenclature == null || SelectedNomenclatureAnalog == null) return;
-        await _nomenclatureAnalogService.DeleteNomenclatureAnalogAsync(SelectedNomenclature.Id,SelectedNomenclatureAnalog.Id);
+        var result = await _nomenclatureAnalogService.DeleteNomenclatureAnalogAsync(SelectedNomenclature.Id,SelectedNomenclatureAnalog.Id);
+        if (!result) return;
         await LoadNomenclatureAnalogAsync();
+        DialogResult = true;
+    }
+
+    public void Init(Nomenclature? messageInitNomenclature)
+    {
+        DialogResult = false;
+        if (messageInitNomenclature == null) return;
+        FilterText = $"{messageInitNomenclature.Name} {messageInitNomenclature.Code} {messageInitNomenclature.Article}";
     }
 }

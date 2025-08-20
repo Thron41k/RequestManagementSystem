@@ -75,7 +75,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<ExpenseDataLoadViewModel>();
         serviceCollection.AddScoped<CommissionsViewModel>();
         serviceCollection.AddScoped<PrintReportViewModel>();
-        serviceCollection.AddScoped<SparePartsAnalogsViewModel>();
+        serviceCollection.AddSingleton<SparePartsAnalogsViewModel>();
         serviceCollection.AddScoped<IncomingDataLoadViewModel>();
         serviceCollection.AddScoped<LabelCountSelectorViewModel>();
         serviceCollection.AddScoped<LabelPrintListViewModel>();

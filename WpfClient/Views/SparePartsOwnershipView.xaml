@@ -152,9 +152,21 @@
                         <DataGridTextColumn Header="Наименование" Binding="{Binding Nomenclature.Name}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Артикул" Binding="{Binding Nomenclature.Article}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Потребность" Binding="{Binding RequiredQuantity}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="На складе" Binding="{Binding CurrentQuantity}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="На складе" IsReadOnly="True">
+                            <DataGridTextColumn.Binding>
+                                <MultiBinding StringFormat="{}{0} ({1})">
+                                    <Binding Path="CurrentQuantity"/>
+                                    <Binding Path="AnalogSum"/>
+                                </MultiBinding>
+                            </DataGridTextColumn.Binding>
+                        </DataGridTextColumn>
                         <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" IsReadOnly="True"/>
                     </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Редактировать аналоги" Command="{Binding EditAnalogForNomenclatureCommand}"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
                     <DataGrid.InputBindings>
                         <MouseBinding
                             MouseAction="LeftClick"

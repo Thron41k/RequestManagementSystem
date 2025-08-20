@@ -38,8 +38,6 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task SelectFinanciallyResponsiblePerson()
     {
-        Console.WriteLine($"Публикуем тип: {typeof(SelectDriverTaskModel).Name}");
-
         await _messageBus.Publish(new SelectDriverTaskModel
         {
             Caller = typeof(MainWindowViewModel),

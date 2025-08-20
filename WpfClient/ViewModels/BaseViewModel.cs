@@ -1,11 +1,9 @@
-﻿namespace RequestManagement.WpfClient.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class BaseViewModel : System.ComponentModel.INotifyPropertyChanged
+namespace RequestManagement.WpfClient.ViewModels;
+
+public class BaseViewModel : ObservableObject
 {
-    public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
-    protected void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-    }
+    public bool DialogResult { get; set; }
+    protected Guid Id { get; set; } = Guid.NewGuid();
 }
