@@ -50,6 +50,7 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
         if (DateTime.TryParse(requestFromDate, out var fromDate) &&
             DateTime.TryParse(requestToDate, out var toDate))
         {
+            Console.WriteLine(fromDate);
             query = query.Where(e => e.Date >= fromDate && e.Date < toDate.AddDays(1));
         }
         else
