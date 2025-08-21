@@ -4,9 +4,7 @@ using RequestManagement.Common.Models;
 using RequestManagement.Common.Models.Enums;
 using RequestManagement.Server.Data;
 using System.Security.Cryptography;
-using Windows.UI;
 using Microsoft.IdentityModel.Tokens;
-using RequestManagement.Server.Controllers;
 
 namespace RequestManagement.Server.Services;
 
