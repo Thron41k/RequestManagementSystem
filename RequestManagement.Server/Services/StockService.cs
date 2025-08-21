@@ -4,8 +4,6 @@ using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.Server.Data;
 using WpfClient.Models;
-using EFCore.BulkExtensions;
-using Windows.UI;
 
 namespace RequestManagement.Server.Services;
 
