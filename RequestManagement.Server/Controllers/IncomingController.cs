@@ -58,7 +58,7 @@ public class IncomingController(IIncomingService incomingService, ILogger<Incomi
             throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
         }
 
-        _logger.LogInformation("Getting all incomings");
+        _logger.LogInformation("Getting all incomings from {0} to {1}", request.FromDate, request.ToDate);
 
         var incomingList = await _incomingService.GetAllIncomingsAsync(request.Filter,request.WarehouseId,request.FromDate,request.ToDate);
         var response = Converters.IncomingConverter.ToGrpc(incomingList);

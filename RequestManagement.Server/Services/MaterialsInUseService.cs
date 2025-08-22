@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
+using RequestManagement.Common.Utilities;
 using RequestManagement.Server.Data;
 
 namespace RequestManagement.Server.Services;
@@ -78,10 +79,10 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         if (materialsInUse.Count == 0)
             return false;
         var validItems = materialsInUse
-            .Where(i => DateTime.TryParse(i.Date, out _))
+            .Where(i => DateTimeHelper.TryParseDto(i.Date, out _))
             .Select(i =>
             {
-                i.Date = DateTime.Parse(i.Date).ToString("yyyy-MM-dd");
+                i.Date = DateTime.Parse(i.Date).ToString("dd.MM.yyyy");
                 return i;
             })
             .ToList();
