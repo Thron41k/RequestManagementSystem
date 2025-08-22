@@ -62,6 +62,10 @@ public class IncomingController(IIncomingService incomingService, ILogger<Incomi
 
         var incomingList = await _incomingService.GetAllIncomingsAsync(request.Filter,request.WarehouseId,request.FromDate,request.ToDate);
         var response = Converters.IncomingConverter.ToGrpc(incomingList);
+        foreach (var incoming in incomingList)
+        {
+            _logger.LogInformation(incoming.Date.ToShortDateString());
+        }
         return response;
     }
 
