@@ -16,7 +16,7 @@ using Warehouse = RequestManagement.Common.Models.Warehouse;
 
 namespace RequestManagement.Server.Services;
 
-public class IncomingService(ApplicationDbContext dbContext, ILogger<IncomingService> logger) : IIncomingService
+public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
 {
     public async Task<List<Incoming>> GetAllIncomingsAsync(string filter, int requestWarehouseId, string requestFromDate, string requestToDate)
     {
@@ -64,8 +64,6 @@ public class IncomingService(ApplicationDbContext dbContext, ILogger<IncomingSer
                 query = query.Where(e => e.Date < toDate.AddDays(1));
             }
         }
-        logger.LogInformation("FROM: {DateTimeOffset:o}, TO: {ToDate:o}", fromDate, toDate);
-        logger.LogInformation(query.ToQueryString());
         return await query.ToListAsync();
     }
 
