@@ -24,7 +24,7 @@ public static class IncomingConverter
                 Id = inc.Id,
                 StockId = inc.StockId,
                 Quantity = (double)inc.Quantity,
-                Date = inc.Date.ToString("yyyy-MM-dd"),
+                Date = inc.Date.ToString("dd.MM.yyyy"),
                 Code = inc.Code,
                 DocType = inc.DocType,
                 ApplicationId = inc.ApplicationId,
@@ -82,7 +82,7 @@ public static class IncomingConverter
                 {
                     Id = inc.Application.Id,
                     Number = inc.Application.Number,
-                    Date = inc.Application.Date.ToString("yyyy-MM-dd"),
+                    Date = inc.Application.Date.ToString("dd.MM.yyyy"),
                     ResponsibleId = inc.Application.ResponsibleId,
                     EquipmentId = inc.Application.EquipmentId
                 };
