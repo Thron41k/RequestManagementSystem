@@ -84,6 +84,7 @@ public class ServiceConfigurator
         serviceCollection.AddScoped<MaterialInUseListViewModel>();
         serviceCollection.AddScoped<AddMaterialsInUseToOffViewModel>();
         serviceCollection.AddScoped<ReasonsForWritingOffMaterialsFromOperationViewModel>();
+        serviceCollection.AddScoped<AddMaterialInUseFromExpenseViewModel>();
 
         serviceCollection.AddScoped<GrpcAuthService>();
         serviceCollection.AddScoped<IEquipmentService, GrpcEquipmentService>();
@@ -130,6 +131,7 @@ public class ServiceConfigurator
         serviceCollection.AddTransient<MaterialInUseListView>();
         serviceCollection.AddTransient<AddMaterialsInUseToOffView>();
         serviceCollection.AddTransient<ReasonsForWritingOffMaterialsFromOperationView>();
+        serviceCollection.AddTransient<AddMaterialInUseFromExpenseView>();
 
         return serviceCollection.BuildServiceProvider();
     }

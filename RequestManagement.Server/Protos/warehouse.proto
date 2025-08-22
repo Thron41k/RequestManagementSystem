@@ -8,6 +8,12 @@ service WarehouseService {
     rpc UpdateWarehouse (UpdateWarehouseRequest) returns (UpdateWarehouseResponse);
     rpc DeleteWarehouse (DeleteWarehouseRequest) returns (DeleteWarehouseResponse);
     rpc GetOrCreateWarehouse (GetOrCreateWarehouseRequest) returns (GetOrCreateWarehouseResponse);
+    rpc GetAllWarehousesByMolId (GetAllWarehousesByMolIdRequest) returns (GetAllWarehousesResponse);
+}
+
+
+message GetAllWarehousesByMolIdRequest{
+    int32 mol_id = 1;
 }
 
 message GetOrCreateWarehouseRequest{

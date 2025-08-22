@@ -37,6 +37,34 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
         return response;
     }
 
+    public override async Task<GetAllWarehousesResponse> GetAllWarehousesByMolId(GetAllWarehousesByMolIdRequest request, ServerCallContext context)
+    {
+        var user = context.GetHttpContext().User;
+        if (user.Identity is { IsAuthenticated: false })
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+        }
+        logger.LogInformation("Getting all warehouses by mol Id");
+        var warehouseList = await warehouseService.GetAllWarehousesByMolIdAsync(request.MolId);
+        var response = new GetAllWarehousesResponse();
+        response.Warehouse.AddRange(warehouseList.Select(e => new Warehouse
+        {
+            Id = e.Id,
+            Name = e.Name,
+            Code = e.Code,
+            LastUpdated = e.LastUpdated.ToString("o"),
+            FinanciallyResponsiblePerson = e.FinanciallyResponsiblePerson != null ? new WarehouseDriver
+            {
+                Id = e.FinanciallyResponsiblePerson.Id,
+                FullName = e.FinanciallyResponsiblePerson.FullName,
+                ShortName = e.FinanciallyResponsiblePerson.ShortName,
+                Position = e.FinanciallyResponsiblePerson.Position
+            } : new WarehouseDriver(),
+            FinanciallyResponsiblePersonId = e.FinanciallyResponsiblePersonId ?? 0
+        }));
+        return response;
+    }
+
     public override async Task<GetOrCreateWarehouseResponse> GetOrCreateWarehouse(
         GetOrCreateWarehouseRequest request, ServerCallContext context)
     {

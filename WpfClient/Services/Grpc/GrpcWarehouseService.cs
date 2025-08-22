@@ -1,8 +1,9 @@
-﻿using System.Globalization;
-using Grpc.Core;
+﻿using Grpc.Core;
+using Microsoft.Office.Interop.Excel;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
+using System.Globalization;
 using Warehouse = RequestManagement.Common.Models.Warehouse;
 
 namespace RequestManagement.WpfClient.Services.Grpc;
@@ -22,6 +23,33 @@ internal class GrpcWarehouseService(IGrpcClientFactory clientFactory, AuthTokenS
         {
             Id = warehouse.Id, 
             Name = warehouse.Name, 
+            LastUpdated = DateTime.Parse(warehouse.LastUpdated),
+            Code = warehouse.Code,
+            FinanciallyResponsiblePersonId = warehouse.FinanciallyResponsiblePersonId,
+            FinanciallyResponsiblePerson = warehouse.FinanciallyResponsiblePerson != null ? new Common.Models.Driver
+            {
+                Id = warehouse.FinanciallyResponsiblePerson.Id,
+                FullName = warehouse.FinanciallyResponsiblePerson.FullName,
+                ShortName = warehouse.FinanciallyResponsiblePerson.ShortName,
+                Position = warehouse.FinanciallyResponsiblePerson.Position,
+                Code = warehouse.FinanciallyResponsiblePerson.Code
+            } : null
+        }).ToList();
+    }
+
+    public async Task<List<Warehouse>> GetAllWarehousesByMolIdAsync(int id)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateWarehouseClient();
+        var response = await client.GetAllWarehousesByMolIdAsync(new GetAllWarehousesByMolIdRequest { MolId = id }, headers);
+        return response.Warehouse.Select(warehouse => new Warehouse
+        {
+            Id = warehouse.Id,
+            Name = warehouse.Name,
             LastUpdated = DateTime.Parse(warehouse.LastUpdated),
             Code = warehouse.Code,
             FinanciallyResponsiblePersonId = warehouse.FinanciallyResponsiblePersonId,

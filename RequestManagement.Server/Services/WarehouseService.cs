@@ -31,6 +31,13 @@ public class WarehouseService(ApplicationDbContext dbContext) : IWarehouseServic
             .ToListAsync();
     }
 
+    public async Task<List<Warehouse>> GetAllWarehousesByMolIdAsync(int id)
+    {
+        var query = _dbContext.Warehouses.AsQueryable();
+        if (id <= 0) return [];
+        return await query.Where(x => x.FinanciallyResponsiblePersonId == id).ToListAsync();
+    }
+
     public async Task<Warehouse> GetOrCreateWarehousesAsync(string filter)
     {
         var query = _dbContext.Warehouses.AsQueryable();

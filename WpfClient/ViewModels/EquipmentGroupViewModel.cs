@@ -11,7 +11,7 @@ using Timer = System.Timers.Timer;
 
 namespace RequestManagement.WpfClient.ViewModels;
 
-public partial class EquipmentGroupViewModel : ObservableObject
+public partial class EquipmentGroupViewModel : BaseViewModel
 {
     private readonly IMessageBus _messageBus;
     private readonly IEquipmentGroupService _equipmentGroupService;
@@ -20,8 +20,6 @@ public partial class EquipmentGroupViewModel : ObservableObject
     [ObservableProperty] private string _filterText;
     [ObservableProperty] private ObservableCollection<RequestManagement.Common.Models.EquipmentGroup> _equipmentGroupList = [];
     [ObservableProperty] private CollectionViewSource _equipmentGroupViewSource;
-    public bool DialogResult { get; private set; }
-    public bool EditMode { get; set; }
     private readonly Dispatcher _dispatcher;
     private readonly Timer _filterTimer;
     public event EventHandler CloseWindowRequested;

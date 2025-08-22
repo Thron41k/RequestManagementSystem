@@ -12,7 +12,7 @@ using Timer = System.Timers.Timer;
 
 namespace RequestManagement.WpfClient.ViewModels;
 
-public partial class MaterialInUseListViewModel : ObservableObject
+public partial class MaterialInUseListViewModel : BaseViewModel
 {
     private readonly IMessageBus _messageBus;
     private readonly IMaterialsInUseService _materialsInUseService;
@@ -138,5 +138,12 @@ public partial class MaterialInUseListViewModel : ObservableObject
     private async Task Print()
     {
         await _messageBus.Publish(new PrintMaterialInUseOffModel { MaterialsInUse = _materialsInUseList });
+    }
+
+    [RelayCommand]
+    private async Task MaterialInUseLoad()
+    {
+        if (SelectedFinanciallyResponsiblePerson == null) return;
+        await _messageBus.Publish(new DialogAddMaterialInUseFromExpenseModel() { Caller = Id, Mol = SelectedFinanciallyResponsiblePerson });
     }
 }

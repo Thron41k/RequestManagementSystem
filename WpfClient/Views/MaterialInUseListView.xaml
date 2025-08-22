@@ -63,6 +63,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Grid.Column="1" VerticalAlignment="Center" Margin="15,0,0,0">
                     <Button Content="Печать списания" Command="{Binding PrintCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=ExpenseViewWindow}"/>
+                    <Button Content="Загрузить эксплуатацию" Margin="0,20,0,0" Command="{Binding MaterialInUseLoadCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Grid>
         </Grid>

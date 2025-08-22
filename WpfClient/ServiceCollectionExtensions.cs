@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IMessageBus, MessageBusService>();
         services.AddScoped<PrintReportMaterialsInUseOffTaskHandlerService>();
         services.AddScoped<EditAnalogForNomenclatureTaskHandleService>();
+        services.AddScoped<AddMaterialInUseFromExpenseTaskHandlerService>();
         services.AddSingleton<MessageProcessingService>();
 
         return services;
@@ -23,5 +24,6 @@ public static class ServiceCollectionExtensions
         var processor = serviceProvider.GetRequiredService<MessageProcessingService>();
         processor.RegisterHandler<PrintMaterialInUseOffModel, PrintReportMaterialsInUseOffTaskHandlerService>();
         processor.RegisterHandler<DialogSparePartsAnalogsModel, EditAnalogForNomenclatureTaskHandleService>();
+        processor.RegisterHandler<DialogAddMaterialInUseFromExpenseModel, AddMaterialInUseFromExpenseTaskHandlerService>();
     }
 }
