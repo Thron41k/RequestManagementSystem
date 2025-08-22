@@ -64,7 +64,7 @@ public class IncomingController(IIncomingService incomingService, ILogger<Incomi
         var response = Converters.IncomingConverter.ToGrpc(incomingList);
         foreach (var incoming in incomingList)
         {
-            _logger.LogInformation(incoming.Date.ToShortDateString());
+            _logger.LogInformation("{IncomingCode} - {IncomingDate:dd.MM.yyyy} - {Date:dd.MM.yyyy}", incoming.Code, incoming.Date, response.Incoming.First(x=>x.Code == incoming.Code).Date);
         }
         return response;
     }
