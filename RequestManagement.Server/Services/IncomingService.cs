@@ -65,8 +65,8 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                 query = query.Where(e => e.Date < toDate.AddDays(1));
             }
         }
-        Console.WriteLine($"FROM: {fromDate:o}, TO: {toDate:o}");
-        Console.WriteLine(query.ToQueryString());
+        Debug.WriteLine($"FROM: {fromDate:o}, TO: {toDate:o}");
+        Debug.WriteLine(query.ToQueryString());
         return await query.ToListAsync();
     }
 
