@@ -47,20 +47,20 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
         {
             query = query.Where(e => e.Stock.WarehouseId == requestWarehouseId);
         }
-        if (DateTime.TryParse(requestFromDate, out var fromDate) &&
-            DateTime.TryParse(requestToDate, out var toDate))
+        if (DateTimeHelper.TryParseDto(requestFromDate, out var fromDate) &&
+            DateTimeHelper.TryParseDto(requestToDate, out var toDate))
         {
             Console.WriteLine(fromDate);
             query = query.Where(e => e.Date >= fromDate && e.Date < toDate.AddDays(1));
         }
         else
         {
-            if (DateTime.TryParse(requestFromDate, out fromDate))
+            if (DateTimeHelper.TryParseDto(requestFromDate, out fromDate))
             {
                 query = query.Where(e => e.Date >= fromDate);
             }
 
-            if (DateTime.TryParse(requestToDate, out toDate))
+            if (DateTimeHelper.TryParseDto(requestToDate, out toDate))
             {
                 query = query.Where(e => e.Date < toDate.AddDays(1));
             }
@@ -264,7 +264,7 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                 .Where(i => !string.IsNullOrEmpty(i.ApplicationNumber) && !string.IsNullOrEmpty(i.ApplicationDate))
                 .Select(i =>
                 {
-                    if (DateTime.TryParse(i.ApplicationDate, out var date))
+                    if (DateTimeHelper.TryParseDto(i.ApplicationDate, out var date))
                     {
                         return (Number: i.ApplicationNumber, Date: date.Date);
                     }
@@ -283,12 +283,12 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
             foreach (var item in incoming.Items)
             {
                 if (string.IsNullOrEmpty(item.ApplicationNumber) || string.IsNullOrEmpty(item.ApplicationDate) ||
-                    !DateTime.TryParse(item.ApplicationDate, out var applicationDate))
+                    !DateTimeHelper.TryParseDto(item.ApplicationDate, out var applicationDate))
                 {
                     continue;
                 }
 
-                var appKey = (item.ApplicationNumber, applicationDate);
+                var appKey = (item.ApplicationNumber, applicationDate.Date);
                 if (!existingApplications.ContainsKey(appKey))
                 {
                     var responsibleId = 1;
@@ -308,7 +308,7 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                     var application = new Application
                     {
                         Number = item.ApplicationNumber,
-                        Date = applicationDate,
+                        Date = applicationDate.Date,
                         ResponsibleId = responsibleId,
                         EquipmentId = equipmentId
                     };
@@ -377,9 +377,9 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
             {
                 Application? application = null;
                 if (!string.IsNullOrEmpty(item.ApplicationNumber) && !string.IsNullOrEmpty(item.ApplicationDate) &&
-                    DateTime.TryParse(item.ApplicationDate, out var applicationDate))
+                    DateTimeHelper.TryParseDto(item.ApplicationDate, out var applicationDate))
                 {
-                    var appKey = (item.ApplicationNumber, applicationDate);
+                    var appKey = (item.ApplicationNumber, applicationDate.Date);
                     existingApplications.TryGetValue(appKey, out application);
                 }
 
@@ -389,27 +389,25 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                     var nomenclatureKey = (material.Code, material.Article, material.ItemName, material.Unit);
                     if (!existingNomenclatures.TryGetValue(nomenclatureKey, out var nomenclature))
                     {
-                        //logger.LogWarning("Номенклатура с ключом {NomenclatureKey} не найдена.", nomenclatureKey);
                         continue;
                     }
 
                     var stockKey = (nomenclature.Id, warehouse.Id);
                     if (!existingStocks.TryGetValue(stockKey, out var stock))
                     {
-                        //logger.LogWarning("Запас с ключом {StockKey} не найден для номенклатуры {NomenclatureId}.", stockKey, nomenclature.Id);
                         continue;
                     }
                     var incomingCode = item.RegistratorNumber ?? $"AUTO_{Guid.NewGuid().ToString("N")[..8]}";
-                    var incomingDate = DateTime.TryParse(item.RegistratorDate, out var registratorDate)
-                        ? registratorDate
-                        : DateTime.UtcNow;
+                    var incomingDate = DateTimeHelper.TryParseDto(item.RegistratorDate, out var regDto)
+                        ? regDto
+                        : DateTimeOffset.UtcNow;
                     var incomingType = item.RegistratorType;
                     var incomingKey = (stock.Id, application?.Id ?? 1, incomingCode);
                     if (existingIncomings.TryGetValue(incomingKey, out var existingIncoming))
                     {
                         var quantityDifference = (decimal)material.FinalBalance - existingIncoming.Quantity;
                         existingIncoming.Quantity = (decimal)material.FinalBalance;
-                        existingIncoming.Date = incomingDate;
+                        existingIncoming.Date = incomingDate.Date;
                         existingIncoming.DocType = incomingType;
                         existingIncoming.InWarehouseId = currentWarehouse?.Id ?? null;
                         stock.ReceivedQuantity += quantityDifference;
@@ -420,7 +418,7 @@ public class IncomingService(ApplicationDbContext dbContext) : IIncomingService
                     {
                         StockId = stock.Id,
                         Quantity = (decimal)material.FinalBalance,
-                        Date = incomingDate,
+                        Date = incomingDate.Date,
                         Code = incomingCode,
                         DocType = incomingType,
                         ApplicationId = application?.Id ?? 1,

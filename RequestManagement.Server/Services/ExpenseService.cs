@@ -51,19 +51,19 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
         {
             query = query.Where(e => e.DefectId == requestDefectId);
         }
-        if (DateTime.TryParse(requestFromDate, out var fromDate) &&
-            DateTime.TryParse(requestToDate, out var toDate))
+        if (DateTimeHelper.TryParseDto(requestFromDate, out var fromDate) &&
+            DateTimeHelper.TryParseDto(requestToDate, out var toDate))
         {
             query = query.Where(e => e.Date >= fromDate && e.Date < toDate.AddDays(1));
         }
         else
         {
-            if (DateTime.TryParse(requestFromDate, out fromDate))
+            if (DateTimeHelper.TryParseDto(requestFromDate, out fromDate))
             {
                 query = query.Where(e => e.Date >= fromDate);
             }
 
-            if (DateTime.TryParse(requestToDate, out toDate))
+            if (DateTimeHelper.TryParseDto(requestToDate, out toDate))
             {
                 query = query.Where(e => e.Date < toDate.AddDays(1));
             }
@@ -163,8 +163,6 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                     material.NomenclatureArticle,
                     material.NomenlatureUnitOfMeasure);
 
-                if("Ю0014569" == material.NomenclatureCode)
-                    Console.WriteLine(material.NomenclatureCode);
                 if (!stockMap.TryGetValue(key, out var stock))
                 {
                     error.Add(material);
