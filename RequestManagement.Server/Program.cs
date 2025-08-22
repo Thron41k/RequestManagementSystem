@@ -10,9 +10,15 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 var builder = WebApplication.CreateBuilder(args);
 
 
-// Регистрация контекста БД
+//// Регистрация контекста БД
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+//        .LogTo(Console.WriteLine, LogLevel.Information) // вывод всех SQL в консоль
+//        .EnableSensitiveDataLogging() // покажет реальные параметры
+//        .EnableDetailedErrors());
 
 // Регистрация сервисов
 builder.Services.AddScoped<INomenclatureService, NomenclatureService>();

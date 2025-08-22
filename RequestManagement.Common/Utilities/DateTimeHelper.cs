@@ -4,36 +4,28 @@ namespace RequestManagement.Common.Utilities;
 
 public static class DateTimeHelper
 {
-    private static readonly string[] DateFormats =
-    [
-        "yyyy-MM-dd",
-        "yyyy-MM-dd HH:mm:ss",
-        "yyyy-MM-dd HH:mm:ss.fff",
-        "yyyy-MM-ddTHH:mm:ssK",
-        "yyyy-MM-dd HH:mm:ss.fff K",
-        "yyyy-MM-dd HH:mm:ss zzz",
-        "yyyy-MM-dd HH:mm:ss.fff zzz",
-        "dd.MM.yyyy",
-        "dd.MM.yyyy HH:mm:ss",
-        "dd.MM.yyyy HH:mm:ss zzz",
-        "dd/MM/yyyy",
-        "dd/MM/yyyy HH:mm:ss",
-        "dd/MM/yyyy HH:mm:ss zzz"
-    ];
-
-    public static bool TryParseDto(string? s, out DateTimeOffset dto)
+    public static bool TryParseDto(string? s, out DateTime dto)
     {
-        if (!string.IsNullOrWhiteSpace(s) &&
-            DateTimeOffset.TryParseExact(
-                s.Trim(),
-                DateFormats,
-                new CultureInfo("ru-RU"), // ← важное изменение
-                DateTimeStyles.AllowWhiteSpaces,
-                out dto))
-        {
-            return true;
-        }
         dto = default;
-        return false;
+        if (string.IsNullOrWhiteSpace(s)) throw new InvalidDataException("Дата имеет неверный формат");
+        if (!DateTime.TryParseExact(
+                s.Trim(),
+                [
+                    "yyyy-MM-dd",
+                    "yyyy-MM-dd H:mm:ss",
+                    "yyyy-MM-dd HH:mm:ss",
+                    "yyyy-MM-dd HH:mm:ss.fff",
+                    "dd.MM.yyyy",
+                    "dd.MM.yyyy H:mm:ss", 
+                    "dd.MM.yyyy HH:mm:ss",
+                    "dd/MM/yyyy",
+                    "dd/MM/yyyy H:mm:ss",
+                    "dd/MM/yyyy HH:mm:ss"
+                ],
+                new CultureInfo("ru-RU"),
+                DateTimeStyles.None,
+                out var dt)) throw new InvalidDataException("Дата имеет неверный формат");
+        dto = new DateTimeOffset(dt).DateTime; 
+        return true;
     }
 }
