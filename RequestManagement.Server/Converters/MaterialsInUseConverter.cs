@@ -17,7 +17,7 @@ public static class MaterialsInUseConverter
         {
             Id = entity.Id,
             DocumentNumber = entity.DocumentNumber,
-            Date = entity.Date.ToString("yyyy-MM-dd"),
+            Date = entity.Date.ToString("dd.MM.yyyy"),
             Quantity = (double)entity.Quantity,
             NomenclatureId = entity.NomenclatureId,
             Nomenclature = new MaterialsInUseNomenclature
@@ -58,7 +58,7 @@ public static class MaterialsInUseConverter
                 Id = entity.ReasonForWriteOff.Id,
                 Reason = entity.ReasonForWriteOff.Reason
             },
-            DateForWriteOff = entity.DateForWriteOff.ToString("yyyy-MM-dd"),
+            DateForWriteOff = entity.DateForWriteOff.ToString("dd.MM.yyyy"),
             DocumentNumberForWriteOff = entity.DocumentNumberForWriteOff
         };
     }

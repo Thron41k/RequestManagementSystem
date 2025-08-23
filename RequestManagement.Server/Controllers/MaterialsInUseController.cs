@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Utilities;
 using RequestManagement.Server.Converters;
 
 namespace RequestManagement.Server.Controllers;
@@ -66,7 +67,7 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
         var materialsInUse = new Common.Models.MaterialsInUse
         {
             DocumentNumber = request.MaterialsInUse.DocumentNumber,
-            Date = DateTime.Parse(request.MaterialsInUse.Date),
+            Date = DateTimeHelper.TryParseDto(request.MaterialsInUse.Date, out var parsedDate) ? parsedDate : throw new FormatException(),
             Quantity = (decimal)request.MaterialsInUse.Quantity,
             NomenclatureId = request.MaterialsInUse.NomenclatureId,
             EquipmentId = request.MaterialsInUse.EquipmentId,
@@ -78,7 +79,7 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
                 Reason = request.MaterialsInUse.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
             },
             DocumentNumberForWriteOff = request.MaterialsInUse.DocumentNumberForWriteOff,
-            DateForWriteOff = DateTime.Parse(request.MaterialsInUse.DateForWriteOff)
+            DateForWriteOff = DateTimeHelper.TryParseDto(request.MaterialsInUse.DateForWriteOff, out var parsedDateForWriteOff) ? parsedDateForWriteOff : throw new FormatException()
         };
 
         var id = await _materialsInUseService.CreateMaterialsInUseAsync(materialsInUse);
@@ -91,7 +92,7 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
         {
             Id = request.MaterialsInUse.Id,
             DocumentNumber = request.MaterialsInUse.DocumentNumber,
-            Date = DateTime.Parse(request.MaterialsInUse.Date),
+            Date = DateTimeHelper.TryParseDto(request.MaterialsInUse.Date, out var parsedDate) ? parsedDate : throw new FormatException(),
             Quantity = (decimal)request.MaterialsInUse.Quantity,
             NomenclatureId = request.MaterialsInUse.NomenclatureId,
             EquipmentId = request.MaterialsInUse.EquipmentId,
@@ -104,7 +105,7 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
                 Reason = request.MaterialsInUse.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
             },
             DocumentNumberForWriteOff = request.MaterialsInUse.DocumentNumberForWriteOff,
-            DateForWriteOff = DateTime.Parse(request.MaterialsInUse.DateForWriteOff)
+            DateForWriteOff = DateTimeHelper.TryParseDto(request.MaterialsInUse.DateForWriteOff, out var parsedDateForWriteOff) ? parsedDateForWriteOff : throw new FormatException()
         };
         var success = await _materialsInUseService.UpdateMaterialsInUseAsync(materialsInUse);
         return new UpdateMaterialsInUseResponse { Success = success };
@@ -117,7 +118,7 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
         {
             Id = x.Id,
             DocumentNumber = x.DocumentNumber,
-            Date = DateTime.Parse(x.Date),
+            Date = DateTimeHelper.TryParseDto(x.Date, out var parsedDate) ? parsedDate : throw new FormatException(),
             Quantity = (decimal)x.Quantity,
             NomenclatureId = x.NomenclatureId,
             EquipmentId = x.EquipmentId,
@@ -130,7 +131,7 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
                 Reason = x.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
             },
             DocumentNumberForWriteOff = x.DocumentNumberForWriteOff,
-            DateForWriteOff = DateTime.Parse(x.DateForWriteOff)
+            DateForWriteOff = DateTimeHelper.TryParseDto(x.DateForWriteOff, out var parsedDateForWriteOff) ? parsedDateForWriteOff : throw new FormatException()
         }) ;
         var success = await _materialsInUseService.UpdateMaterialsInUseAnyAsync(materialsInUseAny.ToList());
         return new UpdateMaterialsInUseResponse { Success = success };

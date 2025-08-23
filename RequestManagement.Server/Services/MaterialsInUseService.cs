@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.Common.Utilities;
@@ -80,11 +81,6 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
             return false;
         var validItems = materialsInUse
             .Where(i => DateTimeHelper.TryParseDto(i.Date, out _))
-            .Select(i =>
-            {
-                i.Date = DateTime.Parse(i.Date).ToString("dd.MM.yyyy");
-                return i;
-            })
             .ToList();
         if (validItems.Count == 0)
             return false;
@@ -110,7 +106,9 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         var newMaterialsInUse = new List<MaterialsInUse>();
         foreach (var item in validItems)
         {
-            var date = DateTime.Parse(item.Date);
+            var date = DateTimeHelper.TryParseDto(item.Date, out var parsedDate)
+                ? parsedDate
+                : throw new FormatException();
             if (!nomenclatures.TryGetValue(item.NomenclatureCode, out var nomenclature))
             {
                 nomenclature = new Nomenclature
