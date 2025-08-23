@@ -24,8 +24,8 @@ namespace RequestManagement.Common.Models
         public Equipment Equipment { get; set; }
         public Driver FinanciallyResponsiblePerson { get; set; } = null!;
         public int FinanciallyResponsiblePersonId { get; set; } = 1;
-        public Driver MolForMove { get; set; } = null!;
-        public int MolForMoveId { get; set; } = 1;
+        public Driver? MolForMove { get; set; } = null!;
+        public int? MolForMoveId { get; set; }
         public int ReasonForWriteOffId { get; set; } = 1;
         public ReasonsForWritingOffMaterialsFromOperation ReasonForWriteOff { get; set; } = null!;
         public string DocumentNumberForWriteOff { get; set; } = "";
