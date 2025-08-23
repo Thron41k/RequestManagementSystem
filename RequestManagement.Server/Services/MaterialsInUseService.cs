@@ -20,6 +20,7 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
             .Include(e => e.Equipment)
             .Include(e => e.FinanciallyResponsiblePerson)
             .Include(e => e.ReasonForWriteOff)
+            .Include(e => e.MolForMove)
             .AsQueryable();
 
         // Отфильтруем по ответственному лицу
@@ -162,7 +163,8 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
                     Quantity = item.Quantity,
                     Nomenclature = nomenclature,
                     Equipment = equipment,
-                    FinanciallyResponsiblePerson = mol!
+                    FinanciallyResponsiblePerson = mol!,
+                    MolForMove = new Driver{Id = 1}
                 });
             }
         }
@@ -210,6 +212,7 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         existMaterialsInUse.ReasonForWriteOffId = materialsInUse.ReasonForWriteOffId;
         existMaterialsInUse.DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff;
         existMaterialsInUse.DateForWriteOff = materialsInUse.DateForWriteOff;
+        existMaterialsInUse.MolForMoveId = materialsInUse.MolForMoveId;
         await _dbContext.SaveChangesAsync();
         return true;
     }

@@ -92,6 +92,8 @@ message MaterialsInUse {
     string date_for_write_off = 13;
     int32 materials_in_use_driver_reasons_for_writing_off_materials_from_operation_id = 14;
     MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation materials_in_use_driver_reasons_for_writing_off_materials_from_operation = 15;
+    int32 mol_for_move_id = 16;
+    MaterialsInUseDriver mol_for_move = 17;
 }
 
 message MaterialsInUseNomenclature {

@@ -196,8 +196,13 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                 }
 
                 // Создаем новый Expense
-                var defectData = defectMappings.TryGetValue(stock.NomenclatureId, out var defect) ? defect : new NomenclatureDefectMapping {DefectId = 1};
-
+                var defectData = defectMappings.TryGetValue(stock.NomenclatureId, out var defect) ? defect : new NomenclatureDefectMapping { DefectId = 1 };
+                var term = defectData.DefectId switch
+                {
+                    2 => 24,
+                    3 => 12,
+                    _ => defectData.Term
+                };
                 var expense = new Common.Models.Expense
                 {
                     Code = material.Number,
@@ -207,7 +212,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                     Driver = driver,
                     Equipment = equipment,
                     DefectId = defectData.DefectId,
-                    Term = defectData.Term
+                    Term = term
                 };
                 stock.ConsumedQuantity += expense.Quantity;
                 newExpenses.Add(expense);
