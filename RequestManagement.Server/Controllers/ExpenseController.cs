@@ -1,6 +1,8 @@
 ﻿using Grpc.Core;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using RequestManagement.Common.Interfaces;
 using System.Security.Claims;
+using RequestManagement.Common.Utilities;
 
 namespace RequestManagement.Server.Controllers;
 
@@ -238,7 +240,7 @@ public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseCo
             request.MaterialExpenses.Select(x => new RequestManagement.Common.Models.MaterialExpense
             {
                 Number = x.Number,
-                Date = DateTime.Parse(x.Date),
+                Date = DateTimeHelper.TryParseDto(x.Date, out var parsedDate) ? parsedDate : throw new FormatException(),
                 DriverFullName = x.DriverFullName,
                 EquipmentCode = x.EquipmentCode,
                 NomenclatureArticle = x.NomenclatureArticle,
