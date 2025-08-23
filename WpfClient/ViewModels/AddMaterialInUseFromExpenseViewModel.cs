@@ -60,7 +60,7 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
     {
         if(SelectedWarehouse == null)return;
         var expensesList = await _expenseService.GetAllExpensesAsync("",SelectedWarehouse.Id,0,0,0,FromDate.ToString("dd.MM.yyyy"), ToDate.ToString("dd.MM.yyyy"));
-        ExpenseList = new ObservableCollection<Expense>(expensesList);
+        ExpenseList = new ObservableCollection<Expense>(expensesList.Where(x=>x.Term > 0));
         ExpenseViewSource = new CollectionViewSource{ Source = ExpenseList };
     }
 

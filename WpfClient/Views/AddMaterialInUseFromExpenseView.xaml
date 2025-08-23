@@ -50,7 +50,7 @@
                         Command="{Binding PrintCommand}"  
                         Content="Добавить в эксплуатацию"/>
             </StackPanel>
-            <ListBox Grid.Column="1" Margin="10" ItemsSource="{Binding WarehouseViewSource.View}" SelectedItem="{Binding SelectedWarehouse}">
+            <ListBox Grid.Column="1" Margin="10" Width="500" HorizontalAlignment="Left" ItemsSource="{Binding WarehouseViewSource.View}" SelectedItem="{Binding SelectedWarehouse}" DisplayMemberPath="Name">
                 
             </ListBox>
         </Grid>
@@ -66,12 +66,12 @@
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Дата" Binding="{Binding Date.Date, StringFormat=\{0:dd.MM.yyyy\}}" IsReadOnly="True" Width="99" />
-                <DataGridTextColumn Header="Номер документа" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.UnitOfMeasure}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Срок" Binding="{Binding Quantity}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Единица техники" Binding="{Binding Quantity}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Номер документа" Binding="{Binding Code}" IsReadOnly="True" Width="150" />
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Stock.Nomenclature.Name}" IsReadOnly="True" Width="Auto" />
+                <DataGridTextColumn Header="Артикул" Binding="{Binding Stock.Nomenclature.Article}" IsReadOnly="True" Width="Auto" />
+                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" IsReadOnly="True" Width="80" />
+                <DataGridTextColumn Header="Срок" Binding="{Binding Term}" IsReadOnly="True" Width="80" />
+                <DataGridTextColumn Header="Единица техники" Binding="{Binding Equipment.FullName}" IsReadOnly="True" Width="Auto" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

@@ -21,9 +21,8 @@ namespace RequestManagement.WpfClient.Services.Message
             {
                 Content = addMaterialInUseFromExpenseView,
                 Title = "Загрузка эксплуатации из расходов",
-                Width = 850,
-                Height = 490,
-                ResizeMode = ResizeMode.NoResize
+                Width = 1300,
+                Height = 600
             };
             await addMaterialInUseFromExpenseViewModel.Init(message.Mol);
             window.ShowDialog();

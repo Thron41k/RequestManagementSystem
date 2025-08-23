@@ -147,7 +147,7 @@ public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseCo
                     Name = e.Defect.DefectGroup.Name
                 }
             },
-            Date = e.Date.ToString("o") // ISO 8601 format
+            Date = e.Date.ToString("dd.MM.yyyy")
         }));
 
         return response;
@@ -257,7 +257,7 @@ public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseCo
                 success.Item2.Select(s => new MaterialExpense
                 {
                     Number = s.Number,
-                    Date = s.Date.ToString("o"), // ISO 8601 format
+                    Date = s.Date.ToString("dd.MM.yyyy"),
                     DriverFullName = s.DriverFullName,
                     EquipmentCode = s.EquipmentCode,
                     NomenclatureArticle = s.NomenclatureArticle,

@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
+using RequestManagement.Common.Utilities;
 using RequestManagement.WpfClient.Messages;
 using RequestManagement.WpfClient.Services.Interfaces;
 
@@ -26,8 +27,8 @@ public partial class ExpenseListViewModel : ObservableObject
     [ObservableProperty] private Equipment _selectedEquipment = new();
     [ObservableProperty] private Driver _selectedDriver = new();
     [ObservableProperty] private string _searchText = "";
-    [ObservableProperty] private DateTime _fromDate = DateTime.Parse("01.07.2025");
-    [ObservableProperty] private DateTime _toDate = DateTime.Parse("15.07.2025");
+    [ObservableProperty] private DateTime _fromDate;
+    [ObservableProperty] private DateTime _toDate;
     [ObservableProperty] private CollectionViewSource _expensesViewSource;
     private readonly System.Timers.Timer _filterTimer;
 
@@ -39,6 +40,9 @@ public partial class ExpenseListViewModel : ObservableObject
     {
         _messageBus = messageBus;
         _expenseService = expenseService;
+        var dateRange = DateRangeHelper.GetCurrentHalfMonthRange();
+        _fromDate = dateRange.FromDate;
+        _toDate = dateRange.ToDate;
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
         _expensesViewSource = new CollectionViewSource { Source = Expenses };
         var dispatcher = Dispatcher.CurrentDispatcher;
