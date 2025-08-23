@@ -177,7 +177,7 @@ public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseCo
             DriverId = request.DriverId,
             DefectId = request.DefectId,
             Term = request.Term,
-            Date = DateTime.Parse(request.Date)
+            Date = DateTimeHelper.TryParseDto(request.Date, out var parsedDate) ? parsedDate : throw new FormatException(),
         };
         var newExpense = await _expenseService.CreateExpenseAsync(expense);
         await _expenseService.SaveUserLastSelectionAsync(userId, request.DriverId, request.EquipmentId);
@@ -207,7 +207,7 @@ public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseCo
             EquipmentId = request.EquipmentId,
             DriverId = request.DriverId,
             DefectId = request.DefectId,
-            Date = DateTime.Parse(request.Date),
+            Date = DateTimeHelper.TryParseDto(request.Date, out var parsedDate) ? parsedDate : throw new FormatException(),
             Term = request.Term
         };
 
