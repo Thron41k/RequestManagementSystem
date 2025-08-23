@@ -91,7 +91,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasOne(e => e.FinanciallyResponsiblePerson)
                 .WithMany()
                 .HasForeignKey(e => e.FinanciallyResponsiblePersonId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.MolForMove)
+                .WithMany()
+                .HasForeignKey(e => e.MolForMoveId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(e => e.ReasonForWriteOff)
                 .WithMany()
