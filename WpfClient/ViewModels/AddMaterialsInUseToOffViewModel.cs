@@ -17,6 +17,9 @@ namespace RequestManagement.WpfClient.ViewModels
         [ObservableProperty] private string _documentNumber = string.Empty;
         [ObservableProperty] private ReasonsForWritingOffMaterialsFromOperation _reason = new(){Id = 1};
         [ObservableProperty] private DateTime _documentDate = DateTime.Now;
+        [ObservableProperty] private Driver _financiallyResponsiblePerson = new(){Id = 1};
+        [ObservableProperty] private bool _isMoveToMol;
+
         public event EventHandler CloseWindowRequested;
         public bool DialogResult { get; set; }
 
@@ -35,14 +38,23 @@ namespace RequestManagement.WpfClient.ViewModels
                     case MessagesEnum.ResultReasonsForWritingOffMaterialsFromOperation:
                         Reason = (ReasonsForWritingOffMaterialsFromOperation)arg.Item;
                         break;
+                    case MessagesEnum.SelectDriver:
+                        FinanciallyResponsiblePerson = (Driver)arg.Item;
+                        break;
                 }
             }
 
             return Task.CompletedTask;
         }
 
-        public void Init(ReasonsForWritingOffMaterialsFromOperation reason, string documentNumber = "", DateTime documentDate = default)
+        partial void OnReasonChanged(ReasonsForWritingOffMaterialsFromOperation value)
         {
+            IsMoveToMol = value.Id == 23;
+        }
+
+        public void Init(Driver molForMove, ReasonsForWritingOffMaterialsFromOperation reason, string documentNumber = "", DateTime documentDate = default)
+        {
+            FinanciallyResponsiblePerson = molForMove;
             DocumentNumber = documentNumber;
             Reason = reason;
             DocumentDate = documentDate == DateTime.MinValue ? DateTime.Now : documentDate;
@@ -51,6 +63,7 @@ namespace RequestManagement.WpfClient.ViewModels
         [RelayCommand]
         private void SaveResult()
         {
+            if(IsMoveToMol && FinanciallyResponsiblePerson.Id == 1)return;
             DialogResult = true;
             CloseWindowRequested.Invoke(this, EventArgs.Empty);
         }
@@ -59,6 +72,24 @@ namespace RequestManagement.WpfClient.ViewModels
         private async Task SelectReasonsForWritingOffMaterialsFromOperation()
         {
             await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectReasonsForWritingOffMaterialsFromOperation, typeof(AddMaterialsInUseToOffViewModel)));
+        }
+
+        [RelayCommand]
+        private async Task SelectFinanciallyResponsiblePerson()
+        {
+            await _messageBus.Publish(new SelectTaskMessage(MessagesEnum.SelectDriver, typeof(AddMaterialsInUseToOffViewModel)));
+        }
+
+        [RelayCommand]
+        private void ClearSelectedFinanciallyResponsiblePerson()
+        {
+            FinanciallyResponsiblePerson = new Driver { Id = 1 };
+        }
+
+        [RelayCommand]
+        private void ClearSelectedReason()
+        {
+            Reason = new ReasonsForWritingOffMaterialsFromOperation{Id = 1};
         }
     }
 }

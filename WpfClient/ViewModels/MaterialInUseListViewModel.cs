@@ -55,6 +55,7 @@ public partial class MaterialInUseListViewModel : BaseViewModel
                 SelectedMaterialsInUse.ReasonForWriteOff = arg.Reason;
                 SelectedMaterialsInUse.DocumentNumberForWriteOff = arg.DocumentNumber;
                 SelectedMaterialsInUse.DateForWriteOff = arg.DocumentDate;
+                SelectedMaterialsInUse.MolForMove = arg.Reason.Id == 23 ? arg.MolForMove : new Driver { Id = 1 };
                 await _materialsInUseService.UpdateMaterialsInUseAsync(SelectedMaterialsInUse);
                 MaterialsInUseViewSource.View.Refresh();
                 break;
@@ -131,7 +132,8 @@ public partial class MaterialInUseListViewModel : BaseViewModel
             typeof(MaterialInUseListViewModel),
             SelectedMaterialsInUse.DocumentNumberForWriteOff,
             SelectedMaterialsInUse.ReasonForWriteOff,
-            SelectedMaterialsInUse.DateForWriteOff));
+            SelectedMaterialsInUse.DateForWriteOff,
+            SelectedMaterialsInUse.MolForMove ?? new Driver { Id = 1 }));
     }
 
     [RelayCommand]

@@ -3,13 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:RequestManagement.WpfClient.Views"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:RequestManagement.WpfClient.ViewModels.Behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:validationRules="clr-namespace:RequestManagement.WpfClient.ViewModels.ValidationRules"
+             xmlns:helpers="clr-namespace:RequestManagement.WpfClient.ViewModels.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="180" d:DesignWidth="400">
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,0">
@@ -41,7 +44,7 @@
 
             <TextBox materialDesign:HintAssist.Hint="Причина списания материалов из эксплуатации" 
                      Margin="10,15,10,5" 
-                     Tag="{Binding ClearSelectedFinanciallyResponsiblePersonCommand}" 
+                     Tag="{Binding ClearSelectedReasonCommand}" 
                      IsReadOnly="True" 
                      materialDesign:ValidationAssist.UsePopup="True"
                      materialDesign:TextFieldAssist.HasClearButton="True"
@@ -59,6 +62,34 @@
                 </TextBox.Text>
                 <b:Interaction.Behaviors>
                     <behaviors:MouseClickCommandBehavior Command="{Binding SelectReasonsForWritingOffMaterialsFromOperationCommand}" />
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBox materialDesign:HintAssist.Hint="МОЛ" 
+                     Margin="0,15,0,10"
+                     Tag="{Binding ClearSelectedFinanciallyResponsiblePersonCommand}" 
+                     IsReadOnly="True" 
+                     materialDesign:ValidationAssist.UsePopup="True"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     materialDesign:HintAssist.HintPaddingBrush="White"
+                     materialDesign:HintAssist.FloatingScale="1"
+                     FontSize="14"
+                     AcceptsReturn="True"
+                     Width="380" 
+                     Visibility="{Binding IsMoveToMol, Converter={StaticResource BoolToVisibilityConverter}}"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                <TextBox.Text>
+                    <Binding
+                        Path="FinanciallyResponsiblePerson.FullName"
+                        Mode="TwoWay"
+                        UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validationRules:NotEmptyDriverNameValidationRule
+                                ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+                <b:Interaction.Behaviors>
+                    <behaviors:MouseClickCommandBehavior Command="{Binding SelectFinanciallyResponsiblePersonCommand}" />
                 </b:Interaction.Behaviors>
             </TextBox>
             <Button Content="Сохранить" Command="{Binding SaveResultCommand}" Margin="10"/>

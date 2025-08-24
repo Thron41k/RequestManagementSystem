@@ -211,7 +211,7 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         existMaterialsInUse.FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId;
         existMaterialsInUse.ReasonForWriteOffId = materialsInUse.ReasonForWriteOffId;
         existMaterialsInUse.DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff;
-        existMaterialsInUse.DateForWriteOff = materialsInUse.DateForWriteOff;
+        existMaterialsInUse.DateForWriteOff = materialsInUse.ReasonForWriteOffId == 1 ? DateTime.MinValue : materialsInUse.DateForWriteOff;
         existMaterialsInUse.MolForMoveId = materialsInUse.MolForMoveId;
         await _dbContext.SaveChangesAsync();
         return true;
@@ -245,7 +245,7 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
             existMaterial.FinanciallyResponsiblePersonId = updatedMaterial.FinanciallyResponsiblePersonId;
             existMaterial.ReasonForWriteOffId = updatedMaterial.ReasonForWriteOffId;
             existMaterial.DocumentNumberForWriteOff = updatedMaterial.DocumentNumberForWriteOff;
-            existMaterial.DateForWriteOff = updatedMaterial.DateForWriteOff;
+            existMaterial.DateForWriteOff = updatedMaterial.ReasonForWriteOffId == 1 ? DateTime.MinValue : updatedMaterial.DateForWriteOff;
         }
         await _dbContext.SaveChangesAsync();
         return true;

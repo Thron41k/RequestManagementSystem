@@ -148,7 +148,7 @@ public partial class MainMenuViewModel : BaseViewModel
     {
         if (arg.Message == MessagesEnum.ShowAddMaterialsInUseToOffView && arg.Caller == typeof(MaterialInUseListViewModel))
         {
-            ShowAddMaterialsInUseToOffViewDialog(arg.DocumentNumber, arg.Reason, arg.DocumentDate, arg.Caller);
+            ShowAddMaterialsInUseToOffViewDialog(arg.DocumentNumber, arg.MolForMove, arg.Reason, arg.DocumentDate, arg.Caller);
         }
         return Task.CompletedTask;
     }
@@ -210,18 +210,18 @@ public partial class MainMenuViewModel : BaseViewModel
     }
 
 
-    private void ShowAddMaterialsInUseToOffViewDialog(string documentNumber, ReasonsForWritingOffMaterialsFromOperation reason, DateTime documentDate, Type argCaller)
+    private void ShowAddMaterialsInUseToOffViewDialog(string documentNumber, Driver molForMove, ReasonsForWritingOffMaterialsFromOperation reason, DateTime documentDate, Type argCaller)
     {
         var addMaterialsInUseToOffView = new AddMaterialsInUseToOffView(_addMaterialsInUseToOffViewModel);
         var window = new Window
         {
             Content = addMaterialsInUseToOffView,
-            Title = "Списание материалов в эксплуатацию",
+            Title = "Списание материалов из эксплуатации",
             Width = 420,
-            Height = 280,
+            Height = 360,
             ResizeMode = ResizeMode.NoResize
         };
-        _addMaterialsInUseToOffViewModel.Init(reason, documentNumber, documentDate);
+        _addMaterialsInUseToOffViewModel.Init(molForMove, reason, documentNumber, documentDate);
         window.ShowDialog();
         if (_addMaterialsInUseToOffViewModel.DialogResult)
         {
@@ -231,7 +231,8 @@ public partial class MainMenuViewModel : BaseViewModel
                     argCaller,
                     _addMaterialsInUseToOffViewModel.DocumentNumber,
                     _addMaterialsInUseToOffViewModel.Reason,
-                    _addMaterialsInUseToOffViewModel.DocumentDate));
+                    _addMaterialsInUseToOffViewModel.DocumentDate,
+                    _addMaterialsInUseToOffViewModel.FinanciallyResponsiblePerson));
         }
     }
 
@@ -638,7 +639,7 @@ public partial class MainMenuViewModel : BaseViewModel
         _ = _reasonsForWritingOffMaterialsFromOperationViewModel.Load();
         _reasonsForWritingOffMaterialsFromOperationViewModel.EditMode = editMode;
         window.ShowDialog();
-        if (_reasonsForWritingOffMaterialsFromOperationViewModel.SelectedReasonsForWritingOffMaterialsFromOperation != null && 
+        if (_reasonsForWritingOffMaterialsFromOperationViewModel.SelectedReasonsForWritingOffMaterialsFromOperation != null &&
             argCaller != null && _reasonsForWritingOffMaterialsFromOperationViewModel.DialogResult)
             _messageBus.Publish(
                 new SelectResultMessage(

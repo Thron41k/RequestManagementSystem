@@ -57,11 +57,12 @@ public class ShowResultMessage(MessagesEnum message, Type caller,List<Incoming> 
     public List<Incoming> Items { get; } = items;
 }
 
-public class ShowResultMessageForMaterialsInUse(MessagesEnum message, Type caller, string documentNumber, ReasonsForWritingOffMaterialsFromOperation reason, DateTime documentDate)
+public class ShowResultMessageForMaterialsInUse(MessagesEnum message, Type caller, string documentNumber, ReasonsForWritingOffMaterialsFromOperation reason, DateTime documentDate, Driver molForMove)
 {
     public MessagesEnum Message { get; } = message;
     public Type Caller { get; } = caller;
     public ReasonsForWritingOffMaterialsFromOperation Reason { get; } = reason;
     public string DocumentNumber { get; } = documentNumber;
     public DateTime DocumentDate { get; } = documentDate;
+    public Driver MolForMove { get; set; } = molForMove;
 }
