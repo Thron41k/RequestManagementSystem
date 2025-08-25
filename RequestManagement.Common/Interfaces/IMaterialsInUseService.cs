@@ -11,4 +11,5 @@ public interface IMaterialsInUseService
     Task<bool> UpdateMaterialsInUseAsync(MaterialsInUse materialsInUse);
     Task<bool> UpdateMaterialsInUseAnyAsync(List<MaterialsInUse> materialsInUseAny);
     Task<bool> DeleteMaterialsInUseAsync(int id);
+    Task<bool> CreateMaterialsInUseAnyAsync(IEnumerable<MaterialsInUse> materialsInUseList);
 }

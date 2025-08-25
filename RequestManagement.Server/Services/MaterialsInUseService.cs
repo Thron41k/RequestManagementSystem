@@ -76,6 +76,18 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
         return materialsInUse.Id;
     }
 
+    public async Task<bool> CreateMaterialsInUseAnyAsync(IEnumerable<MaterialsInUse> materialsInUseList)
+    {
+        if (materialsInUseList is null)
+            throw new ArgumentNullException(nameof(materialsInUseList));
+        var materialsInUses = materialsInUseList as MaterialsInUse[] ?? materialsInUseList.ToArray();
+        var entities = materialsInUses.ToList();
+        await _dbContext.MaterialsInUse.AddRangeAsync(entities);
+        await _dbContext.SaveChangesAsync();
+        return entities.Count == materialsInUses.Length;
+    }
+
+
     public async Task<bool> UploadMaterialsInUseAsync(List<MaterialsInUseForUpload> materialsInUse)
     {
         if (materialsInUse.Count == 0)

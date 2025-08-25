@@ -65,6 +65,11 @@ namespace RequestManagement.WpfClient.ViewModels
         {
             if(IsMoveToMol && FinanciallyResponsiblePerson.Id == 1)return;
             DialogResult = true;
+            if (Reason.Id == 1)
+            {
+                FinanciallyResponsiblePerson = new Driver { Id = 1 };
+                DocumentDate = DateTime.MinValue;
+            }
             CloseWindowRequested.Invoke(this, EventArgs.Empty);
         }
 

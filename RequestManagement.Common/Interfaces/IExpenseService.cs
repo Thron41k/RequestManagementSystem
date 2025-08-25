@@ -19,6 +19,7 @@ namespace RequestManagement.Common.Interfaces
         Task SaveNomenclatureDefectMappingAsync(int userId, int stockId, int defectId, int term);
         Task<bool> DeleteExpensesAsync(List<int> requestId);
         Task<List<Expense>> GetAllExpensesAsync(string requestFilter, int requestWarehouseId, int requestEquipmentId, int requestDriverId, int requestDefectId, string requestFromDate, string requestToDate);
+        Task<List<Expense>> GetAllExpensesForMiUAsync(int requestWarehouseId, string requestFromDate, string requestToDate);
         Task<(bool, List<MaterialExpense>)> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId);
     }
 }

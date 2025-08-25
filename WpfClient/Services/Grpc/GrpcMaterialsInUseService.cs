@@ -72,7 +72,8 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
             headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
         }
         var client = clientFactory.CreateMaterialsInUseClient();
-        var result = await client.UploadMaterialsInUseAsync(new UploadMaterialsInUseRequest { 
+        var result = await client.UploadMaterialsInUseAsync(new UploadMaterialsInUseRequest
+        {
             MaterialsInUse = { materialsInUse.Select(x => new Server.Controllers.MaterialsInUseForUpload
             {
                 DocumentNumber = x.DocumentNumber,
@@ -106,11 +107,11 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                 Id = materialsInUse.Id,
                 Date = materialsInUse.Date.ToString(CultureInfo.CurrentCulture),
                 Quantity = (double)materialsInUse.Quantity,
-                DocumentNumber =  materialsInUse.DocumentNumber,
+                DocumentNumber = materialsInUse.DocumentNumber,
                 NomenclatureId = materialsInUse.NomenclatureId,
                 EquipmentId = materialsInUse.EquipmentId,
                 FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId,
-                IsOut = materialsInUse.IsOut, 
+                IsOut = materialsInUse.IsOut,
                 MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperationId = materialsInUse.ReasonForWriteOffId,
                 MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation = new MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation
                 {
@@ -138,6 +139,39 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
         }
         var client = clientFactory.CreateMaterialsInUseClient();
         var result = await client.DeleteMaterialsInUseAsync(new DeleteMaterialsInUseRequest { Id = id }, headers);
+        return result.Success;
+    }
+
+    public async Task<bool> CreateMaterialsInUseAnyAsync(IEnumerable<MaterialsInUse> materialsInUseList)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateMaterialsInUseClient();
+        var result = await client.CreateMaterialsInUseAnyAsync(new CreateMaterialsInUseAnyRequest
+        {
+            MaterialsInUse = { materialsInUseList.Select(materialsInUse => new Server.Controllers.MaterialsInUse
+            {
+                Id = materialsInUse.Id,
+                Date = materialsInUse.Date.ToString(CultureInfo.CurrentCulture),
+                Quantity = (double)materialsInUse.Quantity,
+                DocumentNumber = materialsInUse.DocumentNumber,
+                NomenclatureId = materialsInUse.NomenclatureId,
+                EquipmentId = materialsInUse.EquipmentId,
+                FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId,
+                IsOut = materialsInUse.IsOut,
+                MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperationId = materialsInUse.ReasonForWriteOffId,
+                MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation = new MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation
+                {
+                    Id = materialsInUse.ReasonForWriteOff.Id,
+                    Reason = materialsInUse.ReasonForWriteOff.Reason
+                },
+                DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff,
+                DateForWriteOff = materialsInUse.DateForWriteOff.ToString("yyyy-MM-dd")
+            })}
+        }, headers);
         return result.Success;
     }
 }

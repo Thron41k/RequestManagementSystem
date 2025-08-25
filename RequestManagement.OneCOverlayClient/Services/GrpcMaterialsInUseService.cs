@@ -188,4 +188,9 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
         var result = await client.DeleteMaterialsInUseAsync(new DeleteMaterialsInUseRequest { Id = id }, headers);
         return result.Success;
     }
+
+    public Task<bool> CreateMaterialsInUseAnyAsync(IEnumerable<MaterialsInUse> materialsInUseList)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Office.Interop.Excel;
+using CommunityToolkit.Mvvm.Input;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
+using RequestManagement.Common.Utilities;
 using RequestManagement.WpfClient.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
-using System.Windows.Threading;
-using RequestManagement.Common.Utilities;
 using Timer = System.Timers.Timer;
 
 namespace RequestManagement.WpfClient.ViewModels;
@@ -14,9 +13,7 @@ namespace RequestManagement.WpfClient.ViewModels;
 public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
 {
     private readonly IWarehouseService _warehouseService;
-    private readonly IMessageBus _messageBus;
     private readonly IExpenseService _expenseService;
-    private readonly Dispatcher _dispatcher;
     private readonly Timer _filterTimer;
     public event EventHandler CloseWindowRequested;
     private Driver? _selectedDriver;
@@ -28,17 +25,13 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
     [ObservableProperty] private DateTime _fromDate;
     [ObservableProperty] private DateTime _toDate;
 
-    public AddMaterialInUseFromExpenseViewModel(IWarehouseService warehouseService, IMessageBus messageBus, IExpenseService expenseService)
+    public AddMaterialInUseFromExpenseViewModel(IWarehouseService warehouseService, IExpenseService expenseService)
     {
         _warehouseService = warehouseService;
-        _messageBus = messageBus;
         _expenseService = expenseService;
         var dateRange = DateRangeHelper.GetCurrentHalfMonthRange();
         _fromDate = dateRange.FromDate;
         _toDate = dateRange.ToDate;
-        _dispatcher = Dispatcher.CurrentDispatcher;
-        _filterTimer = new Timer(Vars.SearchDelay) { AutoReset = false };
-        _filterTimer.Elapsed += async (_, _) => await LoadWarehouseAsync();
         WarehouseViewSource = new CollectionViewSource{Source = WarehouseList };
     }
 
@@ -67,5 +60,42 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
     partial void OnSelectedWarehouseChanged(Warehouse? value)
     {
         _ = LoadExpensesByWarehouse();
+    }
+
+    [RelayCommand]
+    private void SelectAll()
+    {
+        foreach (var expense in ExpenseList)
+        {
+            expense.IsSelected = true;
+        }
+
+        ExpenseViewSource.View.Refresh();
+    }
+    [RelayCommand]
+    private void DeselectAll()
+    {
+        foreach (var expense in ExpenseList)
+        {
+            expense.IsSelected = false;
+        }
+
+        ExpenseViewSource.View.Refresh();
+    }
+    [RelayCommand]
+    private void InvertSelected()
+    {
+        foreach (var expense in ExpenseList)
+        {
+            expense.IsSelected = !expense.IsSelected;
+        }
+
+        ExpenseViewSource.View.Refresh();
+    }
+
+    [RelayCommand]
+    private async Task AddMaterialInUse()
+    {
+
     }
 }

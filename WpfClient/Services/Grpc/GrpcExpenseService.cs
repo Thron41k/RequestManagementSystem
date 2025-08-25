@@ -1,9 +1,10 @@
-﻿using System.Globalization;
-using Grpc.Core;
+﻿using Grpc.Core;
+using Microsoft.Office.Interop.Excel;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
 using RequestManagement.Server.Controllers;
 using RequestManagement.WpfClient.Services.Interfaces;
+using System.Globalization;
 using Expense = RequestManagement.Common.Models.Expense;
 using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
 using Stock = RequestManagement.Common.Models.Stock;
@@ -29,6 +30,83 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
                 EquipmentId = requestEquipmentId,
                 DriverId = requestDriverId,
                 DefectId = requestDefectId,
+                FromDate = requestFromDate,
+                ToDate = requestToDate
+            }, headers);
+        return response.Expenses.Select(expense => new Expense
+        {
+            Id = expense.Id,
+            Code = expense.Code,
+            StockId = expense.Stock.Id,
+            Stock = new Stock
+            {
+                Id = expense.Stock.Id,
+                WarehouseId = expense.Stock.Warehouse.Id,
+                Warehouse = new Common.Models.Warehouse
+                {
+                    Id = expense.Stock.Warehouse.Id,
+                    Name = expense.Stock.Warehouse.Name
+                },
+                NomenclatureId = expense.Stock.Nomenclature.Id,
+                Nomenclature = new Common.Models.Nomenclature
+                {
+                    Id = expense.Stock.Nomenclature.Id,
+                    Name = expense.Stock.Nomenclature.Name,
+                    Code = expense.Stock.Nomenclature.Code,
+                    Article = expense.Stock.Nomenclature.Article,
+                    UnitOfMeasure = expense.Stock.Nomenclature.UnitOfMeasure
+                },
+                InitialQuantity = (decimal)expense.Stock.InitialQuantity,
+                ReceivedQuantity = (decimal)expense.Stock.ReceivedQuantity,
+                ConsumedQuantity = (decimal)expense.Stock.ConsumedQuantity
+            },
+            EquipmentId = expense.Equipment.Id,
+            Equipment = new Common.Models.Equipment
+            {
+                Id = expense.Equipment.Id,
+                Code = expense.Equipment.Code,
+                Name = expense.Equipment.Name,
+                StateNumber = expense.Equipment.LicensePlate
+            },
+            DriverId = expense.Driver.Id,
+            Driver = new Common.Models.Driver
+            {
+                Id = expense.Driver.Id,
+                Code = expense.Driver.Code,
+                FullName = expense.Driver.FullName,
+                ShortName = expense.Driver.ShortName,
+                Position = expense.Driver.Position
+            },
+            DefectId = expense.Defect.Id,
+            Defect = new Common.Models.Defect
+            {
+                Id = expense.Defect.Id,
+                Name = expense.Defect.Name,
+                DefectGroupId = expense.Defect.DefectGroup.Id,
+                DefectGroup = new Common.Models.DefectGroup
+                {
+                    Id = expense.Defect.DefectGroup.Id,
+                    Name = expense.Defect.DefectGroup.Name
+                }
+            },
+            Date = Convert.ToDateTime(expense.Date),
+            Quantity = (decimal)expense.Quantity,
+            Term = expense.Term
+        }).ToList();
+    }
+
+    public async Task<List<Expense>> GetAllExpensesForMiUAsync(int requestWarehouseId, string requestFromDate, string requestToDate)
+    {
+        var headers = new Metadata();
+        if (!string.IsNullOrEmpty(tokenStore.GetToken()))
+        {
+            headers.Add("Authorization", $"Bearer {tokenStore.GetToken()}");
+        }
+        var client = clientFactory.CreateExpenseClient();
+        var response = await client.GetAllExpensesForMiUAsync(
+            new GetAllExpensesRequestForMiU
+            {
+                WarehouseId = requestWarehouseId,
                 FromDate = requestFromDate,
                 ToDate = requestToDate
             }, headers);

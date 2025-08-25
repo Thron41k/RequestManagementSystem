@@ -55,7 +55,7 @@ public partial class MaterialInUseListViewModel : BaseViewModel
                 SelectedMaterialsInUse.ReasonForWriteOff = arg.Reason;
                 SelectedMaterialsInUse.DocumentNumberForWriteOff = arg.DocumentNumber;
                 SelectedMaterialsInUse.DateForWriteOff = arg.DocumentDate;
-                SelectedMaterialsInUse.MolForMove = arg.Reason.Id == 23 ? arg.MolForMove : new Driver { Id = 1 };
+                SelectedMaterialsInUse.MolForMove = arg.MolForMove;
                 await _materialsInUseService.UpdateMaterialsInUseAsync(SelectedMaterialsInUse);
                 MaterialsInUseViewSource.View.Refresh();
                 break;
@@ -66,6 +66,7 @@ public partial class MaterialInUseListViewModel : BaseViewModel
     {
         _ = LoadEquipmentAsync();
     }
+
     partial void OnFilterTextChanged(string value)
     {
         _filterTimer.Stop();

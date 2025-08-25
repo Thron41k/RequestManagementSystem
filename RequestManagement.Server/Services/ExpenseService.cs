@@ -6,6 +6,7 @@ using RequestManagement.Server.Controllers;
 using RequestManagement.Server.Data;
 using System.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Expense = RequestManagement.Common.Models.Expense;
 using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
 
 namespace RequestManagement.Server.Services;
@@ -68,6 +69,41 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                 query = query.Where(e => e.Date < toDate.AddDays(1));
             }
         }
+        return await query.ToListAsync();
+    }
+
+    public async Task<List<Expense>> GetAllExpensesForMiUAsync(int requestWarehouseId, string requestFromDate, string requestToDate)
+    {
+        if (requestWarehouseId == 0) throw new ArgumentNullException(nameof(requestWarehouseId));
+        var query = dbContext.Expenses
+        .Include(e => e.Stock)
+        .ThenInclude(s => s.Nomenclature)
+        .Include(e => e.Stock)
+        .ThenInclude(s => s.Warehouse)
+        .ThenInclude(d => d.FinanciallyResponsiblePerson)
+        .Include(e => e.Equipment)
+        .Include(e => e.Driver)
+        .Include(e => e.Defect)
+        .ThenInclude(s => s.DefectGroup)
+        .AsQueryable();
+        if (DateTimeHelper.TryParseDto(requestFromDate, out var fromDate) &&
+            DateTimeHelper.TryParseDto(requestToDate, out var toDate))
+        {
+            query = query.Where(e => e.Date >= fromDate && e.Date < toDate.AddDays(1));
+        }
+        else
+        {
+            if (DateTimeHelper.TryParseDto(requestFromDate, out fromDate))
+            {
+                query = query.Where(e => e.Date >= fromDate);
+            }
+            if (DateTimeHelper.TryParseDto(requestToDate, out toDate))
+            {
+                query = query.Where(e => e.Date < toDate.AddDays(1));
+            }
+        }
+
+        var miUQuery = dbContext.MaterialsInUse.Where(x => x.ExpenseId == null);
         return await query.ToListAsync();
     }
 

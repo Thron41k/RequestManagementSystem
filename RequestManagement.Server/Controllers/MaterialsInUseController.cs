@@ -85,6 +85,44 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
         var id = await _materialsInUseService.CreateMaterialsInUseAsync(materialsInUse);
         return new CreateMaterialsInUseResponse { Id = id };
     }
+
+    public override async Task<CreateMaterialsInUseAnyResponse> CreateMaterialsInUseAny(
+        CreateMaterialsInUseAnyRequest request,
+        ServerCallContext context)
+    {
+        _logger.LogInformation("Creating {Count} MaterialsInUse records", request.MaterialsInUse.Count);
+
+        var materialsInUseList = request.MaterialsInUse.Select(dto => new Common.Models.MaterialsInUse
+        {
+            DocumentNumber = dto.DocumentNumber,
+            Date = DateTimeHelper.TryParseDto(dto.Date, out var parsedDate)
+                ? parsedDate
+                : throw new FormatException($"Invalid date format in DocumentNumber: {dto.DocumentNumber}"),
+            Quantity = (decimal)dto.Quantity,
+            NomenclatureId = dto.NomenclatureId,
+            EquipmentId = dto.EquipmentId,
+            FinanciallyResponsiblePersonId = dto.FinanciallyResponsiblePersonId,
+            IsOut = dto.IsOut,
+            ReasonForWriteOff = new Common.Models.ReasonsForWritingOffMaterialsFromOperation
+            {
+                Id = dto.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Id,
+                Reason = dto.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
+            },
+            DocumentNumberForWriteOff = dto.DocumentNumberForWriteOff,
+            DateForWriteOff = DateTimeHelper.TryParseDto(dto.DateForWriteOff, out var parsedDateForWriteOff)
+                ? parsedDateForWriteOff
+                : throw new FormatException($"Invalid write-off date format in DocumentNumber: {dto.DocumentNumber}")
+        }).ToList();
+
+        var ids = await _materialsInUseService.CreateMaterialsInUseAnyAsync(materialsInUseList);
+
+        return new CreateMaterialsInUseAnyResponse
+        {
+           Success = true
+        };
+    }
+
+
     public override async Task<UpdateMaterialsInUseResponse> UpdateMaterialsInUse(UpdateMaterialsInUseRequest request, ServerCallContext context)
     {
         _logger.LogInformation("Updating materialsInUse with ID: {Id}", request.MaterialsInUse.Id);
