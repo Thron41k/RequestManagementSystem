@@ -26,6 +26,7 @@ public class MaterialsInUse : IEntity
     public string DocumentNumberForWriteOff { get; set; } = "";
     public DateTime DateForWriteOff { get; set; }
     public int? ExpenseId { get; set; }
+    public int Term { get; set; }
     [NotMapped] public string DateForList => DateForWriteOff == DateTime.MinValue ? "" : DateForWriteOff.ToString("dd.MM.yyyy");
     [NotMapped] public string ServiceLife => ((DateTime.Now.Year - Date.Year) * 12 + DateTime.Now.Month - Date.Month - 1).ToString();
 }

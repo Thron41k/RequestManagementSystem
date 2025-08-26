@@ -102,7 +102,8 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
             NomenclatureId = dto.NomenclatureId,
             EquipmentId = dto.EquipmentId,
             FinanciallyResponsiblePersonId = dto.FinanciallyResponsiblePersonId,
-            IsOut = dto.IsOut
+            IsOut = dto.IsOut,
+            Term = dto.Term
         }).ToList();
 
         var ids = await _materialsInUseService.CreateMaterialsInUseAnyAsync(materialsInUseList);

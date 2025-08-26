@@ -104,6 +104,7 @@ message MaterialsInUse {
     MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation materials_in_use_driver_reasons_for_writing_off_materials_from_operation = 15;
     int32 mol_for_move_id = 16;
     MaterialsInUseDriver mol_for_move = 17;
+    int32 term = 18;
 }
 
 message MaterialsInUseNomenclature {

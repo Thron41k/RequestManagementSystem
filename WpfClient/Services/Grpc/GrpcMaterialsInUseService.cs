@@ -162,6 +162,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                 EquipmentId = materialsInUse.EquipmentId,
                 FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId,
                 IsOut = materialsInUse.IsOut,
+                Term = materialsInUse.Term
             })}
         }, headers);
         return result.Success;
