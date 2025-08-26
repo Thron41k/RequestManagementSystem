@@ -8,6 +8,7 @@ using System.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Expense = RequestManagement.Common.Models.Expense;
 using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
+using MaterialsInUse = RequestManagement.Common.Models.MaterialsInUse;
 
 namespace RequestManagement.Server.Services;
 
@@ -72,20 +73,28 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
         return await query.ToListAsync();
     }
 
-    public async Task<List<Expense>> GetAllExpensesForMiUAsync(int requestWarehouseId, string requestFromDate, string requestToDate)
+    public async Task<List<Expense>> GetAllExpensesForMiUAsync(
+        int requestWarehouseId,
+        string requestFromDate,
+        string requestToDate)
     {
-        if (requestWarehouseId == 0) throw new ArgumentNullException(nameof(requestWarehouseId));
+        if (requestWarehouseId == 0)
+            throw new ArgumentNullException(nameof(requestWarehouseId));
+
         var query = dbContext.Expenses
-        .Include(e => e.Stock)
-        .ThenInclude(s => s.Nomenclature)
-        .Include(e => e.Stock)
-        .ThenInclude(s => s.Warehouse)
-        .ThenInclude(d => d.FinanciallyResponsiblePerson)
-        .Include(e => e.Equipment)
-        .Include(e => e.Driver)
-        .Include(e => e.Defect)
-        .ThenInclude(s => s.DefectGroup)
-        .AsQueryable();
+            .Include(e => e.Stock)
+            .ThenInclude(s => s.Nomenclature)
+            .Include(e => e.Stock)
+            .ThenInclude(s => s.Warehouse)
+            .ThenInclude(d => d.FinanciallyResponsiblePerson)
+            .Include(e => e.Equipment)
+            .Include(e => e.Driver)
+            .Include(e => e.Defect)
+            .ThenInclude(s => s.DefectGroup)
+            .Where(e => dbContext.MaterialsInUse.Any(m => m.ExpenseId == e.Id)) // <-- ключевой момент
+            .AsNoTracking()
+            .AsQueryable();
+
         if (DateTimeHelper.TryParseDto(requestFromDate, out var fromDate) &&
             DateTimeHelper.TryParseDto(requestToDate, out var toDate))
         {
@@ -103,9 +112,9 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
             }
         }
 
-        var miUQuery = dbContext.MaterialsInUse.Where(x => x.ExpenseId == null);
         return await query.ToListAsync();
     }
+
 
 
     public async Task<(bool, List<MaterialExpense>)> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId)

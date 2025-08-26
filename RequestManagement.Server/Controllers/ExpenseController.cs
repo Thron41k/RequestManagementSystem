@@ -155,6 +155,73 @@ public class ExpenseController(IExpenseService expenseService, ILogger<ExpenseCo
         return response;
     }
 
+    public override async Task<GetAllExpensesResponse> GetAllExpensesForMiU(GetAllExpensesForMiURequest request,
+        ServerCallContext context)
+    {
+        var user = context.GetHttpContext().User;
+        if (user.Identity is { IsAuthenticated: false })
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, "User is not authenticated"));
+        }
+        var expenseList = await _expenseService.GetAllExpensesForMiUAsync(request.WarehouseId, request.FromDate, request.ToDate);
+        var response = new GetAllExpensesResponse();
+        response.Expenses.AddRange(expenseList.Select(e => new Expense
+        {
+            Id = e.Id,
+            Code = e.Code,
+            Term = e.Term ?? 0,
+            Stock = new ExpenseStock
+            {
+                Id = e.StockId,
+                Warehouse = new ExpenseWarehouse
+                {
+                    Id = e.Stock.Warehouse.Id,
+                    Name = e.Stock.Warehouse.Name,
+                },
+                Nomenclature = new ExpenseNomenclature
+                {
+                    Id = e.Stock.Nomenclature.Id,
+                    Name = e.Stock.Nomenclature.Name,
+                    Code = e.Stock.Nomenclature.Code,
+                    UnitOfMeasure = e.Stock.Nomenclature.UnitOfMeasure,
+                    Article = e.Stock.Nomenclature.Article
+                },
+                InitialQuantity = (double)e.Stock.InitialQuantity,
+                ReceivedQuantity = (double)e.Stock.ReceivedQuantity,
+                ConsumedQuantity = (double)e.Stock.ConsumedQuantity
+            },
+            Quantity = (double)e.Quantity,
+            Equipment = new ExpenseEquipment
+            {
+                Id = e.Equipment.Id,
+                Name = e.Equipment.Name,
+                Code = e.Equipment.Code,
+                LicensePlate = e.Equipment.StateNumber
+            },
+            Driver = new ExpenseDriver
+            {
+                Id = e.Driver.Id,
+                Code = e.Driver.Code,
+                FullName = e.Driver.FullName,
+                ShortName = e.Driver.ShortName,
+                Position = e.Driver.Position
+            },
+            Defect = new ExpenseDefect
+            {
+                Id = e.Defect.Id,
+                Name = e.Defect.Name,
+                DefectGroup = new ExpenseDefectGroup
+                {
+                    Id = e.Defect.DefectGroupId,
+                    Name = e.Defect.DefectGroup.Name
+                }
+            },
+            Date = e.Date.ToString("dd.MM.yyyy")
+        }));
+
+        return response;
+    }
+
     public override async Task<CreateExpenseResponse> CreateExpense(CreateExpenseRequest request, ServerCallContext context)
     {
         var user = context.GetHttpContext().User;

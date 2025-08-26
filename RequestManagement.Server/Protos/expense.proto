@@ -4,7 +4,7 @@ option csharp_namespace = "RequestManagement.Server.Controllers";
 
 service ExpenseService {
   rpc GetAllExpenses (GetAllExpensesRequest) returns (GetAllExpensesResponse);
-  rpc GetAllExpensesForMiU (GetAllExpensesRequestForMiU) returns (GetAllExpensesResponse);
+  rpc GetAllExpensesForMiU (GetAllExpensesForMiURequest) returns (GetAllExpensesResponse);
   rpc CreateExpense (CreateExpenseRequest) returns (CreateExpenseResponse);
   rpc UpdateExpense (UpdateExpenseRequest) returns (UpdateExpenseResponse);
   rpc DeleteExpense (DeleteExpenseRequest) returns (DeleteExpenseResponse);
@@ -14,7 +14,7 @@ service ExpenseService {
   rpc UploadMaterialExpense (UploadMaterialExpenseRequest) returns (UploadMaterialExpenseResponse);
 }
 
-message GetAllExpensesRequestForMiU {
+message GetAllExpensesForMiURequest {
   int32 warehouse_id = 1;
   string from_date = 2;
   string to_date = 3;

@@ -14,6 +14,7 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
 {
     private readonly IWarehouseService _warehouseService;
     private readonly IExpenseService _expenseService;
+    private readonly IMaterialsInUseService _materialsInUseService;
     private readonly Timer _filterTimer;
     public event EventHandler CloseWindowRequested;
     private Driver? _selectedDriver;
@@ -25,10 +26,11 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
     [ObservableProperty] private DateTime _fromDate;
     [ObservableProperty] private DateTime _toDate;
 
-    public AddMaterialInUseFromExpenseViewModel(IWarehouseService warehouseService, IExpenseService expenseService)
+    public AddMaterialInUseFromExpenseViewModel(IWarehouseService warehouseService, IExpenseService expenseService, IMaterialsInUseService materialsInUseService)
     {
         _warehouseService = warehouseService;
         _expenseService = expenseService;
+        _materialsInUseService = materialsInUseService;
         var dateRange = DateRangeHelper.GetCurrentHalfMonthRange();
         _fromDate = dateRange.FromDate;
         _toDate = dateRange.ToDate;
@@ -96,6 +98,17 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
     [RelayCommand]
     private async Task AddMaterialInUse()
     {
-
+        var result = await _materialsInUseService.CreateMaterialsInUseAnyAsync(ExpenseList.Where(x=>x.IsSelected).Select(z=>new MaterialsInUse
+        {
+            Date = z.Date,
+            DocumentNumber = z.Code ?? "",
+            EquipmentId = z.EquipmentId,
+            ExpenseId = z.Id,
+            NomenclatureId = z.Stock.NomenclatureId,
+            Quantity = z.Quantity,
+            FinanciallyResponsiblePersonId = SelectedWarehouse?.FinanciallyResponsiblePersonId ?? 1
+        }));
+        if(result)
+            await LoadExpensesByWarehouse();
     }
 }
