@@ -102,16 +102,7 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
             NomenclatureId = dto.NomenclatureId,
             EquipmentId = dto.EquipmentId,
             FinanciallyResponsiblePersonId = dto.FinanciallyResponsiblePersonId,
-            IsOut = dto.IsOut,
-            ReasonForWriteOff = new Common.Models.ReasonsForWritingOffMaterialsFromOperation
-            {
-                Id = dto.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Id,
-                Reason = dto.MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation.Reason
-            },
-            DocumentNumberForWriteOff = dto.DocumentNumberForWriteOff,
-            DateForWriteOff = DateTimeHelper.TryParseDto(dto.DateForWriteOff, out var parsedDateForWriteOff)
-                ? parsedDateForWriteOff
-                : throw new FormatException($"Invalid write-off date format in DocumentNumber: {dto.DocumentNumber}")
+            IsOut = dto.IsOut
         }).ToList();
 
         var ids = await _materialsInUseService.CreateMaterialsInUseAnyAsync(materialsInUseList);

@@ -47,7 +47,7 @@
                 <Button 
                         Width="210"
                         Margin="0,20,0,0" 
-                        Command="{Binding PrintCommand}"  
+                        Command="{Binding AddMaterialInUseCommand}"  
                         Content="Добавить в эксплуатацию"/>
             </StackPanel>
             <ListBox Grid.Column="1" Margin="10" Width="500" HorizontalAlignment="Left" ItemsSource="{Binding WarehouseViewSource.View}" SelectedItem="{Binding SelectedWarehouse}" DisplayMemberPath="Name">

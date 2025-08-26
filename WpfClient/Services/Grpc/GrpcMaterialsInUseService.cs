@@ -162,14 +162,6 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                 EquipmentId = materialsInUse.EquipmentId,
                 FinanciallyResponsiblePersonId = materialsInUse.FinanciallyResponsiblePersonId,
                 IsOut = materialsInUse.IsOut,
-                MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperationId = materialsInUse.ReasonForWriteOffId,
-                MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation = new MaterialsInUseDriverReasonsForWritingOffMaterialsFromOperation
-                {
-                    Id = materialsInUse.ReasonForWriteOff.Id,
-                    Reason = materialsInUse.ReasonForWriteOff.Reason
-                },
-                DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff,
-                DateForWriteOff = materialsInUse.DateForWriteOff.ToString("yyyy-MM-dd")
             })}
         }, headers);
         return result.Success;

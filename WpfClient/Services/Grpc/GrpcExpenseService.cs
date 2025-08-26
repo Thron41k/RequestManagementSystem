@@ -104,7 +104,7 @@ internal class GrpcExpenseService(IGrpcClientFactory clientFactory, AuthTokenSto
         }
         var client = clientFactory.CreateExpenseClient();
         var response = await client.GetAllExpensesForMiUAsync(
-            new GetAllExpensesRequestForMiU
+            new GetAllExpensesForMiURequest
             {
                 WarehouseId = requestWarehouseId,
                 FromDate = requestFromDate,
