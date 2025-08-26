@@ -105,6 +105,7 @@ message MaterialsInUse {
     int32 mol_for_move_id = 16;
     MaterialsInUseDriver mol_for_move = 17;
     int32 term = 18;
+    int32 expense_id = 19;
 }
 
 message MaterialsInUseNomenclature {
