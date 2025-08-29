@@ -106,7 +106,8 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
             ExpenseId = z.Id,
             NomenclatureId = z.Stock.NomenclatureId,
             Quantity = z.Quantity,
-            FinanciallyResponsiblePersonId = SelectedWarehouse?.FinanciallyResponsiblePersonId ?? 1
+            FinanciallyResponsiblePersonId = SelectedWarehouse?.FinanciallyResponsiblePersonId ?? 1,
+            Term = z.Term ?? 0
         }));
         if(result)
             await LoadExpensesByWarehouse();
