@@ -84,15 +84,14 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
         if (!DateTime.TryParse(requestToDate, out var toDate))
             throw new ArgumentException("Неверный формат даты окончания", nameof(requestToDate));
 
-        return await (
-            from e in dbContext.Expenses.AsNoTracking()
-            where e.Stock.WarehouseId == requestWarehouseId
-                  && e.Date >= fromDate && e.Date <= toDate
-            join miu in dbContext.MaterialsInUse on e.Id equals miu.ExpenseId into gj
-            from miu in gj.DefaultIfEmpty()
-            where miu == null
-            select e
-        ).ToListAsync();
+        return await dbContext.Expenses
+            .AsNoTracking()
+            .Where(e => e.Stock.WarehouseId == requestWarehouseId)
+            .Where(e => e.Date >= fromDate && e.Date <= toDate)
+            .Where(e => !dbContext.MaterialsInUse
+                .Any(miu => miu.ExpenseId != null && miu.ExpenseId == e.Id))
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
 
     public async Task<(bool, List<MaterialExpense>)> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId)
