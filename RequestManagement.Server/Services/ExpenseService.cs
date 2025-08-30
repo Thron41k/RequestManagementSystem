@@ -78,53 +78,21 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
         string requestFromDate,
         string requestToDate)
     {
-        if (requestWarehouseId == 0)
-            throw new ArgumentNullException(nameof(requestWarehouseId));
-        var query = dbContext.Expenses
-            .Include(e => e.Stock)
-            .ThenInclude(s => s.Nomenclature)
-            .Include(e => e.Stock)
-            .ThenInclude(s => s.Warehouse)
-            .ThenInclude(d => d.FinanciallyResponsiblePerson)
-            .Include(e => e.Equipment)
-            .Include(e => e.Driver)
-            .Include(e => e.Defect)
-            .ThenInclude(s => s.DefectGroup)
-            .GroupJoin(
-                dbContext.MaterialsInUse,
-                expense => expense.Id,
-                miu => miu.ExpenseId,
-                (expense, miuGroup) => new { expense, miuGroup }
-            )
-            .SelectMany(
-                x => x.miuGroup.DefaultIfEmpty(),
-                (x, miu) => new { x.expense, miu }
-            )
-            .Where(x => x.miu == null)
-            .Select(x => x.expense)
+        if (!DateTime.TryParse(requestFromDate, out var fromDate))
+            throw new ArgumentException("Неверный формат даты начала", nameof(requestFromDate));
+
+        if (!DateTime.TryParse(requestToDate, out var toDate))
+            throw new ArgumentException("Неверный формат даты окончания", nameof(requestToDate));
+
+        return await dbContext.Expenses
             .AsNoTracking()
-            .AsQueryable();
-        if (DateTimeHelper.TryParseDto(requestFromDate, out var fromDate) &&
-            DateTimeHelper.TryParseDto(requestToDate, out var toDate))
-        {
-            query = query.Where(e => e.Date >= fromDate && e.Date < toDate.AddDays(1));
-        }
-        else
-        {
-            if (DateTimeHelper.TryParseDto(requestFromDate, out fromDate))
-            {
-                query = query.Where(e => e.Date >= fromDate);
-            }
-            if (DateTimeHelper.TryParseDto(requestToDate, out toDate))
-            {
-                query = query.Where(e => e.Date < toDate.AddDays(1));
-            }
-        }
-        return await query.ToListAsync();
+            .Where(e => e.Stock.WarehouseId == requestWarehouseId)
+            .Where(e => e.Date >= fromDate && e.Date <= toDate)
+            .Where(e => !dbContext.MaterialsInUse
+                .Any(miu => miu.ExpenseId != null && miu.ExpenseId == e.Id))
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
-
-
-
 
     public async Task<(bool, List<MaterialExpense>)> UploadMaterialsExpenseAsync(List<MaterialExpense>? materials, int warehouseId)
     {
