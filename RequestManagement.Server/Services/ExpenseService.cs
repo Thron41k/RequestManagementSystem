@@ -5,6 +5,7 @@ using RequestManagement.Common.Utilities;
 using RequestManagement.Server.Controllers;
 using RequestManagement.Server.Data;
 using System.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Expense = RequestManagement.Common.Models.Expense;
 using MaterialExpense = RequestManagement.Common.Models.MaterialExpense;
@@ -78,10 +79,10 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
         string requestFromDate,
         string requestToDate)
     {
-        if (!DateTime.TryParse(requestFromDate, out var fromDate))
+        if (!DateTimeHelper.TryParseDto(requestToDate, out var fromDate))
             throw new ArgumentException("Неверный формат даты начала", nameof(requestFromDate));
 
-        if (!DateTime.TryParse(requestToDate, out var toDate))
+        if (!DateTimeHelper.TryParseDto(requestToDate, out var toDate))
             throw new ArgumentException("Неверный формат даты окончания", nameof(requestToDate));
 
         return await dbContext.Expenses
