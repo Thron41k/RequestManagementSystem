@@ -27,5 +27,6 @@ public enum MessagesEnum
     ShowAddMaterialsInUseToOffView,
     ShowAddMaterialsInUseToOffViewResult,
     SelectReasonsForWritingOffMaterialsFromOperation,
-    ResultReasonsForWritingOffMaterialsFromOperation
+    ResultReasonsForWritingOffMaterialsFromOperation,
+    UpdateMaterialsInUseList
 }

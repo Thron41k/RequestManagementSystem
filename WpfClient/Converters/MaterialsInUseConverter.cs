@@ -13,6 +13,7 @@ public static class MaterialsInUseConverter
             Date = DateTime.Parse(proto.Date),
             Quantity = (decimal)proto.Quantity,
             NomenclatureId = proto.NomenclatureId,
+            Term = proto.Term,
             Nomenclature = proto.Nomenclature is null ? null! : new RequestManagement.Common.Models.Nomenclature
             {
                 Id = proto.Nomenclature.Id,

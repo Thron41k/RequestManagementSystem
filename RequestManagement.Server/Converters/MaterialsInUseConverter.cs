@@ -20,6 +20,7 @@ public static class MaterialsInUseConverter
             Date = entity.Date.ToString("dd.MM.yyyy"),
             Quantity = (double)entity.Quantity,
             NomenclatureId = entity.NomenclatureId,
+            Term = entity.Term,
             Nomenclature = new MaterialsInUseNomenclature
             {
                 Id = entity.Nomenclature.Id,

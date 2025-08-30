@@ -6,6 +6,7 @@ using RequestManagement.Common.Utilities;
 using RequestManagement.WpfClient.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
+using RequestManagement.WpfClient.Messages;
 using Timer = System.Timers.Timer;
 
 namespace RequestManagement.WpfClient.ViewModels;
@@ -15,6 +16,7 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
     private readonly IWarehouseService _warehouseService;
     private readonly IExpenseService _expenseService;
     private readonly IMaterialsInUseService _materialsInUseService;
+    private readonly IMessageBus _messageBus;
     private readonly Timer _filterTimer;
     public event EventHandler CloseWindowRequested;
     private Driver? _selectedDriver;
@@ -26,15 +28,17 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
     [ObservableProperty] private DateTime _fromDate;
     [ObservableProperty] private DateTime _toDate;
 
-    public AddMaterialInUseFromExpenseViewModel(IWarehouseService warehouseService, IExpenseService expenseService, IMaterialsInUseService materialsInUseService)
+    public AddMaterialInUseFromExpenseViewModel(IWarehouseService warehouseService, IExpenseService expenseService, IMaterialsInUseService materialsInUseService, IMessageBus messageBus)
     {
         _warehouseService = warehouseService;
         _expenseService = expenseService;
         _materialsInUseService = materialsInUseService;
+        _messageBus = messageBus;
         var dateRange = DateRangeHelper.GetCurrentHalfMonthRange();
         _fromDate = dateRange.FromDate;
         _toDate = dateRange.ToDate;
         WarehouseViewSource = new CollectionViewSource{Source = WarehouseList };
+        ExpenseViewSource = new CollectionViewSource{Source = ExpenseList };
     }
 
     public async Task Init(Driver? mol)
@@ -54,9 +58,17 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
     private async Task LoadExpensesByWarehouse()
     {
         if(SelectedWarehouse == null)return;
+        var currentSortDescriptions = (ExpenseViewSource.View?.SortDescriptions!).ToList();
         var expensesList = await _expenseService.GetAllExpensesForMiUAsync(SelectedWarehouse.Id,FromDate.ToString("dd.MM.yyyy"), ToDate.ToString("dd.MM.yyyy"));
         ExpenseList = new ObservableCollection<Expense>(expensesList.Where(x=>x.Term > 0));
         ExpenseViewSource = new CollectionViewSource{ Source = ExpenseList };
+        if (currentSortDescriptions.Any())
+        {
+            foreach (var sortDescription in currentSortDescriptions)
+            {
+                ExpenseViewSource.View?.SortDescriptions.Add(sortDescription);
+            }
+        }
     }
 
     partial void OnSelectedWarehouseChanged(Warehouse? value)
@@ -74,6 +86,7 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
 
         ExpenseViewSource.View.Refresh();
     }
+
     [RelayCommand]
     private void DeselectAll()
     {
@@ -109,7 +122,10 @@ public partial class AddMaterialInUseFromExpenseViewModel : BaseViewModel
             FinanciallyResponsiblePersonId = SelectedWarehouse?.FinanciallyResponsiblePersonId ?? 1,
             Term = z.Term ?? 0
         }));
-        if(result)
+        if (result)
+        {
             await LoadExpensesByWarehouse();
+            await _messageBus.Publish(new UpdatedMessage(MessagesEnum.UpdateMaterialsInUseList));
+        }
     }
 }

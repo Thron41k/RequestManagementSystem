@@ -34,6 +34,7 @@ public partial class MaterialInUseListViewModel : BaseViewModel
         _messageBus = messageBus;
         _materialsInUseService = materialsInUseService;
         _messageBus.Subscribe<SelectResultMessage>(OnSelect);
+        _messageBus.Subscribe<UpdatedMessage>(OnUpdate);
         _messageBus.Subscribe<ShowResultMessageForMaterialsInUse>(OnShow);
         _dispatcher = Dispatcher.CurrentDispatcher;
         _equipmentViewSource = new CollectionViewSource { Source = EquipmentList };
@@ -43,6 +44,14 @@ public partial class MaterialInUseListViewModel : BaseViewModel
         {
             await _dispatcher.InvokeAsync(async () => { await LoadEquipmentAsync(); });
         };
+    }
+
+    private async Task OnUpdate(UpdatedMessage arg)
+    {
+        if (arg.Message == MessagesEnum.UpdateMaterialsInUseList)
+        {
+            await LoadEquipmentAsync();
+        }
     }
 
     private async Task OnShow(ShowResultMessageForMaterialsInUse arg)
@@ -147,6 +156,6 @@ public partial class MaterialInUseListViewModel : BaseViewModel
     private async Task MaterialInUseLoad()
     {
         if (SelectedFinanciallyResponsiblePerson == null) return;
-        await _messageBus.Publish(new DialogAddMaterialInUseFromExpenseModel() { Caller = Id, Mol = SelectedFinanciallyResponsiblePerson });
+        await _messageBus.Publish(new DialogAddMaterialInUseFromExpenseModel { Caller = Id, Mol = SelectedFinanciallyResponsiblePerson });
     }
 }
