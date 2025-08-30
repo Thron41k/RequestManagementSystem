@@ -80,7 +80,6 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
     {
         if (requestWarehouseId == 0)
             throw new ArgumentNullException(nameof(requestWarehouseId));
-
         var query = dbContext.Expenses
             .Include(e => e.Stock)
             .ThenInclude(s => s.Nomenclature)
@@ -91,10 +90,20 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
             .Include(e => e.Driver)
             .Include(e => e.Defect)
             .ThenInclude(s => s.DefectGroup)
-            .Where(e => dbContext.MaterialsInUse.Any(m => m.ExpenseId == e.Id)) // <-- ключевой момент
+            .GroupJoin(
+                dbContext.MaterialsInUse,
+                expense => expense.Id,
+                miu => miu.ExpenseId,
+                (expense, miuGroup) => new { expense, miuGroup }
+            )
+            .SelectMany(
+                x => x.miuGroup.DefaultIfEmpty(),
+                (x, miu) => new { x.expense, miu }
+            )
+            .Where(x => x.miu == null)
+            .Select(x => x.expense)
             .AsNoTracking()
             .AsQueryable();
-
         if (DateTimeHelper.TryParseDto(requestFromDate, out var fromDate) &&
             DateTimeHelper.TryParseDto(requestToDate, out var toDate))
         {
@@ -111,9 +120,9 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                 query = query.Where(e => e.Date < toDate.AddDays(1));
             }
         }
-
         return await query.ToListAsync();
     }
+
 
 
 

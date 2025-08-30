@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Microsoft.Extensions.Logging;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Utilities;
 using RequestManagement.Server.Converters;
@@ -91,7 +92,7 @@ public class MaterialsInUseController(IMaterialsInUseService materialsInUseServi
         ServerCallContext context)
     {
         _logger.LogInformation("Creating {Count} MaterialsInUse records", request.MaterialsInUse.Count);
-
+        _logger.LogError("Вот так хуйня - {0}", request.MaterialsInUse[0].ExpenseId);
         var materialsInUseList = request.MaterialsInUse.Select(dto => new Common.Models.MaterialsInUse
         {
             DocumentNumber = dto.DocumentNumber,
