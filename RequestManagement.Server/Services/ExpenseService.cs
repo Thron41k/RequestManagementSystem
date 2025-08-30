@@ -87,6 +87,9 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
 
         return await dbContext.Expenses
             .AsNoTracking()
+            .Include(e => e.Stock)
+            .Include(e => e.Equipment)
+            .Include(e => e.Driver)
             .Where(e => e.Stock.WarehouseId == requestWarehouseId)
             .Where(e => e.Date >= fromDate && e.Date <= toDate)
             .Where(e => !dbContext.MaterialsInUse
