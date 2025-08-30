@@ -89,8 +89,12 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
             .AsNoTracking()
             .Include(e => e.Stock)
             .ThenInclude(s => s.Warehouse)
+            .Include(e => e.Stock)
+            .ThenInclude(s => s.Nomenclature)
             .Include(e => e.Equipment)
             .Include(e => e.Driver)
+            .Include(e => e.Defect)
+            .ThenInclude(s => s.DefectGroup)
             .Where(e => e.Stock.WarehouseId == requestWarehouseId)
             .Where(e => e.Date >= fromDate && e.Date <= toDate)
             .Where(e => !dbContext.MaterialsInUse
