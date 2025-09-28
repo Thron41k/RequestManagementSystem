@@ -219,6 +219,16 @@ public partial class PrintReportViewModel : ObservableObject
                         _excelWriterService.ExportAndSave(ExcelTemplateType.Operations, operations,
                             "Передача в эксплуатацию");
                         break;
+                    case 6:
+                        var actGsm = new ActPartsModel
+                        {
+                            Commissions = SelectedCommissions,
+                            Frp = SelectedFrp,
+                            Expenses = _listExpense
+                        };
+                        _excelWriterService.ExportAndSave(ExcelTemplateType.ActGsm, actGsm,
+                            "Акты ГСМ");
+                        break;
                 }
                 break;
             case PrintDialogType.MaterialsInUse:

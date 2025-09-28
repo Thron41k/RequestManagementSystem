@@ -10,18 +10,16 @@ public class OperationsTemplate : ExcelTemplateWriterBase<ActPartsModel>
     public override ExcelTemplateType TemplateType => ExcelTemplateType.Operations;
     public override byte[] FillTemplate(ActPartsModel data)
     {
-        var startDataRow = 25;
+        var startDataRow = 19;
         ExcelPackage.License.SetNonCommercialPersonal("Thron41k");
         using var stream = GetTemplateStream("OperationsTemplate.xlsx");
         using var package = new ExcelPackage(stream);
         var templateSheet = package.Workbook.Worksheets[0];
-        templateSheet.Cells[16, 4].Value = data.Commissions?.BranchName;
-        templateSheet.Cells[5, 20].Value = data.Commissions?.ApproveForAct?.Position;
-        templateSheet.Cells[7, 20].Value = data.Commissions?.ApproveForAct?.ShortName;
-        templateSheet.Cells[28, 13].Value = data.Commissions?.ApproveForDefectAndLimit?.Position;
-        templateSheet.Cells[28, 20].Value = data.Commissions?.ApproveForDefectAndLimit?.ShortName;
-        templateSheet.Cells[28, 3].Value = data.Frp?.Position;
-        templateSheet.Cells[28, 9].Value = data.Frp?.ShortName;
+        templateSheet.Cells[10, 4].Value = data.Commissions?.BranchName;
+        templateSheet.Cells[22, 13].Value = data.Commissions?.ApproveForDefectAndLimit?.Position;
+        templateSheet.Cells[22, 20].Value = data.Commissions?.ApproveForDefectAndLimit?.ShortName;
+        templateSheet.Cells[22, 3].Value = data.Frp?.Position;
+        templateSheet.Cells[22, 9].Value = data.Frp?.ShortName;
         var grouped = data.Expenses
             .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.Id == 4)
             .OrderBy(e => e.Stock.Nomenclature.Name)
@@ -32,10 +30,10 @@ public class OperationsTemplate : ExcelTemplateWriterBase<ActPartsModel>
             var code = group.Key;
             var sheetName = ExcelHelpers.GetSafeSheetName(code);
             var newSheet = package.Workbook.Worksheets.Add(sheetName, templateSheet);
-            newSheet.Cells[10, 1].Value = $"ВЕДОМОСТЬ № {code}";
-            newSheet.Cells[20, 13].Value = group.First().Date.ToString("dd.MM.yyyy");
+            newSheet.Cells[4, 1].Value = $"ВЕДОМОСТЬ № {code}";
+            newSheet.Cells[14, 13].Value = group.First().Date.ToString("dd.MM.yyyy");
             var gn = string.IsNullOrEmpty(group.First().Equipment.StateNumber) ? "" : $"({group.First().Equipment.StateNumber})";
-            newSheet.Cells[17, 3].Value = $"{group.First().Equipment.Name}{gn}";
+            newSheet.Cells[11, 3].Value = $"{group.First().Equipment.Name}{gn}";
             var startRow = startDataRow;
             foreach (var item in group.OrderBy(x => x.Stock.Nomenclature.Name))
             {

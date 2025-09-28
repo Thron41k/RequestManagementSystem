@@ -11,5 +11,6 @@ public enum ExcelTemplateType
     RequisitionInvoice,
     MovingBetweenWarehouses,
     MaterialsInUseOffTemplateV1,
-    MaterialsInUseOffTemplateV2
+    MaterialsInUseOffTemplateV2,
+    ActGsm
 }

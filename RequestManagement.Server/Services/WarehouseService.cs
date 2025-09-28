@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RequestManagement.Common.Interfaces;
 using RequestManagement.Common.Models;
+using RequestManagement.Common.Utilities;
 using RequestManagement.Server.Data;
 
 namespace RequestManagement.Server.Services;
@@ -18,6 +19,7 @@ public class WarehouseService(ApplicationDbContext dbContext) : IWarehouseServic
             var phrases = filter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             query = phrases.Aggregate(query, (current, phrase) => current.Where(e => e.Name.ToLower().Contains(phrase)));
         }
+       
         return await query
             .Select(e => new Warehouse
             {

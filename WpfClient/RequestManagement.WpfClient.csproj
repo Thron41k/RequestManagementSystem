@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\ActGsmTemplate.xlsx" />
     <None Remove="Resources\ActPartsTemplate.xlsx" />
     <None Remove="Resources\ConsumablesTemplate.xlsx" />
     <None Remove="Resources\DefectPartsTemplate.xlsx" />
@@ -33,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\ActGsmTemplate.xlsx" />
     <EmbeddedResource Include="Resources\ActPartsTemplate.xlsx" />
     <EmbeddedResource Include="Resources\ConsumablesTemplate.xlsx" />
     <EmbeddedResource Include="Resources\DefectPartsTemplate.xlsx" />

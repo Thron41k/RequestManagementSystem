@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Utilities;
 
 namespace RequestManagement.Server.Controllers;
 
@@ -23,7 +24,7 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
             Id = e.Id,
             Name = e.Name,
             Code = e.Code,
-            LastUpdated = e.LastUpdated.ToString("o"),
+            LastUpdated = e.LastUpdated.ToString("dd.MM.yyyy"),
             FinanciallyResponsiblePerson = e.FinanciallyResponsiblePerson != null ? new WarehouseDriver
             {
                 Id = e.FinanciallyResponsiblePerson.Id,
@@ -52,7 +53,7 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
             Id = e.Id,
             Name = e.Name,
             Code = e.Code,
-            LastUpdated = e.LastUpdated.ToString("o"),
+            LastUpdated = e.LastUpdated.ToString("dd.MM.yyyy"),
             FinanciallyResponsiblePerson = e.FinanciallyResponsiblePerson != null ? new WarehouseDriver
             {
                 Id = e.FinanciallyResponsiblePerson.Id,
@@ -83,7 +84,7 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
                 Id = warehouse.Id, 
                 Name = warehouse.Name,
                 Code = warehouse.Code,
-                LastUpdated = warehouse.LastUpdated.ToString("o"),
+                LastUpdated = warehouse.LastUpdated.ToString("dd.MM.yyyy"),
                 FinanciallyResponsiblePerson = warehouse.FinanciallyResponsiblePerson != null ? new WarehouseDriver
                 {
                     Id = warehouse.FinanciallyResponsiblePerson.Id,
@@ -105,7 +106,7 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
         {
             Name = request.Warehouse.Name,
             Code = request.Warehouse.Code,
-            LastUpdated = DateTime.Parse(request.Warehouse.LastUpdated),
+            LastUpdated = DateTimeHelper.TryParseDto(request.Warehouse.LastUpdated, out var parsedDate) ? parsedDate : throw new FormatException(),
             FinanciallyResponsiblePersonId = request.Warehouse.FinanciallyResponsiblePersonId
         };
 
@@ -122,7 +123,7 @@ public class WarehouseController(IWarehouseService warehouseService, ILogger<War
             Id = request.Warehouse.Id,
             Name = request.Warehouse.Name,
             Code = request.Warehouse.Code,
-            LastUpdated = DateTime.Parse(request.Warehouse.LastUpdated),
+            LastUpdated = DateTimeHelper.TryParseDto(request.Warehouse.LastUpdated, out var parsedDate) ? parsedDate : throw new FormatException(),
             FinanciallyResponsiblePersonId = request.Warehouse.FinanciallyResponsiblePersonId == 0 ? null : request.Warehouse.FinanciallyResponsiblePersonId
         };
 
