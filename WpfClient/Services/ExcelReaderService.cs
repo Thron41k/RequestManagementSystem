@@ -106,7 +106,9 @@ public class ExcelReaderService : IExcelReaderService
                     var code = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
                     if(string.IsNullOrEmpty(code))
                         code = worksheet.Cells[row, 5].Value?.ToString()?.Trim() ?? string.Empty;
-                    if(string.IsNullOrEmpty(code))
+                    if (string.IsNullOrEmpty(code))
+                        code = worksheet.Cells[row, 6].Value?.ToString()?.Trim() ?? string.Empty;
+                    if (string.IsNullOrEmpty(code))
                         throw new Exception("Code is empty");
                     var material = new MaterialStock
                     {

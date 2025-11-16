@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using RequestManagement.Common.Interfaces;
+using RequestManagement.Common.Utilities;
 using WpfClient.Models;
 
 namespace RequestManagement.Server.Controllers;
@@ -19,7 +20,7 @@ public class StockController(IStockService requestService, ILogger<StockControll
 
         _logger.LogInformation("Upload Materials to stock");
         var materialList = request.Materials.Select(e => new MaterialStock { ItemName = e.Name, Code = e.Code,Article = e.Article,Unit = e.Unit,FinalBalance = e.FinalBalance}).ToList();
-        var result = await _requestService.UploadMaterialsStockAsync(materialList, request.WarehouseId, DateTime.Parse(request.Date));
+        var result = await _requestService.UploadMaterialsStockAsync(materialList, request.WarehouseId, DateTimeHelper.TryParseDto(request.Date, out var parsedDate) ? parsedDate : throw new FormatException());
         return new UploadMaterialStockResponse{ Success = result };
     }
 
