@@ -50,6 +50,10 @@ public class ExcelReaderService : IExcelReaderService
                     expenseDate = DateTime.Parse(numberAndDate[index + 2]);
                     driverName = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty;
                     driverCode = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
+                    if (string.IsNullOrEmpty(driverName) && !string.IsNullOrEmpty(driverCode))
+                    {
+                        driverName = worksheet.Cells[row, 5].Value?.ToString()?.Trim() ?? string.Empty;
+                    }
                     equipmentName = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
                     equipmentCode = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
                 }
@@ -262,7 +266,7 @@ public class ExcelReaderService : IExcelReaderService
         const int startRow = 14;
         if (worksheet.Cells[startRow - 1, 1].Value == null) return [];
         var molName = worksheet.Cells[startRow - 1, 1].Value.ToString()?.Trim();
-        var molCode = worksheet.Cells[startRow - 1, 5].Value.ToString()?.Trim();
+        var molCode = worksheet.Cells[startRow - 1, 6].Value.ToString()?.Trim();
         MaterialsInUseForUpload? newMaterialsInUseForUpload = null;
         for (var row = startRow; row < rowCount; row++)
         {
@@ -271,34 +275,43 @@ public class ExcelReaderService : IExcelReaderService
             var code = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? string.Empty;
             var unit = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
             var quantity = worksheet.Cells[row, 11].Value?.ToString()?.Trim() ?? string.Empty;
-            if (string.IsNullOrEmpty(article) && string.IsNullOrEmpty(code) && string.IsNullOrEmpty(unit))
-            {
-                var equipmentName = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
-                var equipmentCode = worksheet.Cells[row, 10].Value?.ToString()?.Trim() ?? string.Empty;
-                var date = name.Split(' ');
-                var tmpMaterialsInUseForUpload = new MaterialsInUseForUpload(newMaterialsInUseForUpload!)
-                {
-                    DocumentNumber = date[2],
-                    Date = date[4],
-                    Quantity = Convert.ToDecimal(quantity),
-                    EquipmentCode = equipmentCode,
-                    EquipmentName = equipmentName
-                };
-                materialsInUseForUploadList.Add(tmpMaterialsInUseForUpload);
-            }
-            else
+            try
             {
 
-                newMaterialsInUseForUpload = new MaterialsInUseForUpload
+                if (string.IsNullOrEmpty(article) && string.IsNullOrEmpty(code) && string.IsNullOrEmpty(unit))
                 {
-                    NomenclatureName = name,
-                    NomenclatureCode = code,
-                    NomenclatureArticle = article,
-                    NomenclatureUnitOfMeasure = unit,
-                    FinanciallyResponsiblePersonFullName = molName!,
-                    FinanciallyResponsiblePersonCode = molCode!
-                };
+                    var equipmentName = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
+                    var equipmentCode = worksheet.Cells[row, 10].Value?.ToString()?.Trim() ?? string.Empty;
+                    var date = name.Split(' ');
+                    var tmpMaterialsInUseForUpload = new MaterialsInUseForUpload(newMaterialsInUseForUpload!)
+                    {
+                        DocumentNumber = date[2],
+                        Date = date[4],
+                        Quantity = Convert.ToDecimal(quantity),
+                        EquipmentCode = equipmentCode,
+                        EquipmentName = equipmentName
+                    };
+                    materialsInUseForUploadList.Add(tmpMaterialsInUseForUpload);
+                }
+                else
+                {
+
+                    newMaterialsInUseForUpload = new MaterialsInUseForUpload
+                    {
+                        NomenclatureName = name,
+                        NomenclatureCode = code,
+                        NomenclatureArticle = article,
+                        NomenclatureUnitOfMeasure = unit,
+                        FinanciallyResponsiblePersonFullName = molName!,
+                        FinanciallyResponsiblePersonCode = molCode!
+                    };
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
         }
         return materialsInUseForUploadList;
     }

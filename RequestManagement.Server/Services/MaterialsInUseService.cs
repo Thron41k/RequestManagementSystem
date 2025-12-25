@@ -90,13 +90,16 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
 
     public async Task<bool> UploadMaterialsInUseAsync(List<MaterialsInUseForUpload> materialsInUse)
     {
-        if (materialsInUse.Count == 0)
+        if (materialsInUse == null || materialsInUse.Count == 0)
             return false;
+
         var validItems = materialsInUse
             .Where(i => DateTimeHelper.TryParseDto(i.Date, out _))
             .ToList();
+
         if (validItems.Count == 0)
             return false;
+
         var nomenclatureCodes = validItems.Select(i => i.NomenclatureCode).Distinct().ToList();
         var equipmentCodes = validItems.Select(i => i.EquipmentCode).Distinct().ToList();
         var molNames = validItems
@@ -104,104 +107,125 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
             .Select(i => i.FinanciallyResponsiblePersonFullName)
             .Distinct()
             .ToList();
+
         var nomenclatures = await _dbContext.Nomenclatures
             .Where(n => nomenclatureCodes.Contains(n.Code))
             .ToDictionaryAsync(n => n.Code);
+
         var equipments = await _dbContext.Equipments
             .Where(e => equipmentCodes.Contains(e.Code))
             .ToDictionaryAsync(e => e.Code);
+
         var molList = await _dbContext.Set<Driver>()
             .Where(d => molNames.Contains(d.FullName))
             .ToDictionaryAsync(d => d.FullName);
+
         var newNomenclatures = new List<Nomenclature>();
         var newEquipments = new List<Equipment>();
-        var newMolList = new List<Driver>();
-        var newMaterialsInUse = new List<MaterialsInUse>();
+        var newDrivers = new List<Driver>();
+
         foreach (var item in validItems)
         {
-            var date = DateTimeHelper.TryParseDto(item.Date, out var parsedDate)
-                ? parsedDate
-                : throw new FormatException();
-            if (!nomenclatures.TryGetValue(item.NomenclatureCode, out var nomenclature))
+            if (!nomenclatures.ContainsKey(item.NomenclatureCode))
             {
-                nomenclature = new Nomenclature
+                var n = new Nomenclature
                 {
                     Code = item.NomenclatureCode,
                     Name = item.NomenclatureName,
                     Article = item.NomenclatureArticle,
                     UnitOfMeasure = item.NomenclatureUnitOfMeasure
                 };
-                newNomenclatures.Add(nomenclature);
-                nomenclatures[item.NomenclatureCode] = nomenclature;
+
+                nomenclatures[item.NomenclatureCode] = n;
+                newNomenclatures.Add(n);
             }
-            if (!equipments.TryGetValue(item.EquipmentCode, out var equipment))
+
+            if (!equipments.ContainsKey(item.EquipmentCode))
             {
-                equipment = new Equipment
+                var e = new Equipment
                 {
                     Code = item.EquipmentCode,
                     Name = item.EquipmentName
                 };
-                newEquipments.Add(equipment);
-                equipments[item.EquipmentCode] = equipment;
+
+                equipments[item.EquipmentCode] = e;
+                newEquipments.Add(e);
             }
-            Driver? mol = null;
-            if (!string.IsNullOrWhiteSpace(item.FinanciallyResponsiblePersonFullName))
+
+            if (!string.IsNullOrWhiteSpace(item.FinanciallyResponsiblePersonFullName) &&
+                !molList.ContainsKey(item.FinanciallyResponsiblePersonFullName))
             {
-                if (!molList.TryGetValue(item.FinanciallyResponsiblePersonFullName, out mol))
+                var d = new Driver
                 {
-                    mol = new Driver
-                    {
-                        FullName = item.FinanciallyResponsiblePersonFullName,
-                        ShortName = item.FinanciallyResponsiblePersonFullName,
-                        Position = "",
-                        Code = ""
-                    };
-                    newMolList.Add(mol);
-                    molList[item.FinanciallyResponsiblePersonFullName] = mol;
-                }
+                    FullName = item.FinanciallyResponsiblePersonFullName,
+                    ShortName = item.FinanciallyResponsiblePersonFullName,
+                    Position = "",
+                    Code = ""
+                };
+
+                molList[item.FinanciallyResponsiblePersonFullName] = d;
+                newDrivers.Add(d);
             }
+        }
+
+        if (newNomenclatures.Count > 0)
+            await _dbContext.Nomenclatures.AddRangeAsync(newNomenclatures);
+
+        if (newEquipments.Count > 0)
+            await _dbContext.Equipments.AddRangeAsync(newEquipments);
+
+        if (newDrivers.Count > 0)
+            await _dbContext.Set<Driver>().AddRangeAsync(newDrivers);
+
+        await _dbContext.SaveChangesAsync();
+
+        var newMaterials = new List<MaterialsInUse>();
+
+        foreach (var item in validItems)
+        {
+            var date = DateTimeHelper.TryParseDto(item.Date, out var parsedDate)
+                ? parsedDate
+                : throw new FormatException();
+
+            var nomenclature = nomenclatures[item.NomenclatureCode];
+            var equipment = equipments[item.EquipmentCode];
+            var mol = molList[item.FinanciallyResponsiblePersonFullName];
+
             var exists = await _dbContext.Set<MaterialsInUse>().AnyAsync(mu =>
                 mu.DocumentNumber == item.DocumentNumber &&
                 mu.Date == date &&
-                mu.Nomenclature.Code == item.NomenclatureCode &&
-                mu.Equipment!.Code == item.EquipmentCode &&
-                mu.FinanciallyResponsiblePerson.FullName == mol!.FullName);
-            if (!exists)
+                mu.NomenclatureId == nomenclature.Id &&
+                mu.EquipmentId == equipment.Id &&
+                mu.FinanciallyResponsiblePersonId == mol.Id);
+
+            if (exists)
+                continue;
+
+            newMaterials.Add(new MaterialsInUse
             {
-                newMaterialsInUse.Add(new MaterialsInUse
-                {
-                    DocumentNumber = item.DocumentNumber,
-                    Date = date,
-                    Quantity = item.Quantity,
-                    Nomenclature = nomenclature,
-                    Equipment = equipment,
-                    FinanciallyResponsiblePerson = mol!,
-                    MolForMove = new Driver{Id = 1}
-                });
-            }
+                DocumentNumber = item.DocumentNumber,
+                Date = date,
+                Quantity = item.Quantity,
+
+                NomenclatureId = nomenclature.Id,
+                EquipmentId = equipment.Id,
+                FinanciallyResponsiblePersonId = mol.Id,
+
+                MolForMoveId = 1,
+                ReasonForWriteOffId = 1,
+                DateForWriteOff = DateTime.MinValue
+            });
         }
-        if (newNomenclatures.Count > 0)
-            await _dbContext.Nomenclatures.AddRangeAsync(newNomenclatures);
-        if (newEquipments.Count > 0)
-            await _dbContext.Equipments.AddRangeAsync(newEquipments);
-        if (newMolList.Count > 0)
-            await _dbContext.Set<Driver>().AddRangeAsync(newMolList);
-        await _dbContext.SaveChangesAsync();
-        if (newMaterialsInUse.Count > 0)
+
+        if (newMaterials.Count > 0)
         {
-            foreach (var entry in newMaterialsInUse)
-            {
-                entry.NomenclatureId = entry.Nomenclature.Id;
-                entry.EquipmentId = entry.Equipment!.Id;
-                entry.FinanciallyResponsiblePersonId = entry.FinanciallyResponsiblePerson.Id;
-                entry.ReasonForWriteOffId = 1;
-                entry.DateForWriteOff = DateTime.MinValue;
-            }
-            await _dbContext.Set<MaterialsInUse>().AddRangeAsync(newMaterialsInUse);
+            await _dbContext.Set<MaterialsInUse>().AddRangeAsync(newMaterials);
             await _dbContext.SaveChangesAsync();
         }
+
         return true;
     }
+
 
 
 
