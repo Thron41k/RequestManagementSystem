@@ -108,24 +108,59 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
             .Distinct()
             .ToList();
 
-        var nomenclatures = await _dbContext.Nomenclatures
+        // Используем Dictionary с проверкой на дубликаты при загрузке из БД
+        var nomenclatures = new Dictionary<string, Nomenclature>();
+        var existingNomenclatures = await _dbContext.Nomenclatures
             .Where(n => nomenclatureCodes.Contains(n.Code))
-            .ToDictionaryAsync(n => n.Code);
+            .ToListAsync();
 
-        var equipments = await _dbContext.Equipments
+        foreach (var n in existingNomenclatures)
+        {
+            if (!nomenclatures.ContainsKey(n.Code))
+                nomenclatures[n.Code] = n;
+        }
+
+        var equipments = new Dictionary<string, Equipment>();
+        var existingEquipments = await _dbContext.Equipments
             .Where(e => equipmentCodes.Contains(e.Code))
-            .ToDictionaryAsync(e => e.Code);
+            .ToListAsync();
 
-        var molList = await _dbContext.Set<Driver>()
-            .Where(d => molNames.Contains(d.FullName))
-            .ToDictionaryAsync(d => d.FullName);
+        foreach (var e in existingEquipments)
+        {
+            if (!equipments.ContainsKey(e.Code))
+                equipments[e.Code] = e;
+        }
+
+        var molList = new Dictionary<string, Driver>();
+        if (molNames.Any())
+        {
+            var existingDrivers = await _dbContext.Set<Driver>()
+                .Where(d => molNames.Contains(d.FullName))
+                .ToListAsync();
+
+            foreach (var d in existingDrivers)
+            {
+                if (!molList.ContainsKey(d.FullName))
+                    molList[d.FullName] = d;
+            }
+        }
 
         var newNomenclatures = new List<Nomenclature>();
         var newEquipments = new List<Equipment>();
         var newDrivers = new List<Driver>();
 
+        // Сначала собираем все новые сущности без добавления в словари
+        var itemsToProcess = new List<(MaterialsInUseForUpload item, DateTime date)>();
+
         foreach (var item in validItems)
         {
+            var date = DateTimeHelper.TryParseDto(item.Date, out var parsedDate)
+                ? parsedDate
+                : throw new FormatException();
+
+            itemsToProcess.Add((item, date));
+
+            // Проверяем и собираем новые номенклатуры
             if (!nomenclatures.ContainsKey(item.NomenclatureCode))
             {
                 var n = new Nomenclature
@@ -135,11 +170,11 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
                     Article = item.NomenclatureArticle,
                     UnitOfMeasure = item.NomenclatureUnitOfMeasure
                 };
-
-                nomenclatures[item.NomenclatureCode] = n;
                 newNomenclatures.Add(n);
+                // Не добавляем в словарь сразу, чтобы избежать дубликатов при повторных итерациях
             }
 
+            // Проверяем и собираем новое оборудование
             if (!equipments.ContainsKey(item.EquipmentCode))
             {
                 var e = new Equipment
@@ -147,11 +182,10 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
                     Code = item.EquipmentCode,
                     Name = item.EquipmentName
                 };
-
-                equipments[item.EquipmentCode] = e;
                 newEquipments.Add(e);
             }
 
+            // Проверяем и собираем новых водителей
             if (!string.IsNullOrWhiteSpace(item.FinanciallyResponsiblePersonFullName) &&
                 !molList.ContainsKey(item.FinanciallyResponsiblePersonFullName))
             {
@@ -162,41 +196,75 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
                     Position = "",
                     Code = ""
                 };
-
-                molList[item.FinanciallyResponsiblePersonFullName] = d;
                 newDrivers.Add(d);
             }
         }
 
+        // Удаляем дубликаты из новых списков
+        newNomenclatures = newNomenclatures
+            .GroupBy(n => n.Code)
+            .Select(g => g.First())
+            .ToList();
+
+        newEquipments = newEquipments
+            .GroupBy(e => e.Code)
+            .Select(g => g.First())
+            .ToList();
+
+        newDrivers = newDrivers
+            .GroupBy(d => d.FullName)
+            .Select(g => g.First())
+            .ToList();
+
+        // Сохраняем новые сущности в БД
         if (newNomenclatures.Count > 0)
+        {
             await _dbContext.Nomenclatures.AddRangeAsync(newNomenclatures);
+            await _dbContext.SaveChangesAsync();
+
+            // Загружаем сохраненные сущности обратно в словари
+            foreach (var n in newNomenclatures)
+            {
+                if (!nomenclatures.ContainsKey(n.Code))
+                    nomenclatures[n.Code] = n;
+            }
+        }
 
         if (newEquipments.Count > 0)
+        {
             await _dbContext.Equipments.AddRangeAsync(newEquipments);
+            await _dbContext.SaveChangesAsync();
+
+            foreach (var e in newEquipments)
+            {
+                if (!equipments.ContainsKey(e.Code))
+                    equipments[e.Code] = e;
+            }
+        }
 
         if (newDrivers.Count > 0)
+        {
             await _dbContext.Set<Driver>().AddRangeAsync(newDrivers);
+            await _dbContext.SaveChangesAsync();
 
-        await _dbContext.SaveChangesAsync();
+            foreach (var d in newDrivers)
+            {
+                if (!molList.ContainsKey(d.FullName))
+                    molList[d.FullName] = d;
+            }
+        }
 
         var newMaterials = new List<MaterialsInUse>();
 
-        foreach (var item in validItems)
+        foreach (var (item, date) in itemsToProcess)
         {
-            var date = DateTimeHelper.TryParseDto(item.Date, out var parsedDate)
-                ? parsedDate
-                : throw new FormatException();
-
-            var nomenclature = nomenclatures[item.NomenclatureCode];
-            var equipment = equipments[item.EquipmentCode];
-            var mol = molList[item.FinanciallyResponsiblePersonFullName];
-
+            // Проверяем существование записи
             var exists = await _dbContext.Set<MaterialsInUse>().AnyAsync(mu =>
                 mu.DocumentNumber == item.DocumentNumber &&
                 mu.Date == date &&
-                mu.NomenclatureId == nomenclature.Id &&
-                mu.EquipmentId == equipment.Id &&
-                mu.FinanciallyResponsiblePersonId == mol.Id);
+                mu.Nomenclature.Code == item.NomenclatureCode &&
+                mu.Equipment.Code == item.EquipmentCode &&
+                mu.FinanciallyResponsiblePerson.FullName == item.FinanciallyResponsiblePersonFullName);
 
             if (exists)
                 continue;
@@ -207,9 +275,9 @@ public class MaterialsInUseService(ApplicationDbContext dbContext) : IMaterialsI
                 Date = date,
                 Quantity = item.Quantity,
 
-                NomenclatureId = nomenclature.Id,
-                EquipmentId = equipment.Id,
-                FinanciallyResponsiblePersonId = mol.Id,
+                Nomenclature = nomenclatures[item.NomenclatureCode],
+                Equipment = equipments[item.EquipmentCode],
+                FinanciallyResponsiblePerson = molList[item.FinanciallyResponsiblePersonFullName],
 
                 MolForMoveId = 1,
                 ReasonForWriteOffId = 1,
