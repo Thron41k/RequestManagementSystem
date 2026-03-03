@@ -118,7 +118,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                 .Distinct()
                 .ToList();
             var expenseCodes = materials.Select(m => m.Number).Distinct().ToList();
-
+            Console.WriteLine("Тут нет ошибки!");
             // Загрузка существующих данных одним запросом
             var existingDrivers = await dbContext.Drivers
                 .Where(d => driverFullNames.Contains(d.FullName))
