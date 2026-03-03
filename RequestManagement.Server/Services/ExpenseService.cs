@@ -172,7 +172,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                         ShortName = NameFormatter.FormatToShortName(material.DriverFullName)
                     };
                     newDrivers.Add(driver);
-                    existingDrivers[driver.FullName] = driver;
+                    existingDrivers.TryAdd(driver.FullName, driver);
                 }
 
                 // Оборудование
