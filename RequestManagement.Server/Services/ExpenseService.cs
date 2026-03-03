@@ -124,7 +124,7 @@ public class ExpenseService(ApplicationDbContext dbContext) : IExpenseService
                 .Where(d => driverFullNames.Contains(d.FullName))
                 .Distinct()
                 .ToDictionaryAsync(d => d.FullName);
-
+            Console.WriteLine("А тут ошибка!");
             var existingEquipments = await dbContext.Equipments
                 .Where(e => equipmentCodes.Contains(e.Code))
                 .Distinct()
