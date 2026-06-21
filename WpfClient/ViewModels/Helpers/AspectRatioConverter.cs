@@ -7,7 +7,7 @@ public class AspectRatioConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is double height && parameter is string ratioString && double.TryParse(ratioString, out double ratio))
+        if (value is double height && parameter is string ratioString && double.TryParse(ratioString, out var ratio))
         {
             return height * ratio;
         }

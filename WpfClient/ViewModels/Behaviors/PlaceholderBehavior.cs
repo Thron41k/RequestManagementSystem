@@ -46,8 +46,8 @@ public class PlaceholderBehavior : Behavior<TextBox>
     {
         if (_placeholderElement == null) return;
 
-        bool hasText = !string.IsNullOrEmpty(AssociatedObject.Text);
-        bool hasFocus = AssociatedObject.IsKeyboardFocused;
+        var hasText = !string.IsNullOrEmpty(AssociatedObject.Text);
+        var hasFocus = AssociatedObject.IsKeyboardFocused;
 
         _placeholderElement.Visibility = (!hasText && !hasFocus)
             ? Visibility.Visible

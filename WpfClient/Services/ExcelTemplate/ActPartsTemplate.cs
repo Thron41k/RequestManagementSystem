@@ -11,7 +11,7 @@ public class ActPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
     public override ExcelTemplateType TemplateType => ExcelTemplateType.ActParts;
     public override byte[] FillTemplate(ActPartsModel data)
     {
-        var startDataRow = 21;
+        var startDataRow = 23;
         ExcelPackage.License.SetNonCommercialPersonal("Thron41k");
         using var stream = GetTemplateStream("ActPartsTemplate.xlsx");
         using var package = new ExcelPackage(stream);
@@ -37,16 +37,16 @@ public class ActPartsTemplate : ExcelTemplateWriterBase<ActPartsModel>
             var w2 = newSheet.Column(5).Width;
             var w3 = newSheet.Column(6).Width;
             var w4 = newSheet.Column(7).Width;
-            newSheet.Cells[16, 5, 16, 7].Merge = true;
-            newSheet.Cells[16, 5, 16, 7].Value = equipmentName;
-            newSheet.Cells[16, 5, 16, 7].Style.WrapText = true;
-            newSheet.Cells[16, 5, 16, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
-            newSheet.Cells[16, 5, 16, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-            newSheet.Row(16).Height = ExcelHelpers.GetRowHeight( w2 + w3 + w4, newSheet.Cells[16, 5].Style.Font.Name, newSheet.Cells[16, 5].Style.Font.Size, equipmentName);
-            newSheet.Cells[16, 9].Value = group.First().Equipment.StateNumber;
-            newSheet.Cells[17, 5].Value = group.First().Driver.ShortName;
             newSheet.Cells[17, 5, 17, 7].Merge = true;
-            newSheet.Cells[17, 5, 17, 7].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            newSheet.Cells[17, 5, 17, 7].Value = equipmentName;
+            newSheet.Cells[17, 5, 17, 7].Style.WrapText = true;
+            newSheet.Cells[17, 5, 17, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
+            newSheet.Cells[17, 5, 17, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            newSheet.Row(17).Height = ExcelHelpers.GetRowHeight( w2 + w3 + w4, newSheet.Cells[17, 5].Style.Font.Name, newSheet.Cells[17, 5].Style.Font.Size, equipmentName);
+            newSheet.Cells[17, 9].Value = group.First().Equipment.StateNumber;
+            newSheet.Cells[19, 5].Value = group.First().Driver.ShortName;
+            newSheet.Cells[19, 5, 19, 7].Merge = true;
+            newSheet.Cells[19, 5, 19, 7].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
             var startRow = startDataRow;
             foreach (var expense in group.OrderBy(e => e.Stock.Nomenclature.Name))
             {

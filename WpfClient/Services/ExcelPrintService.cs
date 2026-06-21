@@ -21,7 +21,7 @@ public class ExcelPrintService : IExcelPrintService
 
             workbook = excelApp.Workbooks.Open(filePath, ReadOnly: true);
 
-            for (int i = 0; i < copies; i++)
+            for (var i = 0; i < copies; i++)
             {
                 workbook.PrintOut(ActivePrinter: printerName);
             }

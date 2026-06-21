@@ -13,7 +13,7 @@ public class PrinterService : IPrinterService
     {
         try
         {
-            int bufferSize = 256;
+            var bufferSize = 256;
             var buffer = new StringBuilder(bufferSize);
 
             if (GetDefaultPrinter(buffer, ref bufferSize))

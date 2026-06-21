@@ -11,7 +11,7 @@ public class ConsumablesTemplate : ExcelTemplateWriterBase<ActPartsModel>
     public override ExcelTemplateType TemplateType => ExcelTemplateType.Consumables;
     public override byte[] FillTemplate(ActPartsModel data)
     {
-        var startDataRow = 20;
+        var startDataRow = 22;
         ExcelPackage.License.SetNonCommercialPersonal("Thron41k");
         using var stream = GetTemplateStream("ConsumablesTemplate.xlsx");
         using var package = new ExcelPackage(stream);
@@ -19,16 +19,16 @@ public class ConsumablesTemplate : ExcelTemplateWriterBase<ActPartsModel>
         templateSheet.Cells[4, 1].Value = data.Commissions?.BranchName;
         templateSheet.Cells[5, 8].Value = data.Commissions?.ApproveForAct?.Position;
         templateSheet.Cells[7, 7].Value = data.Commissions?.ApproveForAct?.ShortName;
-        templateSheet.Cells[23, 2].Value = data.Commissions?.Chairman?.Position;
-        templateSheet.Cells[23, 8].Value = data.Commissions?.Chairman?.ShortName;
-        templateSheet.Cells[26, 2].Value = data.Commissions?.Member1?.Position;
-        templateSheet.Cells[26, 8].Value = data.Commissions?.Member1?.ShortName;
-        templateSheet.Cells[29, 2].Value = data.Commissions?.Member2?.Position;
-        templateSheet.Cells[29, 8].Value = data.Commissions?.Member2?.ShortName;
-        templateSheet.Cells[33, 2].Value = data.Frp?.Position;
-        templateSheet.Cells[33, 8].Value = data.Frp?.ShortName;
-        templateSheet.Cells[16, 3].Value = data.Frp?.Position;
-        templateSheet.Cells[16, 6].Value = data.Frp?.ShortName;
+        templateSheet.Cells[25, 2].Value = data.Commissions?.Chairman?.Position;
+        templateSheet.Cells[25, 8].Value = data.Commissions?.Chairman?.ShortName;
+        templateSheet.Cells[28, 2].Value = data.Commissions?.Member1?.Position;
+        templateSheet.Cells[28, 8].Value = data.Commissions?.Member1?.ShortName;
+        templateSheet.Cells[31, 2].Value = data.Commissions?.Member2?.Position;
+        templateSheet.Cells[31, 8].Value = data.Commissions?.Member2?.ShortName;
+        templateSheet.Cells[35, 2].Value = data.Frp?.Position;
+        templateSheet.Cells[35, 8].Value = data.Frp?.ShortName;
+        templateSheet.Cells[18, 3].Value = data.Frp?.Position;
+        templateSheet.Cells[18, 6].Value = data.Frp?.ShortName;
         var grouped = data.Expenses
             .Where(e => !string.IsNullOrWhiteSpace(e.Code) && e.Defect.DefectGroupId == 15 && e.Defect.DefectGroupId != 19)
             .GroupBy(e => e.Code!)
