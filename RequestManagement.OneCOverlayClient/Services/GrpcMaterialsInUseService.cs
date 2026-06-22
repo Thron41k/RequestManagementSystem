@@ -38,7 +38,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
         var response = await client.GetAllMaterialsInUseForOffAsync(new GetAllMaterialsInUseForOffRequest
         {
             FinanciallyResponsiblePersonId = financiallyResponsiblePersonId,
-            DateForOff = date.ToString("dd.MM.yyyy")
+            DateForOff = date.ToString("yyyy-MM-dd")
         }, headers);
         return FromGrpc(response.MaterialsInUse);
     }
@@ -56,7 +56,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
             MaterialsInUse = new RequestManagement.Server.Controllers.MaterialsInUse
             {
                 DocumentNumber = materialsInUse.DocumentNumber,
-                Date = materialsInUse.Date.ToString("dd.MM.yyyy"),
+                Date = materialsInUse.Date.ToString("yyyy-MM-dd"),
                 Quantity = (double)materialsInUse.Quantity,
                 NomenclatureId = materialsInUse.NomenclatureId,
                 EquipmentId = materialsInUse.EquipmentId,
@@ -69,7 +69,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                     Reason = materialsInUse.ReasonForWriteOff.Reason
                 },
                 DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff,
-                DateForWriteOff = materialsInUse.DateForWriteOff.ToString("dd.MM.yyyy")
+                DateForWriteOff = materialsInUse.DateForWriteOff.ToString("yyyy-MM-dd")
             }
         }, headers);
         return result.Id;
@@ -115,7 +115,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
             MaterialsInUse = new RequestManagement.Server.Controllers.MaterialsInUse
             {
                 Id = materialsInUse.Id,
-                Date = materialsInUse.Date.ToString("dd.MM.yyyy"),
+                Date = materialsInUse.Date.ToString("yyyy-MM-dd"),
                 Quantity = (double)materialsInUse.Quantity,
                 DocumentNumber =  materialsInUse.DocumentNumber,
                 NomenclatureId = materialsInUse.NomenclatureId,
@@ -129,7 +129,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                     Reason = materialsInUse.ReasonForWriteOff.Reason
                 },
                 DocumentNumberForWriteOff = materialsInUse.DocumentNumberForWriteOff,
-                DateForWriteOff = materialsInUse.DateForWriteOff.ToString("dd.MM.yyyy")
+                DateForWriteOff = materialsInUse.DateForWriteOff.ToString("yyyy-MM-dd")
             }
         }, headers);
         return result.Success;
@@ -148,7 +148,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
             .Select(m => new RequestManagement.Server.Controllers.MaterialsInUse
             {
                 Id = m.Id,
-                Date = m.Date.ToString("dd.MM.yyyy"),
+                Date = m.Date.ToString("yyyy-MM-dd"),
                 Quantity = (double)m.Quantity,
                 DocumentNumber = m.DocumentNumber ?? string.Empty,
                 NomenclatureId = m.NomenclatureId,
@@ -162,7 +162,7 @@ public class GrpcMaterialsInUseService(IGrpcClientFactory clientFactory, AuthTok
                     Reason = m.ReasonForWriteOff.Reason
                 },
                 DocumentNumberForWriteOff = m.DocumentNumberForWriteOff,
-                DateForWriteOff = m.DateForWriteOff.ToString("dd.MM.yyyy")
+                DateForWriteOff = m.DateForWriteOff.ToString("yyyy-MM-dd")
             })
             .ToList();
 

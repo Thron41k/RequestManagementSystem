@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.WpfClient
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.WarehouseScan", "RequestManagement.WarehouseScan\RequestManagement.WarehouseScan.csproj", "{2A7B81CC-A376-465F-8ADC-98DDF49DDB78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.OneCOverlayClient", "RequestManagement.OneCOverlayClient\OneCOverlayClient.csproj", "{826FFC35-8129-413A-90E3-F76A58688881}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneCOverlayClient", "RequestManagement.OneCOverlayClient\OneCOverlayClient.csproj", "{826FFC35-8129-413A-90E3-F76A58688881}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestManagement.Common.Android", "RequestManagement.Common.Android\RequestManagement.Common.Android.csproj", "{EE302413-BAAB-4E16-9586-D9F8878634C6}"
 EndProject

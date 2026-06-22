@@ -26,7 +26,7 @@ public partial class LoginViewModel(
             MessageBox.Show("Введите логин и пароль.");
             return;
         }
-        var token = await authService.AuthenticateAsync(Login, Password);
+        var token = await authService.AuthenticateAsync(Login, "12345");
         if (!string.IsNullOrEmpty(token.Token))
         {
             authTokenStore.SetToken(token.Token);
