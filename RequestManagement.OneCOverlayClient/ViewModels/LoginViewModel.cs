@@ -16,7 +16,7 @@ public partial class LoginViewModel(
     [ObservableProperty]
     private string _login = "admin";
     [ObservableProperty] 
-    private string _password = "12345";
+    private string _password = "";
 
     [RelayCommand]
     private async Task LoginAsync()
@@ -26,7 +26,7 @@ public partial class LoginViewModel(
             MessageBox.Show("Введите логин и пароль.");
             return;
         }
-        var token = await authService.AuthenticateAsync(Login, "12345");
+        var token = await authService.AuthenticateAsync(Login, Password);
         if (!string.IsNullOrEmpty(token.Token))
         {
             authTokenStore.SetToken(token.Token);
